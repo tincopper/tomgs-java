@@ -1,35 +1,48 @@
 package com.tomgs.core.queue;
 
-import java.util.Comparator;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.BlockingQueue;
 
 /**
- *  
+ * task 执行器
  *
- * @author tomgs
- * @version 2019/4/2 1.0
- */
-public class TaskExecutor {
+ * @author tangzhongyuan
+ * @create 2019-03-14 9:50
+ **/
+public class TaskExecutor extends Thread {
 
-    public static void main(String[] args) throws InterruptedException {
-        PriorityBlockingQueue workQueue = new PriorityBlockingQueue(10);
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 10,
-                30000, TimeUnit.SECONDS, workQueue);
+    private BlockingQueue<ITask> taskQueue;
+    private boolean isRuning = true;
 
-        TaskDemo demo1 = new TaskDemo("1", Priority.DEFAULT);
-        TaskDemo demo2 = new TaskDemo("2", Priority.LOW);
-        TaskDemo demo3 = new TaskDemo("3", Priority.HIGH);
-        TaskDemo demo4 = new TaskDemo("4", Priority.NOW);
+    public TaskExecutor(BlockingQueue<ITask> taskQueue) {
+        this.taskQueue = taskQueue;
+    }
 
-        executor.execute(demo1);
-        executor.execute(demo2);
-        executor.execute(demo3);
-        executor.execute(demo4);
+    @Override
+    public void run() {
+        while (isRuning) {
+            try {
+                ITask task = taskQueue.take();
+                consumer(task);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
 
-        Thread.sleep(5 * 1000);
+                if (isRuning) {
+                    continue;
+                }
+                interrupt();
+                break;
+            }
+        }
+    }
 
-        executor.shutdown();
+    public void shutdown() {
+        isRuning = false;
+        interrupt();
+    }
+
+    public void consumer(ITask task) {
+        if (task != null) {
+            task.run();
+        }
     }
 }
