@@ -6,7 +6,7 @@ package com.tomgs.core.queue;
  * @author tomgs
  * @version 2019/4/2 1.0 
  */
-public class TaskDemo implements Runnable,Comparable<TaskDemo> {
+public class TaskDemo implements Runnable, Comparable<TaskDemo> {
 
     private String name;
     private Priority priority;
