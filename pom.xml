@@ -16,6 +16,7 @@
     <modules>
         <module>learning-es</module>
         <module>learning-core</module>
+        <module>learning-netty</module>
     </modules>
 
     <parent>
