@@ -1,0 +1,15 @@
+{
+  "properties": [{
+      "name": "es.cluster-name",
+      "type": "java.lang.String",
+      "description": "es cluster name"
+  },{
+    "name": "es.host",
+    "type": "java.lang.String",
+    "description": "es node host"
+  },{
+    "name": "es.port",
+    "type": "java.lang.Integer",
+    "description": "es node port"
+  }]
+}
