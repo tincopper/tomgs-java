@@ -1,10 +1,6 @@
 package com.tomgs.es.demo.test;
 
-/**
- * @author tangzhongyuan
- * @create 2019-04-02 18:30
- **/
-
+import com.tomgs.es.AppMain;
 import com.tomgs.es.demo.entity.Commodity;
 import com.tomgs.es.demo.service.CommodityService;
 import org.junit.Test;
@@ -16,8 +12,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-@SpringBootTest
+/**
+ * @author tangzhongyuan
+ * @since 2019-04-02 18:30
+ **/
 @RunWith(SpringRunner.class)
+@SpringBootTest(classes = AppMain.class)
 public class TestCommodityService {
 
     @Autowired

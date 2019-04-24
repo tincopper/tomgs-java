@@ -1,5 +1,6 @@
 package com.tomgs.es.demo.test;
 
+import com.tomgs.es.AppMain;
 import com.tomgs.es.demo.entity.Commodity;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
@@ -17,10 +18,10 @@ import java.util.List;
 
 /**
  * @author tangzhongyuan
- * @create 2019-04-04 18:16
+ * @since 2019-04-04 18:16
  **/
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = AppMain.class)
 public class TestCommodityServiceWithEsTemplate {
 
     /**
