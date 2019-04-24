@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * @author tangzhongyuan
- * @create 2019-04-02 18:13
+ * @since 2019-04-02 18:13
  **/
 @Data
 @Document(indexName = "commodity")

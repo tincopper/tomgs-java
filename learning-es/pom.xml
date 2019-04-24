@@ -12,7 +12,8 @@
     <artifactId>learning-es</artifactId>
 
     <properties>
-        <elasticsearch.version>5.5.0</elasticsearch.version>
+        <!-- es版本需要和spring-data-es版本要对应 -->
+        <elasticsearch.version>6.2.2</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -20,14 +21,40 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <!--<exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.elasticsearch.client</groupId>
+                    <artifactId>transport</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.elasticsearch.plugin</groupId>
+                    <artifactId>transport-netty4-client</artifactId>
+                </exclusion>
+            </exclusions>-->
         </dependency>
 
-        <!--引入spring-data-es的依赖-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>transport</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
+
+        <!--引入spring-data-es的依赖-->
+        <!--<dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elasticsearch.plugin</groupId>
+            <artifactId>transport-netty4-client</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>-->
 
     </dependencies>
 
