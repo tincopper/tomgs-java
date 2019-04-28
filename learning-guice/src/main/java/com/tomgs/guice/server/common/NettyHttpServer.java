@@ -3,6 +3,7 @@ package com.tomgs.guice.server.common;
 import com.tomgs.guice.server.handler.HttpRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -33,36 +34,46 @@ public class NettyHttpServer implements Server {
     }
 
     @Override
-    public void start() {
-        new Thread("http_server_main_thread") {
+    public void start() throws Exception {
+        httpServerStart();
+
+        /*try {
+            httpServerStart();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }*/
+        /*Thread httpServerMainThread = new Thread("http_server_main_thread") {
             @Override
             public void run() {
-                httpServerStart();
+                try {
+                    httpServerStart();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }.start();
+        };
+        httpServerMainThread.setDaemon(false);
+        httpServerMainThread.start();*/
     }
 
-    private void httpServerStart() {
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossThreadPool, workerThreadPool);
-            b.channel(NioServerSocketChannel.class);
-            b.childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel e) throws Exception {
-                    e.pipeline().addLast("http-codec", new HttpServerCodec());
-                    e.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
-                    e.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
-                    e.pipeline().addLast("handler", new HttpRequestHandler());
-                }
-            });
-            System.out.println("HTTP监听开启....");
-            Channel ch = b.bind(host, port).sync().channel();
-            ch.closeFuture().sync();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void httpServerStart() throws InterruptedException {
+        ServerBootstrap b = new ServerBootstrap();
+        b.group(bossThreadPool, workerThreadPool);
+        b.channel(NioServerSocketChannel.class);
+        b.childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(SocketChannel e) throws Exception {
+                e.pipeline().addLast("http-codec", new HttpServerCodec());
+                e.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
+                e.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
+                e.pipeline().addLast("handler", new HttpRequestHandler());
+            }
+        });
+        ChannelFuture future = b.bind(host, port).sync();
+        System.out.println("HTTP监听开启....");
+        //future.channel().closeFuture().sync();
     }
 
     @Override

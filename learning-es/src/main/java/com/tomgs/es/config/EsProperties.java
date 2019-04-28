@@ -24,7 +24,9 @@ public class EsProperties {
     private String host;
 
     //@Value("${es.port}")
-    private int port;
+    private int tcpPort;
+
+    private int httpPort;
 
 }
 

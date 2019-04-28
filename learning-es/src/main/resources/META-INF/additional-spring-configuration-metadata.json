@@ -8,8 +8,12 @@
     "type": "java.lang.String",
     "description": "es node host"
   },{
-    "name": "es.port",
+    "name": "es.tcp-port",
     "type": "java.lang.Integer",
-    "description": "es node port"
+    "description": "es node tcp port"
+  },{
+    "name": "es.http-port",
+    "type": "java.lang.Integer",
+    "description": "es node http port"
   }]
 }

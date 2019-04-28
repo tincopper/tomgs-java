@@ -2,6 +2,7 @@ package com.tomgs.es.demo.test;
 
 import com.tomgs.es.AppMain;
 import com.tomgs.es.tcpclient.EsTcpClient;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author tangzhongyuan
@@ -63,6 +65,18 @@ public class TestTransportClient {
         RestStatus status = indexResponse.status();
 
         System.out.println(id + "#" + index + "#" + type + "#" + version + "#" + status);
+    }
+
+    @Test
+    public void testPrepareGet() {
+        GetResponse indexResponse = esTcpClient.prepareGet("tomgs_index", "tomgs_type", "1");
+        String id = indexResponse.getId();
+        String index = indexResponse.getIndex();
+        String type = indexResponse.getType();
+        long version = indexResponse.getVersion();
+        Map<String, Object> source = indexResponse.getSource();
+
+        System.out.println(id + "#" + index + "#" + type + "#" + version + "#" + source);
     }
 
 }
