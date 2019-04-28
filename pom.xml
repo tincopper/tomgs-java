@@ -20,6 +20,7 @@
         <module>learning-core</module>
         <module>learning-netty</module>
         <module>learning-guice</module>
+        <module>learning-esway</module>
     </modules>
 
     <parent>

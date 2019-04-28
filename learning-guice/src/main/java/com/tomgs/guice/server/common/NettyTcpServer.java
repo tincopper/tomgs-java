@@ -30,39 +30,49 @@ public class NettyTcpServer implements Server {
     }
 
     @Override
-    public void start() {
-        new Thread("tcp_server_main_thread") {
-            @Override
-            public void run() {
-                tcpServerStart();
-            }
-        }.start();
+    public void start() throws Exception {
+        tcpServerStart();
 
-    }
-
-    private void tcpServerStart() {
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossThreadPool, workerThreadPool)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new EchoServerHandler());
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 1024)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
-
-            System.out.println("TCP监听开启....");
-            //绑定端口，同步等待绑定成功
-            ChannelFuture future = bootstrap.bind(host, port).sync();
-            //等待服务端监听端口关闭
-            future.channel().closeFuture().sync();
+        /*try {
+            tcpServerStart();
         }
         catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+        /*Thread tcpServerMainThread = new Thread("tcp_server_main_thread") {
+            @Override
+            public void run() {
+                try {
+                    tcpServerStart();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        tcpServerMainThread.setDaemon(false);
+        tcpServerMainThread.start();*/
+    }
+
+    private void tcpServerStart() throws InterruptedException {
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(bossThreadPool, workerThreadPool)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new EchoServerHandler());
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 1024)
+                .childOption(ChannelOption.SO_KEEPALIVE, true);
+
+        //绑定端口，同步等待绑定成功
+        ChannelFuture future = bootstrap.bind(host, port).sync();
+        //bootstrap.bind().syncUninterruptibly().channel();
+        System.out.println("TCP监听开启....");
+        //等待服务端监听端口关闭
+        //future.channel().closeFuture().sync();
     }
 
     @Override

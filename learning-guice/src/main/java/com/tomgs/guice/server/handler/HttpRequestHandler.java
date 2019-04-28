@@ -1,5 +1,6 @@
 package com.tomgs.guice.server.handler;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,11 +32,21 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                     HttpVersion.HTTP_1_1,
                     HttpResponseStatus.CONTINUE));
         }
+
         // 获取请求的uri
         String uri = req.uri();
         Map<String,String> resMap = new HashMap<>();
-        resMap.put("method",req.method().name());
-        resMap.put("uri",uri);
+        resMap.put("method", req.method().name());
+        resMap.put("uri", uri);
+
+        ByteBuf buf = req.content();
+        byte[] bytes = new byte[buf.readableBytes()];
+        //将信息读到字节数组
+        buf.readBytes(bytes);
+        String content = new String(bytes, "UTF-8");
+
+        System.out.println(content);
+
         String msg = "<html><head><title>test</title></head><body>你请求uri为：" + uri+"</body></html>";
         // 创建http响应
         FullHttpResponse response = new DefaultFullHttpResponse(
