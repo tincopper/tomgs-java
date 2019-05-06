@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,6 +48,13 @@ public class TestCustomRestClient {
 
         restClient = builder.build();
         System.out.println("连接" + host + ":" + port + "成功...");
+    }
+
+    @After
+    public void close() throws IOException {
+        if (restClient != null) {
+            restClient.close();
+        }
     }
 
     @Test
