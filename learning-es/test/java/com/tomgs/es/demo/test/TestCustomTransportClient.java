@@ -7,6 +7,7 @@ import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,8 +26,8 @@ public class TestCustomTransportClient {
     @Before
     public void client() throws UnknownHostException {
         String clusterName = "tomgs-es";
-        String host = "127.0.0.1";
-        int port = 9301;
+        String host = "10.18.4.23";
+        int port = 9001;
 
         // 指定集群名,默认为elasticsearch,如果改了集群名,这里一定要加
         Settings settings = Settings.builder()
@@ -51,11 +52,17 @@ public class TestCustomTransportClient {
         System.out.println("连接" + host + ":" + port + "成功...");
     }
 
+    @After
+    public void close() {
+        client.close();
+    }
+
     @Test
     public void testTransportClient() {
         HashMap<String, String> sourceMap = new HashMap<>();
         sourceMap.put("user", "tomgs");
         sourceMap.put("age", "18");
+
         IndexResponse indexResponse = client.prepareIndex("tomgs_index", "tomgs_type", "1")
                 .setSource(sourceMap, XContentType.JSON).get();
 
