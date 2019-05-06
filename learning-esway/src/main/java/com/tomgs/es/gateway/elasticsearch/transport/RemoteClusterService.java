@@ -116,7 +116,7 @@ public final class RemoteClusterService extends RemoteClusterAware implements Cl
     public static final Setting<String> REMOTE_NODE_ATTRIBUTE =
             Setting.simpleString(
                     "cluster.remote.node.attr",
-                    SEARCH_REMOTE_NODE_ATTRIBUTE, // no default is needed when fallback is removed, use simple string which gives empty
+                    SEARCH_REMOTE_NODE_ATTRIBUTE, // no default is needed when fallback is removed, use list string which gives empty
                     Setting.Property.NodeScope);
 
     public static final Setting<Boolean> SEARCH_ENABLE_REMOTE_CLUSTERS =

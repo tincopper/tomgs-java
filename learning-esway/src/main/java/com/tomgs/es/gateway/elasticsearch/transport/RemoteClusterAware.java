@@ -137,7 +137,7 @@ public abstract class RemoteClusterAware {
             "proxy",
             key -> Setting.simpleString(
                     key,
-                    // no default is needed when fallback is removed, use simple string which gives empty
+                    // no default is needed when fallback is removed, use list string which gives empty
                     "_na_".equals(key)
                             ? SEARCH_REMOTE_CLUSTERS_PROXY.getConcreteSettingForNamespace(key)
                             : SEARCH_REMOTE_CLUSTERS_PROXY.getConcreteSetting(key.replaceAll("^cluster", "search")),
