@@ -20,7 +20,7 @@ public final class HexDumpProxy {
 
     static final int LOCAL_PORT = Integer.parseInt(System.getProperty("localPort", "8080"));
     static final String REMOTE_HOST = System.getProperty("remoteHost", "10.18.4.23");
-    static final int REMOTE_PORT = Integer.parseInt(System.getProperty("remotePort", "9200"));
+    static final int REMOTE_PORT = Integer.parseInt(System.getProperty("remotePort", "9300"));
 
     public static void main(String[] args) throws Exception {
         System.err.println("Proxying *:" + LOCAL_PORT + " to " + REMOTE_HOST + ':' + REMOTE_PORT + " ...");

@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import com.tomgs.es.gateway.common.Props;
 import com.tomgs.es.gateway.transport.http.netty4.NettyHttpServer;
 import com.tomgs.es.gateway.transport.tcp.netty4.Netty4Transport;
+import com.tomgs.es.gateway.transport.tcp.netty4.NettyTcpServer;
 import org.elasticsearch.Version;
 import org.elasticsearch.common.component.LifecycleComponent;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
@@ -45,7 +46,14 @@ public class EsGatewayModule extends AbstractModule {
     @Provides
     @Named(TCP_SERVER)
     private LifecycleComponent createNettyTcpServer(Props props) {
-        String host = props.getString(SERVER_TCP_HOST);
+        String host = props.getString(SERVER_TCP_HOST, "127.0.0.1");
+        int port = props.getInt(SERVER_TCP_PORT, 9300);
+
+        return new NettyTcpServer(host, port);
+    }
+
+    private LifecycleComponent createNettyTcpServer2(Props props) {
+        String host = props.getString(SERVER_TCP_HOST, "127.0.0.1");
         int port = props.getInt(SERVER_TCP_PORT, 9300);
 
         Settings clientSettings = builder()
@@ -73,8 +81,6 @@ public class EsGatewayModule extends AbstractModule {
         String host = props.getString(SERVER_HTTP_HOST, "127.0.0.1");
         int port = props.getInt(SERVER_HTTP_PORT, 8080);
 
-        NettyHttpServer httpServerTransport = new NettyHttpServer(host, port);
-
-        return httpServerTransport;
+        return new NettyHttpServer(host, port);
     }
 }

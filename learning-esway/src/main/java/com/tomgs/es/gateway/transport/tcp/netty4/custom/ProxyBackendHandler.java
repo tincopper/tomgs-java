@@ -1,10 +1,6 @@
-package com.tomgs.netty.proxy.server.handler;
+package com.tomgs.es.gateway.transport.tcp.netty4.custom;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import io.netty.util.concurrent.EventExecutorGroup;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * @author tangzhongyuan
