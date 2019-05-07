@@ -16,7 +16,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
 
     private String realHost = "10.18.4.23";
-    private int realPort = 9000;
+    private int realPort = 9300;
 
     //用于建立代理服务器与真实服务的通道，使用这个通道去与真实的服务器通信
     private Channel outbound;
@@ -29,7 +29,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         Channel inbound = ctx.channel();
 //        EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
         //沿用之前通道的线程池
-        bootstrap.group(inbound.eventLoop()).channel(NioSocketChannel.class);
+        bootstrap.group(inbound.eventLoop()).channel(inbound.getClass());
         bootstrap.option(ChannelOption.AUTO_READ, false);
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override

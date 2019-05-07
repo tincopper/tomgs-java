@@ -1,5 +1,6 @@
 package com.tomgs.es.demo.test;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -26,8 +27,9 @@ public class TestCustomTransportClient {
     @Before
     public void client() throws UnknownHostException {
         String clusterName = "tomgs-es";
-        String host = "10.18.4.23";
-        int port = 9001;
+//        String host = "10.18.4.23";
+        String host = "127.0.0.1";
+        int port = 9301;
 
         // 指定集群名,默认为elasticsearch,如果改了集群名,这里一定要加
         Settings settings = Settings.builder()
@@ -55,6 +57,13 @@ public class TestCustomTransportClient {
     @After
     public void close() {
         client.close();
+    }
+
+    @Test
+    public void testGetMainAction() {
+        GetResponse indexResponse = client.prepareGet().get();
+
+        System.out.println(indexResponse.toString());
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.tomgs.es.gateway;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tomgs.es.gateway.common.Props;
+import com.tomgs.es.gateway.module.ActionModule;
 import com.tomgs.es.gateway.module.CommonModule;
 import com.tomgs.es.gateway.module.EsGatewayModule;
 
@@ -51,6 +52,7 @@ public class Bootstrap {
 
         Injector injector = Guice.createInjector(
                 new CommonModule(props),
+                //new ActionModule(),
                 new EsGatewayModule());
 
         SERVICE_PROVIDER.setInjector(injector);

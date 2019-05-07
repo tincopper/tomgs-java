@@ -29,6 +29,7 @@ public class HttpProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         Channel inboundChannel = ctx.channel();
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(inboundChannel.eventLoop()).channel(inboundChannel.getClass())
+                .option(ChannelOption.AUTO_READ, false)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -58,19 +59,22 @@ public class HttpProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         if (!outboundChannel.isActive()) {
             return;
         }
+        sendProxyRequest(ctx, msg);
         //解析http请求，然后构造http请求，转发请求
-        if (msg instanceof FullHttpRequest) {
+        /*if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             HttpHeaders headers = request.headers();
             HttpMethod method = request.method();
             ByteBuf content = request.content();
             String uri = request.uri();
+
+            //根据path 和 method获取请求的handler
             
             sendProxyRequest(ctx, msg);
         } else {
             //只做转发
             sendProxyRequest(ctx, msg);
-        }
+        }*/
 
     }
 

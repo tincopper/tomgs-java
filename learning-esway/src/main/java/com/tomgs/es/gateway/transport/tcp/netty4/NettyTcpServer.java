@@ -1,5 +1,6 @@
 package com.tomgs.es.gateway.transport.tcp.netty4;
 
+import com.tomgs.es.gateway.transport.tcp.netty4.custom.ProxyFrontendHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -8,12 +9,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.elasticsearch.common.component.AbstractLifecycleComponent;
+
+import java.io.IOException;
 
 /**
  * @author tangzhongyuan
  * @create 2019-04-22 14:21
  **/
-public class NettyTcpServer {
+public class NettyTcpServer extends AbstractLifecycleComponent {
 
     private final String host;
     private final int port;
@@ -28,8 +32,24 @@ public class NettyTcpServer {
         this.workerThreadPool = new NioEventLoopGroup();
     }
 
-    public void start() throws Exception {
-        tcpServerStart();
+    @Override
+    protected void doStart() {
+        try {
+            tcpServerStart();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doStop() {
+
+    }
+
+    @Override
+    protected void doClose() throws IOException {
+        bossThreadPool.shutdownGracefully();
+        workerThreadPool.shutdownGracefully();
     }
 
     private void tcpServerStart() throws InterruptedException {
@@ -39,22 +59,17 @@ public class NettyTcpServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        //TODO: add request handler
-                        //ch.pipeline().addLast(new EchoServerHandler());
+                        ch.pipeline().addLast("logging", new ESLoggingHandler());
+                        ch.pipeline().addLast("size", new Netty4SizeHeaderFrameDecoder());
+                        ch.pipeline().addLast("dispatcher", new ProxyFrontendHandler());
                     }
                 })
-                .option(ChannelOption.SO_BACKLOG, 1024)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-
+                .childOption(ChannelOption.AUTO_READ, false);
         //绑定端口，同步等待绑定成功
-        ChannelFuture future = bootstrap.bind(host, port).sync();
-        System.out.println("TCP监听开启....");
+        ChannelFuture future = bootstrap.bind(host, port).addListener(listner ->
+                System.out.println("ES_WAY_TCP服务" + host + ":" + port + "启动成功...")).sync();
         //等待服务端监听端口关闭
         //future.channel().closeFuture().sync();
     }
 
-    public void shutdown() {
-        workerThreadPool.shutdownGracefully();
-        bossThreadPool.shutdownGracefully();
-    }
 }

@@ -3,6 +3,7 @@ package com.tomgs.es.gateway.transport.http.netty4;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -63,6 +64,7 @@ public class NettyHttpServer extends AbstractLifecycleComponent {
         b.group(bossThreadPool, workerThreadPool);
         b.channel(NioServerSocketChannel.class);
         b.handler(new LoggingHandler(LogLevel.INFO));
+        b.childOption(ChannelOption.AUTO_READ, false);
         b.childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel e) throws Exception {
@@ -76,7 +78,7 @@ public class NettyHttpServer extends AbstractLifecycleComponent {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {
                 if (future.isSuccess()) {
-                    System.out.println("HTTP监听 [" + host + ":" + port + "] 开启....");
+                    System.out.println("ES_WAY_HTTP服务 [" + host + ":" + port + "] 开启....");
                 }
             }
         }).sync();
