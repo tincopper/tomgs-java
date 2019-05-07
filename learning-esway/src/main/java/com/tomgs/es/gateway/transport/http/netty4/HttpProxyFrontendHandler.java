@@ -5,9 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -18,7 +16,7 @@ import io.netty.handler.logging.LoggingHandler;
 public class HttpProxyFrontendHandler extends ChannelInboundHandlerAdapter {
 
     //这个地址从admin中获取
-    private String proxyHost = "10.18.4.23";
+    private String proxyHost = "127.0.0.1";
     private int proxyPort = 9200;
 
     private Channel outboundChannel;
@@ -35,6 +33,8 @@ public class HttpProxyFrontendHandler extends ChannelInboundHandlerAdapter {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(
                                 new LoggingHandler(LogLevel.INFO),
+                                new HttpClientCodec(),
+                                new HttpObjectAggregator(6553600),
                                 new HttpProxyBackendHandler(inboundChannel));
                     }
                 });
@@ -59,22 +59,21 @@ public class HttpProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         if (!outboundChannel.isActive()) {
             return;
         }
-        sendProxyRequest(ctx, msg);
+
         //解析http请求，然后构造http请求，转发请求
-        /*if (msg instanceof FullHttpRequest) {
+        if (msg instanceof FullHttpRequest) {
             FullHttpRequest request = (FullHttpRequest) msg;
             HttpHeaders headers = request.headers();
             HttpMethod method = request.method();
             ByteBuf content = request.content();
             String uri = request.uri();
-
             //根据path 和 method获取请求的handler
-            
+
             sendProxyRequest(ctx, msg);
         } else {
             //只做转发
             sendProxyRequest(ctx, msg);
-        }*/
+        }
 
     }
 
