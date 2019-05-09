@@ -127,13 +127,6 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
             buffer.release();
         }
 
-        /*ByteBuf byteBuf = (ByteBuf) msg;
-        byte[] bytes = new byte[byteBuf.readableBytes()];
-        //将信息读到字节数组
-        byteBuf.readBytes(bytes);
-        String body = new String(bytes, StandardCharsets.UTF_8);
-        System.out.println("from client message:" + body);*/
-
         if (outboundChannel.isActive()) {
             sendRequest(ctx, msg);
         }
