@@ -11,4 +11,22 @@
 
     <artifactId>learning-core</artifactId>
 
+    <properties>
+        <metrics.version>3.1.2</metrics.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-healthchecks</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

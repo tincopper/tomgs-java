@@ -29,7 +29,7 @@ public class TestCustomTransportClient {
         String clusterName = "tomgs-es";
 //        String host = "10.18.4.23";
         String host = "127.0.0.1";
-        int port = 9301;
+        int port = 9300;
 
         // 指定集群名,默认为elasticsearch,如果改了集群名,这里一定要加
         Settings settings = Settings.builder()
