@@ -28,7 +28,7 @@ public abstract class AbstractFilter<T> implements Filter<T> {
         filterFacade.register(this);
     }
 
-    public void filter(FilterInvoker invoker, T t) {
+    public void filter(FilterInvoker invoker, T t) throws Exception {
         doFilter(t);
         if (invoker != null) {
             invoker.invoker(t);
