@@ -1,4 +1,4 @@
-package com.tomgs.core.filter.demo2;
+package com.tomgs.core.filter.demo3;
 
 public interface Filter<T> {
 

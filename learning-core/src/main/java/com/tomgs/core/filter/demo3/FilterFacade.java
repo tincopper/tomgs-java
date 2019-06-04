@@ -1,10 +1,18 @@
-package com.tomgs.core.filter.demo2;
+package com.tomgs.core.filter.demo3;
+
+import java.util.List;
 
 public class FilterFacade {
 
     private FilterInvoker invoker;
 
-    public void register(final Filter filter) {
+    public FilterFacade(List<Filter> filters) {
+        for (int i = filters.size() - 1; i >= 0; i--) {
+            register(filters.get(i));
+        }
+    }
+
+    private void register(final Filter filter) {
         final FilterInvoker next = invoker;
         invoker = new FilterInvoker() {
 
