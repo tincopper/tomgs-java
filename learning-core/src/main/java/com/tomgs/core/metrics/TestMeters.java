@@ -1,13 +1,8 @@
 package com.tomgs.core.metrics;
 
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricFilter;
 
 import java.util.SortedMap;
-import java.util.concurrent.TimeUnit;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * 统计tps
