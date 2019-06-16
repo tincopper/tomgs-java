@@ -1,9 +1,9 @@
 package com.tomgs.core.filter.demo3;
 
-public interface FilterInvoker {
+public interface FilterInvoker<T> {
 
     /**
      * 执行过滤
      */
-    <T> void invoker(T t) throws Exception;
+    void invoker(T t) throws Exception;
 }

@@ -2,28 +2,31 @@ package com.tomgs.core.filter.demo3;
 
 import java.util.List;
 
-public class FilterFacade {
+public class FilterFacade<T> {
 
-    private FilterInvoker invoker;
+    private FilterInvoker<T> invoker;
 
-    public FilterFacade(List<Filter> filters) {
-        for (int i = filters.size() - 1; i >= 0; i--) {
-            register(filters.get(i));
+    public FilterFacade(FilterInvoker<T> invoker, List<Filter> filters) {
+        this.invoker = invoker;
+        if (!filters.isEmpty()) {
+            for (int i = filters.size() - 1; i >= 0; i--) {
+                register(filters.get(i));
+            }
         }
     }
 
     private void register(final Filter filter) {
-        final FilterInvoker next = invoker;
-        invoker = new FilterInvoker() {
-
+        final FilterInvoker<T> next = invoker;
+        /*invoker = new FilterInvoker<T>() {
             @Override
-            public <T> void invoker(T t) throws Exception {
+            public void invoker(T t) throws Exception {
                 filter.filter(next, t);
             }
-        };
+        };*/
+        invoker = t -> filter.filter(next, t);
     }
 
-    public <T> void filter(T t) throws Exception {
+    public void filter(T t) throws Exception {
         if (invoker == null) {
             return;
         }

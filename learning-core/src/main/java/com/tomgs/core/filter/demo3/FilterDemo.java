@@ -8,6 +8,7 @@ public class FilterDemo extends AbstractFilter<String> {
 
     @Override
     protected void doFilter(String str) {
-        System.out.println("do filter: " + str);
+        str += "234";
+        System.out.println("do filter1: " + str);
     }
 }

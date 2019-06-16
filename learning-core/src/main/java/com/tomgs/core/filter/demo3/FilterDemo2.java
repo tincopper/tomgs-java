@@ -8,6 +8,8 @@ public class FilterDemo2 extends AbstractFilter<String> {
 
     @Override
     protected void doFilter(String str) {
-        throw new IllegalArgumentException("str:" + str);
+        //throw new IllegalArgumentException("str:" + str);
+        str += "123";
+        System.out.println("do filter2: " + str);
     }
 }

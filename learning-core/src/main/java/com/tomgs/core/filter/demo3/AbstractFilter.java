@@ -7,6 +7,8 @@ public abstract class AbstractFilter<T> implements Filter<T> {
         if (invoker != null) {
             invoker.invoker(t);
         }
+        //因为invoker没有返回值，所以这里没有后置处理filter
+        //doPostFilter(t);
     }
 
     protected abstract void doFilter(T t) throws Exception;
