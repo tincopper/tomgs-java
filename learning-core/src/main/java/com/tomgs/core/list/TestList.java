@@ -18,6 +18,17 @@ public class TestList {
         list.add("b");
 
         list.remove("c");
+
+        final Integer string = get("123");
+        System.out.println(string);
     }
-    
+
+    public static <T> T get(String key, T t) {
+        return (T) key;
+    }
+
+    public static <T> T get(String key) {
+        return (T) key;
+    }
+
 }
