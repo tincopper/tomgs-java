@@ -94,14 +94,14 @@ public class LeakyBucketLimiter {
                 int data = DATA_CREATOR.incrementAndGet();
                 try {
                     bucket.submit(data);
-                    TimeUnit.MILLISECONDS.sleep(200);
+                    //TimeUnit.MILLISECONDS.sleep(200);
                 } catch (Exception e) {
                     //对submit时，如果桶满了可能会抛出异常
                     if (e instanceof IllegalStateException) {
                         System.out.println(e.getMessage());
                         //当满了后，生产线程就休眠1分钟
                         try {
-                            TimeUnit.SECONDS.sleep(60);
+                            TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
                         }
