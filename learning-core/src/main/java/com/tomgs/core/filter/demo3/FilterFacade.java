@@ -17,7 +17,7 @@ public class FilterFacade<T> {
 
     private void register(final Filter filter) {
         final FilterInvoker<T> next = invoker;
-        /*invoker = new FilterInvoker<T>() {
+        /*invoker = new Invoker<T>() {
             @Override
             public void invoker(T t) throws Exception {
                 filter.filter(next, t);
