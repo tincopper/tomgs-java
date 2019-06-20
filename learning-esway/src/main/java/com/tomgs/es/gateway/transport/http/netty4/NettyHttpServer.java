@@ -1,5 +1,8 @@
 package com.tomgs.es.gateway.transport.http.netty4;
 
+import com.tomgs.es.gateway.common.Props;
+import com.tomgs.es.gateway.transport.http.netty4.v2.HttpHandler;
+import com.tomgs.es.gateway.transport.http.netty4.v2.HttpProxyFrontendHandlerV2;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -19,6 +22,9 @@ import org.elasticsearch.common.component.AbstractLifecycleComponent;
 
 import java.io.IOException;
 
+import static com.tomgs.es.gateway.module.EsGatewayModule.SERVER_HTTP_HOST;
+import static com.tomgs.es.gateway.module.EsGatewayModule.SERVER_HTTP_PORT;
+
 /**
  * @author tangzhongyuan
  * @create 2019-04-22 14:22
@@ -30,10 +36,12 @@ public class NettyHttpServer extends AbstractLifecycleComponent {
 
     private final EventLoopGroup bossThreadPool;
     private final EventLoopGroup workerThreadPool;
+    private final HttpHandler handler;
 
-    public NettyHttpServer(final String host, final int port) {
-        this.host = host;
-        this.port = port;
+    public NettyHttpServer(final Props props, final HttpHandler handler) {
+        host = props.getString(SERVER_HTTP_HOST, "10.33.5.200");
+        port = props.getInt(SERVER_HTTP_PORT, 9201);
+        this.handler = handler;
 
         this.bossThreadPool = new NioEventLoopGroup();
         this.workerThreadPool = new NioEventLoopGroup();
@@ -71,7 +79,7 @@ public class NettyHttpServer extends AbstractLifecycleComponent {
                 e.pipeline().addLast("http-codec", new HttpServerCodec());
                 e.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
                 e.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
-                e.pipeline().addLast("handler", new HttpProxyFrontendHandler());
+                e.pipeline().addLast("handler", new HttpProxyFrontendHandlerV2(handler));
             }
         });
         ChannelFuture future = b.bind(host, port).addListener(new GenericFutureListener<Future<? super Void>>() {

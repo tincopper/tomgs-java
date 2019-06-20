@@ -48,7 +48,7 @@ public class Bootstrap {
         props.put("server.tcp.port", 9301);
 
         props.put("server.http.host", "127.0.0.1");
-        props.put("server.http.port", 8080);
+        props.put("server.http.port", 9201);
 
         Injector injector = Guice.createInjector(
                 new CommonModule(props),
