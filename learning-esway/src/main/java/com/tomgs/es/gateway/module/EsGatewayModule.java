@@ -2,9 +2,12 @@ package com.tomgs.es.gateway.module;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.tomgs.es.gateway.common.Props;
 import com.tomgs.es.gateway.transport.http.netty4.NettyHttpServer;
+import com.tomgs.es.gateway.transport.http.netty4.v2.DefaultHttpHandler;
+import com.tomgs.es.gateway.transport.http.netty4.v2.HttpHandler;
 import com.tomgs.es.gateway.transport.tcp.netty4.Netty4Transport;
 import com.tomgs.es.gateway.transport.tcp.netty4.NettyTcpServer;
 import org.elasticsearch.Version;
@@ -40,6 +43,7 @@ public class EsGatewayModule extends AbstractModule {
     @Override
     protected void configure() {
         //bind(ESGateway.class).toInstance(new ESGateway());
+        bind(HttpHandler.class).to(DefaultHttpHandler.class).in(Scopes.SINGLETON);
     }
 
     @Singleton
@@ -77,10 +81,7 @@ public class EsGatewayModule extends AbstractModule {
     @Singleton
     @Provides
     @Named(HTTP_SERVER)
-    private LifecycleComponent createNettyHttpServer(Props props) {
-        String host = props.getString(SERVER_HTTP_HOST, "127.0.0.1");
-        int port = props.getInt(SERVER_HTTP_PORT, 8080);
-
-        return new NettyHttpServer(host, port);
+    private LifecycleComponent createNettyHttpServer(Props props, HttpHandler handler) {
+        return new NettyHttpServer(props, handler);
     }
 }
