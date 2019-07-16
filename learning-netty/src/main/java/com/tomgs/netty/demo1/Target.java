@@ -46,7 +46,7 @@ public class Target {
                             );
                         }
                     })
-                    .bind(targetPort).sync().channel().closeFuture().sync();
+                    .bind("0.0.0.0", targetPort).sync().channel().closeFuture().sync();
             //监听本地的一个端口，当有客户端请求时，然后向目标服务器发送请求，获取消息，然后发送给客户端
         } finally {
             bossGroup.shutdownGracefully();

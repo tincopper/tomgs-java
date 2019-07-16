@@ -1,10 +1,8 @@
 package com.tomgs.core.appachetools;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tangzhongyuan
@@ -13,11 +11,21 @@ import java.nio.charset.StandardCharsets;
 public class CodecTest {
 
     @Test
-    public void testBase64() {
+    public void testBase64() throws InterruptedException {
         String source = "username:pwd";
-        final String base64String = Base64.encodeBase64String(source.getBytes(StandardCharsets.UTF_8));
-        final byte[] decodeBase64 = Base64.decodeBase64(base64String);
-        String result = StringUtils.newStringUtf8(decodeBase64);
-        System.out.println(result);
+        //final String base64String = Base64.encodeBase64String(source.getBytes(StandardCharsets.UTF_8));
+        //final byte[] decodeBase64 = Base64.decodeBase64(base64String);
+        //String result = StringUtils.newStringUtf8(decodeBase64);
+       // System.out.println(result);
+        long sleepTimeMs = 1;
+        sleepTimeMs = sleepTimeMs / 10 * 10;
+        System.out.println(sleepTimeMs);
+
+        final long toNanos = TimeUnit.MILLISECONDS.toNanos(1);
+        System.out.println(toNanos);
+        for (;;) {
+            Thread.sleep(9);
+            System.out.println(System.currentTimeMillis());
+        }
     }
 }

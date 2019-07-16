@@ -13,6 +13,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.net.InetSocketAddress;
 
@@ -40,6 +42,7 @@ public class NettyClient {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(
+                                new LoggingHandler(LogLevel.INFO),
                                 //new ObjectEncoder(),
                                 //new ObjectDecoder(1315271800, ClassResolvers.cacheDisabled(null)),
                                 new ClientHandler());
@@ -50,7 +53,7 @@ public class NettyClient {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        final NettyClient client = new NettyClient("10.18.4.23", 9001);
+        final NettyClient client = new NettyClient("10.32.4.135", 9001);
         client.start();
     }
 }

@@ -4,14 +4,14 @@ import com.tomgs.netty.test.handler.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+
+import java.lang.management.ManagementFactory;
 
 /**
  * @author tangzhongyuan
@@ -34,11 +34,13 @@ public class NettyServer {
         EventLoopGroup workGroup = new NioEventLoopGroup();
 
         bootstrap.group(bossGroup, workGroup).channel(NioServerSocketChannel.class)
+                .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         //添加socket处理链
                         ch.pipeline().addLast(
+                                new LoggingHandler(LogLevel.INFO),
                                 //new ObjectEncoder(),
                                 //new ObjectDecoder(1315271800, ClassResolvers.cacheDisabled(null)),
                                 new ServerHandler());
@@ -56,7 +58,9 @@ public class NettyServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        final NettyServer server = new NettyServer("10.18.4.23", 9000);
+        final NettyServer server = new NettyServer("10.32.4.135", 9001);
+        final String name = ManagementFactory.getRuntimeMXBean().getName();
+        System.out.println(name);
         server.start();
     }
 }
