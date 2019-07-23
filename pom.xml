@@ -13,9 +13,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source.jdk>1.8</java.source.jdk>
         <lombok.version>1.16.20</lombok.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.12</junit.version>
         <metrics.version>3.1.2</metrics.version>
         <commons-codec.version>1.10</commons-codec.version>
+        <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
     </properties>
 
     <modules>
@@ -27,6 +28,8 @@
         <module>learning-loadbalance</module>
         <module>learning-limiter</module>
         <module>learning-logger</module>
+        <module>learning-algorithm</module>
+        <module>learning-springboot</module>
     </modules>
 
     <parent>
@@ -40,12 +43,14 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <dependency>

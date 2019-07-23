@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +86,10 @@ public final class JsonUtil {
 	public static <T> T parseObject(byte[] data, Class<T> type) {
 		T object = JSON.parseObject(data, type);
 		return object;
+	}
+
+	public static <T> T parseObject(InputStream in, Class<T> type) throws IOException {
+		return JSON.parseObject(in, type);
 	}
 
 	public static <T> List<T> parseFromJson(String json, Class<T> type) {
