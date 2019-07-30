@@ -1,13 +1,9 @@
 package com.tomgs.core.base;
 
-import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
-import static com.tomgs.core.base.Demo1.Inner.comparingByValue;
 
 /**
  * @author tangzhongyuan
@@ -16,6 +12,7 @@ import static com.tomgs.core.base.Demo1.Inner.comparingByValue;
 public class GenericTest {
 
     public static void main(String[] args) {
+        final int i = 2 ^ 3 | 3 & 1;
         final ArrayList<String> arrayList = new ArrayList<>();
         arrayList.add("a");
 

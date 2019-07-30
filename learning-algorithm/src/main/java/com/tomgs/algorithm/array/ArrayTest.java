@@ -13,17 +13,27 @@ public class ArrayTest {
 
     /**
      * 给定一个整数数组和一个目标值，找出数组中和为目标值的两个数，要求时间复杂度为o(n)
+     * 如：数组：1, 2, 7, 5, 4，目标值：8，结果：找到1，7两个值
      */
     @Test
     public void test1() {
         int[] nums = {1, 2, 7, 5, 4};
         int target = 8;
 
+        // 迭代法
         int[] result = findTowSum1(nums, target);
         System.out.println(result[0] + ":" + result[1]);
-
+        // hash表（推荐）
         int[] result2 = findTowSum2(nums, target);
         System.out.println(result2[0] + ":" + result2[1]);
+    }
+
+    /**
+     * 将元素均为0、1、2的数组排序，时间复杂度O（n）。
+     */
+    @Test
+    public void test2() {
+
     }
 
     /**
