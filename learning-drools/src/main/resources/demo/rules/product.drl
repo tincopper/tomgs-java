@@ -1,0 +1,33 @@
+package com.tomgs.drools.test;
+
+rule "Product price less than 500" // 给规则取个名
+when
+    pp : Product( prePrice <= 500 ) // 规则
+then
+    // 符合规则后执行的操作，是Java代码
+    double prePrice = pp.getPrePrice();
+    pp.setRealPrice(prePrice * 0.85);
+    System.out.println(pp.getName() + "活动价是：" + pp.getRealPrice());
+end
+
+
+rule "Product price less than 1000" // 给规则取个名
+when
+    p : Product( prePrice > 500 && prePrice <=1000 ) // 规则
+then
+    // 符合规则后执行的操作，是Java代码
+    double prePrice = p.getPrePrice();
+    p.setRealPrice(prePrice * 0.8);
+    System.out.println(p.getName() + "活动价是：" + p.getRealPrice());
+end
+
+
+rule "Product price more than 1000" // 给规则取个名
+when
+    p : Product( prePrice > 1000 ) // 规则
+then
+    // 符合规则后执行的操作，是Java代码
+    double prePrice = p.getPrePrice();
+    p.setRealPrice(prePrice - 300);
+    System.out.println(p.getName() + "活动价是：" + p.getRealPrice());
+end

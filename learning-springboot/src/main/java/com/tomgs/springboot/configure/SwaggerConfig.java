@@ -13,7 +13,7 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @since 2019-07-22 18:34
  **/
 @Configuration
-public class Swagger {
+public class SwaggerConfig {
 
     @Bean
     public Docket controllerApi() {

@@ -30,6 +30,7 @@
         <module>learning-logger</module>
         <module>learning-algorithm</module>
         <module>learning-springboot</module>
+        <module>learning-drools</module>
     </modules>
 
     <parent>
