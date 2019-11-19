@@ -18,31 +18,31 @@ public class SortTest2 {
      */
     @Test
     public void test1() {
-        int[] arry = {0,1,0,0,1,2,1,2,1};
-        final int[] ints = sortThreeColor(arry);
+        int[] array = {0,1,0,0,1,2,1,2,1};
+        final int[] ints = sortThreeColor(array);
         for (int anInt : ints) {
             System.out.println(anInt);
         }
     }
 
-    private int[] sortThreeColor(int[] arry) {
+    private int[] sortThreeColor(int[] array) {
         // write code here
-        if (arry.length < 1) {
-            return arry;
+        if (array.length < 1) {
+            return array;
         }
         int left = 0;
-        int right = arry.length - 1;
+        int right = array.length - 1;
         int i = 0;
         while (i <= right) {
-            if (arry[i] == 0) {
-                swap(arry, i, left++);
+            if (array[i] == 0) {
+                swap(array, i, left++);
                 i++;
-            } else if (arry[i] == 2) {
-                swap(arry, i, right--);
+            } else if (array[i] == 2) {
+                swap(array, i, right--);
             } else
                 i++;
         }
-        return arry;
+        return array;
     }
 
     private void swap(int[] A, int a, int b) {
