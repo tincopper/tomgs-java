@@ -17,6 +17,7 @@
         <metrics.version>3.1.2</metrics.version>
         <commons-codec.version>1.10</commons-codec.version>
         <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
+        <cglib.version>3.2.4</cglib.version>
     </properties>
 
     <modules>
@@ -31,6 +32,7 @@
         <module>learning-algorithm</module>
         <module>learning-springboot</module>
         <module>learning-drools</module>
+        <module>learning-spring</module>
     </modules>
 
     <parent>
@@ -77,6 +79,13 @@
                 <artifactId>metrics-healthchecks</artifactId>
                 <version>${metrics.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>${cglib.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

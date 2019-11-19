@@ -1,6 +1,8 @@
 package com.tomgs.core.thread;
 
 /**
+ * 奇偶数交替打印
+ *
  * @author tangzhongyuan
  * @since 2019-07-26 14:38
  **/

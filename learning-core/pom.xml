@@ -27,6 +27,12 @@
             <artifactId>metrics-healthchecks</artifactId>
             <!--<version>${metrics.version}</version>-->
         </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
