@@ -7,5 +7,9 @@ package com.tomgs.algorithm.sort;
  * @version 2019/11/8 1.0 
  */
 public class QuickSort {
+
+    public static void main(String[] args) {
+
+    }
     
 }
