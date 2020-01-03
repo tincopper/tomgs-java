@@ -58,7 +58,7 @@ public class NettyServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        final NettyServer server = new NettyServer("10.32.4.135", 9001);
+        final NettyServer server = new NettyServer("127.0.0.1", 9001);
         final String name = ManagementFactory.getRuntimeMXBean().getName();
         System.out.println(name);
         server.start();

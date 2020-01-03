@@ -53,7 +53,7 @@ public class NettyClient {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        final NettyClient client = new NettyClient("10.32.4.135", 9001);
+        final NettyClient client = new NettyClient("127.0.0.1", 9001);
         client.start();
     }
 }

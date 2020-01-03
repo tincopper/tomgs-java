@@ -28,6 +28,8 @@ public class NioServer {
     serverSocketChannel.configureBlocking(false);
     serverSocketChannel.bind(new InetSocketAddress("127.0.0.1", 8080));
     // 将channel注册到selector上去
+    //serverSocketChannel.register(serverSelector, SelectionKey.OP_ACCEPT);
+
     serverSocketChannel.register(serverSelector, SelectionKey.OP_ACCEPT);
 
     while (true) {
