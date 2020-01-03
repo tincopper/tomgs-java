@@ -5,6 +5,7 @@
 *~
 .settings
 .springBeans
+.hprof
 # bin
 build.sh
 integration-repo
