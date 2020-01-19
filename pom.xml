@@ -33,6 +33,7 @@
         <module>learning-springboot</module>
         <module>learning-drools</module>
         <module>learning-spring</module>
+      <module>learning-sentinel</module>
     </modules>
 
     <parent>
