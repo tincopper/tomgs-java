@@ -10,44 +10,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>learning-sentinel</artifactId>
+  <packaging>pom</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.alibaba.csp</groupId>
-      <artifactId>sentinel-core</artifactId>
-      <version>1.7.1</version>
-    </dependency>
+  <modules>
+    <module>sentinel-token-server</module>
+    <module>sentinel-client</module>
+      <module>sentinel-client-embedded</module>
+  </modules>
 
-    <dependency>
-      <groupId>com.alibaba.csp</groupId>
-      <artifactId>sentinel-transport-simple-http</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.alibaba.csp</groupId>
-      <artifactId>sentinel-datasource-apollo</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.alibaba.csp</groupId>
-      <artifactId>sentinel-annotation-aspectj</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.alibaba.csp</groupId>
-      <artifactId>sentinel-parameter-flow-control</artifactId>
-      <version>1.7.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.ctrip.framework.apollo</groupId>
-      <artifactId>apollo-openapi</artifactId>
-      <version>1.5.0</version>
-      <!--<scope>test</scope>-->
-    </dependency>
-
-  </dependencies>
 </project>
