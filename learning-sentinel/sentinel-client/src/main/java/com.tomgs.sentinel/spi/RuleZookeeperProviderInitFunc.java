@@ -7,6 +7,7 @@ import com.alibaba.csp.sentinel.cluster.client.config.ClusterClientConfigManager
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterFlowRuleManager;
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterParamFlowRuleManager;
 import com.alibaba.csp.sentinel.cluster.server.config.ClusterServerConfigManager;
+import com.alibaba.csp.sentinel.cluster.server.config.ServerFlowConfig;
 import com.alibaba.csp.sentinel.cluster.server.config.ServerTransportConfig;
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.zookeeper.ZookeeperDataSource;
@@ -55,6 +56,9 @@ public class RuleZookeeperProviderInitFunc implements InitFunc {
 
         // Init cluster state property for extracting mode from cluster map data source.
         initStateProperty();
+
+        // 初始化最大qps
+        initServerFlowConfig();
     }
 
     private void initDynamicRuleProperty() {
@@ -131,6 +135,29 @@ public class RuleZookeeperProviderInitFunc implements InitFunc {
                     .orElse(ClusterStateManager.CLUSTER_NOT_STARTED);
         });
         ClusterStateManager.registerProperty(clusterModeDs.getProperty());
+    }
+
+    private void initServerFlowConfig() {
+        String path = "/" + APP_NAME + "/config/common/prop/sentinel.cluster.map.config";
+        ReadableDataSource<String, ServerFlowConfig> serverFlowConfigDs = new ZookeeperDataSource<>(remoteAddress, path, source -> {
+            List<ClusterGroupEntity> groupList = JSON.parseObject(source, new TypeReference<List<ClusterGroupEntity>>() {});
+            return Optional.ofNullable(groupList)
+                    .flatMap(this::extractServerFlowConfig)
+                    .orElse(null);
+        });
+        ClusterServerConfigManager.registerGlobalServerFlowProperty(serverFlowConfigDs.getProperty());
+    }
+
+    private Optional<ServerFlowConfig> extractServerFlowConfig(List<ClusterGroupEntity> groupList) {
+        return groupList.stream()
+                .filter(this::machineEqual)
+                .findAny()
+                .map(e -> new ServerFlowConfig()
+                        .setExceedCount(ClusterServerConfigManager.getExceedCount())
+                        .setIntervalMs(ClusterServerConfigManager.getIntervalMs())
+                        .setMaxAllowedQps(e.getMaxAllowedQps())
+                        .setMaxOccupyRatio(ClusterServerConfigManager.getMaxOccupyRatio())
+                        .setSampleCount(ClusterServerConfigManager.getSampleCount()));
     }
 
     private int extractMode(List<ClusterGroupEntity> groupList) {
