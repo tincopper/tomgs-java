@@ -15,6 +15,7 @@
  */
 package com.tomgs.sentinel.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -24,10 +25,14 @@ import java.util.Set;
 public class ClusterGroupEntity {
 
     private String machineId;
+
     private String ip;
     private Integer port;
+    private Double maxAllowedQps;
 
-    private Set<String> clientSet;
+    private Set<String> clientSet = new HashSet<>();
+
+    private Boolean belongToApp;
 
     public String getMachineId() {
         return machineId;
@@ -65,13 +70,33 @@ public class ClusterGroupEntity {
         return this;
     }
 
+    public Boolean getBelongToApp() {
+        return belongToApp;
+    }
+
+    public ClusterGroupEntity setBelongToApp(Boolean belongToApp) {
+        this.belongToApp = belongToApp;
+        return this;
+    }
+
+    public Double getMaxAllowedQps() {
+        return maxAllowedQps;
+    }
+
+    public ClusterGroupEntity setMaxAllowedQps(Double maxAllowedQps) {
+        this.maxAllowedQps = maxAllowedQps;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "ClusterGroupEntity{" +
-            "machineId='" + machineId + '\'' +
-            ", ip='" + ip + '\'' +
-            ", port=" + port +
-            ", clientSet=" + clientSet +
-            '}';
+                "machineId='" + machineId + '\'' +
+                ", ip='" + ip + '\'' +
+                ", port=" + port +
+                ", maxAllowedQps=" + maxAllowedQps +
+                ", clientSet=" + clientSet +
+                ", belongToApp=" + belongToApp +
+                '}';
     }
 }

@@ -18,16 +18,21 @@ package com.tomgs.sentinel.cluster.server.init;
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterFlowRuleManager;
 import com.alibaba.csp.sentinel.cluster.flow.rule.ClusterParamFlowRuleManager;
 import com.alibaba.csp.sentinel.cluster.server.config.ClusterServerConfigManager;
+import com.alibaba.csp.sentinel.cluster.server.config.ServerFlowConfig;
 import com.alibaba.csp.sentinel.cluster.server.config.ServerTransportConfig;
 import com.alibaba.csp.sentinel.datasource.ReadableDataSource;
 import com.alibaba.csp.sentinel.datasource.zookeeper.ZookeeperDataSource;
 import com.alibaba.csp.sentinel.init.InitFunc;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
+import com.alibaba.csp.sentinel.transport.config.TransportConfig;
+import com.alibaba.csp.sentinel.util.HostNameUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.tomgs.sentinel.cluster.server.entity.ClusterGroupEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -56,7 +61,6 @@ public class DemoClusterServerInitFunc implements InitFunc {
                 source -> JSON.parseObject(source, new TypeReference<List<ParamFlowRule>>() {}));
             return ds.getProperty();
         });
-
         // Server namespace set (scope) data source.
         ReadableDataSource<String, Set<String>> namespaceDs = new ZookeeperDataSource<>(remoteAddress, groupId,
             namespaceSetDataId, source -> JSON.parseObject(source, new TypeReference<Set<String>>() {}));
@@ -66,5 +70,38 @@ public class DemoClusterServerInitFunc implements InitFunc {
             groupId, serverTransportDataId,
             source -> JSON.parseObject(source, new TypeReference<ServerTransportConfig>() {}));
         ClusterServerConfigManager.registerServerTransportProperty(transportConfigDs.getProperty());
+        // Server flow configuration data source.
+        ReadableDataSource<String, ServerFlowConfig> serverFlowConfigDs = new ZookeeperDataSource<>(remoteAddress,
+                groupId, serverTransportDataId,
+                source -> {List<ClusterGroupEntity> groupList = JSON.parseObject(source, new TypeReference<List<ClusterGroupEntity>>() {});
+                    return Optional.ofNullable(groupList)
+                            .flatMap(this::extractServerFlowConfig)
+                            .orElse(null);
+                });
+        ClusterServerConfigManager.registerGlobalServerFlowProperty(serverFlowConfigDs.getProperty());
     }
+
+    private Optional<ServerFlowConfig> extractServerFlowConfig(List<ClusterGroupEntity> groupList) {
+        return groupList.stream()
+                .filter(this::machineEqual)
+                .findAny()
+                .map(e -> new ServerFlowConfig()
+                        .setExceedCount(ClusterServerConfigManager.getExceedCount())
+                        .setIntervalMs(ClusterServerConfigManager.getIntervalMs())
+                        .setMaxAllowedQps(e.getMaxAllowedQps())
+                        .setMaxOccupyRatio(ClusterServerConfigManager.getMaxOccupyRatio())
+                        .setSampleCount(ClusterServerConfigManager.getSampleCount()));
+    }
+
+    private boolean machineEqual(/*@Valid*/ ClusterGroupEntity group) {
+        return getCurrentMachineId().equals(group.getMachineId());
+    }
+
+    private String getCurrentMachineId() {
+        // Note: this may not work well for container-based env.
+        return HostNameUtil.getIp() + SEPARATOR + TransportConfig.getRuntimePort();
+    }
+
+    private static final String SEPARATOR = "@";
+
 }
