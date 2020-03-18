@@ -34,6 +34,7 @@
         <module>learning-drools</module>
         <module>learning-spring</module>
         <module>learning-sentinel</module>
+      <module>learning-scheduler</module>
     </modules>
 
     <parent>

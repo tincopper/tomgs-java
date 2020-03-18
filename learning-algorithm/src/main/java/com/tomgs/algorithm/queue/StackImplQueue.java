@@ -1,4 +1,4 @@
-package com.tomgs.algorithm.quue;
+package com.tomgs.algorithm.queue;
 
 import java.util.Stack;
 
