@@ -35,6 +35,7 @@
         <module>learning-spring</module>
         <module>learning-sentinel</module>
       <module>learning-scheduler</module>
+        <module>learning-bigdata</module>
     </modules>
 
     <parent>
