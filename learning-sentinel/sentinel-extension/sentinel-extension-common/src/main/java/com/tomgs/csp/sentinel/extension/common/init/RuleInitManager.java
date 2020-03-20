@@ -1,4 +1,4 @@
-package com.kd.csp.sentinel.extension.common.init;
+package com.tomgs.csp.sentinel.extension.common.init;
 
 import com.alibaba.csp.sentinel.cluster.ClusterStateManager;
 import com.alibaba.csp.sentinel.cluster.client.config.ClusterClientAssignConfig;
@@ -25,13 +25,10 @@ import com.alibaba.csp.sentinel.transport.config.TransportConfig;
 import com.alibaba.csp.sentinel.util.HostNameUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.kd.csp.sentinel.extension.common.entity.ClusterGroupEntity;
-import com.kd.csp.sentinel.extension.common.util.ZkConfigUtil;
+import com.tomgs.csp.sentinel.extension.common.entity.ClusterGroupEntity;
+import com.tomgs.csp.sentinel.extension.common.util.ZkConfigUtil;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  *  
@@ -122,6 +119,15 @@ public class RuleInitManager {
                 ZkConfigUtil.getClusterNameSpaceDataId(appName),
                 source -> JSON.parseObject(source, new TypeReference<Set<String>>() {}));
         ClusterServerConfigManager.registerNamespaceSetProperty(namespaceDs.getProperty());
+        // 默认将自己的appName加入到namespace set中
+        ClusterServerConfigManager.loadServerNamespaceSet(Collections.singleton(appName));
+    }
+
+    public static void initTokenServerStartConfig(String remoteAddress, String appName) {
+        // setting token server start configuration
+        ReadableDataSource<String, ServerTransportConfig> serverTransportDs = new ZookeeperDataSource<>(remoteAddress,
+                ZkConfigUtil.getClusterServerTransportConfig(appName), source -> JSON.parseObject(source, new TypeReference<ServerTransportConfig>() {}));
+        ClusterServerConfigManager.registerServerTransportProperty(serverTransportDs.getProperty());
     }
 
     public static void initStateProperty(String remoteAddress, String appName) {
@@ -151,7 +157,7 @@ public class RuleInitManager {
 
     private static Optional<ServerFlowConfig> extractServerFlowConfig(List<ClusterGroupEntity> groupList) {
         return groupList.stream()
-                .filter(RuleInitManager::machineEqual)
+                //.filter(RuleInitManager::machineEqual)
                 .findAny()
                 .map(e -> new ServerFlowConfig()
                         .setExceedCount(ClusterServerConfigManager.getExceedCount())
@@ -177,7 +183,7 @@ public class RuleInitManager {
 
     private static Optional<ServerTransportConfig> extractServerTransportConfig(List<ClusterGroupEntity> groupList) {
         return groupList.stream()
-                .filter(RuleInitManager::machineEqual)
+                //.filter(RuleInitManager::machineEqual)
                 .findAny()
                 .map(e -> new ServerTransportConfig().setPort(e.getPort()).setIdleSeconds(600));
     }

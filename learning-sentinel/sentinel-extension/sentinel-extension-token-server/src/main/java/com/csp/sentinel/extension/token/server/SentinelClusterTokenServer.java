@@ -1,7 +1,8 @@
-package com.kd.csp.sentinel.extension.token.server;
+package com.csp.sentinel.extension.token.server;
 
 import com.alibaba.csp.sentinel.cluster.server.ClusterTokenServer;
 import com.alibaba.csp.sentinel.cluster.server.SentinelDefaultTokenServer;
+import com.tomgs.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
 
 /**
  *  
@@ -12,6 +13,7 @@ import com.alibaba.csp.sentinel.cluster.server.SentinelDefaultTokenServer;
 public class SentinelClusterTokenServer {
 
     public static void main(String[] args) throws Exception {
+        ZookeeperDataSourceConfig.setRemoteAddress("localhost");
         // Not embedded mode by default (alone mode).
         ClusterTokenServer tokenServer = new SentinelDefaultTokenServer();
 
@@ -21,7 +23,7 @@ public class SentinelClusterTokenServer {
         //ClusterServerConfigManager.loadGlobalTransportConfig(new ServerTransportConfig()
         //        .setIdleSeconds(600)
         //        .setPort(11111));
-        //ClusterServerConfigManager.loadServerNamespaceSet(Collections.singleton(DemoConstants.APP_NAME));
+        //ClusterServerConfigManager.loadServerNamespaceSet(Collections.singleton(AppNameUtil.getAppName()));
 
         // Start the server.
         tokenServer.start();

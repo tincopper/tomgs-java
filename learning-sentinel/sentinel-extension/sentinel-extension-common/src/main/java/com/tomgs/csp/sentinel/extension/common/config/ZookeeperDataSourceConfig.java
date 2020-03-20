@@ -1,4 +1,4 @@
-package com.kd.csp.sentinel.extension.common.config;
+package com.tomgs.csp.sentinel.extension.common.config;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
 
