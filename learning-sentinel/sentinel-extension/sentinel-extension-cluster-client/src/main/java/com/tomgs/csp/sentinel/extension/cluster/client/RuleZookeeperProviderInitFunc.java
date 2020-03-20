@@ -1,10 +1,10 @@
-package com.kd.csp.sentinel.extension.cluster.client;
+package com.tomgs.csp.sentinel.extension.cluster.client;
 
 import com.alibaba.csp.sentinel.init.InitFunc;
 import com.alibaba.csp.sentinel.log.RecordLog;
 import com.alibaba.csp.sentinel.util.AppNameUtil;
-import com.kd.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
-import com.kd.csp.sentinel.extension.common.init.RuleInitManager;
+import com.tomgs.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
+import com.tomgs.csp.sentinel.extension.common.init.RuleInitManager;
 
 /**
  *  
@@ -37,6 +37,8 @@ public class RuleZookeeperProviderInitFunc implements InitFunc {
         RuleInitManager.initStateProperty(REMOTE_ADDRESS, APP_NAME);
         // 初始化最大qps
         RuleInitManager.initServerFlowConfig(REMOTE_ADDRESS, APP_NAME);
+        // 初始化namespace
+        RuleInitManager.initTokenServerNameSpaces(REMOTE_ADDRESS, APP_NAME);
 
         RecordLog.info("RuleZookeeperProviderInitFunc ### init success...");
     }

@@ -1,4 +1,4 @@
-package com.kd.csp.sentinel.extension.common.util;
+package com.tomgs.csp.sentinel.extension.common.util;
 
 /**
  *  
@@ -16,6 +16,7 @@ public class ZkConfigUtil {
     private static final String CLUSTER_CLIENT_CONFIG = "sentinel.cluster.client.config";
     private static final String CLUSTER_MAP_CONFIG = "sentinel.cluster.map.config";
     private static final String CLUSTER_NAMESPACE = "sentinel.cluster.namespace.set";
+    private static final String CLUSTER_SERVER_TRANSPORT_CONFIG = "sentinel.cluster.server-transport.config";
 
     public static String getGroupId(String appName) {
         return appName + "/config/common/prop";
@@ -51,6 +52,10 @@ public class ZkConfigUtil {
 
     public static String getClusterNameSpaceDataId(String appName) {
         return String.format("/%s/%s", getGroupId(appName), CLUSTER_NAMESPACE);
+    }
+
+    public static String getClusterServerTransportConfig(String appName) {
+        return String.format("/%s/%s", getGroupId(appName), CLUSTER_SERVER_TRANSPORT_CONFIG);
     }
 
 }

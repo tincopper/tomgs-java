@@ -4,7 +4,7 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.kd.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
+import com.tomgs.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +18,8 @@ public class ZKDataSourceExtensionDemo {
 
     public static void main(String[] args) throws InterruptedException {
         ZookeeperDataSourceConfig.setRemoteAddress("localhost");
+        new SentinelMonitor().start();
+
         //InitExecutor.doInit();
         //loadRules();
         // Assume we config: resource is `TestResource`, initial QPS threshold is 5.
@@ -27,7 +29,7 @@ public class ZKDataSourceExtensionDemo {
                 entry = SphU.entry("TestResource", EntryType.IN, 1, 1);
                 /*您的业务逻辑 - 开始*/
                 System.out.println("hello world");
-                TimeUnit.MILLISECONDS.sleep(100);
+                //TimeUnit.MILLISECONDS.sleep(100);
                 /*您的业务逻辑 - 结束*/
             } catch (BlockException e) {
                 /*流控逻辑处理 - 开始*/

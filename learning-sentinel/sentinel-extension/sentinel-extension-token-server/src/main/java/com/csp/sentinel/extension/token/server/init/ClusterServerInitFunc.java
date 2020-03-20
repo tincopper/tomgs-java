@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kd.csp.sentinel.extension.token.server.init;
+package com.csp.sentinel.extension.token.server.init;
 
 import com.alibaba.csp.sentinel.init.InitFunc;
 import com.alibaba.csp.sentinel.util.AppNameUtil;
-import com.kd.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
-import com.kd.csp.sentinel.extension.common.init.RuleInitManager;
+import com.tomgs.csp.sentinel.extension.common.config.ZookeeperDataSourceConfig;
+import com.tomgs.csp.sentinel.extension.common.init.RuleInitManager;
 
 /**
  * @author Eric Zhao
@@ -33,10 +33,10 @@ public class ClusterServerInitFunc implements InitFunc {
         // Register cluster flow rule property supplier which creates data source by namespace.
         // Register cluster parameter flow rule property supplier.
         RuleInitManager.registerClusterRuleSupplier(REMOTE_ADDRESS, APP_NAME);
-        // Server transport configuration data source.
-        RuleInitManager.initServerTransportConfigProperty(REMOTE_ADDRESS, APP_NAME);
         // Server flow configuration data source.
         RuleInitManager.initServerFlowConfig(REMOTE_ADDRESS, APP_NAME);
+        // Server transport configuration data source.
+        RuleInitManager.initTokenServerStartConfig(REMOTE_ADDRESS, APP_NAME);
         // Server namespace set (scope) data source.
        RuleInitManager.initTokenServerNameSpaces(REMOTE_ADDRESS, APP_NAME);
     }

@@ -1,1 +1,1 @@
-com.kd.csp.sentinel.extension.token.server.init.ClusterServerInitFunc
+com.csp.sentinel.extension.token.server.init.ClusterServerInitFunc
