@@ -18,6 +18,8 @@ public interface BasicScheduler {
 
   void pauseJob(JobInfo jobInfo) throws Exception;
 
+  boolean isPaused(JobInfo jobInfo) throws Exception;
+
   void clear() throws Exception;
 
   void resumeJob(JobInfo jobInfo) throws Exception;
