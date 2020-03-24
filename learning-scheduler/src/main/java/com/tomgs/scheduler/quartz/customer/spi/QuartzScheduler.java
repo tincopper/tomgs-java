@@ -14,6 +14,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -101,6 +102,11 @@ public class QuartzScheduler implements BasicScheduler {
   @Override
   public void pauseJob(JobInfo jobInfo) throws Exception {
     scheduler.pauseJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  }
+
+  @Override
+  public boolean isPaused(JobInfo jobInfo) throws Exception {
+    return scheduler.isShutdown() && Trigger.TriggerState.PAUSED == scheduler.getTriggerState(new TriggerKey(jobInfo.getJobName(), jobInfo.getGroupName()));
   }
 
   @Override
