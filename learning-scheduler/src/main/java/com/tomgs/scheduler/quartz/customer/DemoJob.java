@@ -39,4 +39,9 @@ public class DemoJob implements JobInfo {
     return new HashMap<>();
   }
 
+  @Override
+  public String getCron() {
+    return "*/3 * * * * ?";
+  }
+
 }

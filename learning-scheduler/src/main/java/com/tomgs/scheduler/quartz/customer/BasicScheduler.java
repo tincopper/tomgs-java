@@ -1,5 +1,7 @@
 package com.tomgs.scheduler.quartz.customer;
 
+import java.util.List;
+
 public interface BasicScheduler {
 
   void config() throws Exception;
@@ -13,6 +15,8 @@ public interface BasicScheduler {
   void addJob(JobInfo jobInfo) throws Exception;
 
   boolean deleteJob(JobInfo jobInfo) throws Exception;
+
+  boolean deleteJobs(List<JobInfo> jobInfoList) throws Exception;
 
   boolean checkExists(JobInfo jobInfo) throws Exception;
 
