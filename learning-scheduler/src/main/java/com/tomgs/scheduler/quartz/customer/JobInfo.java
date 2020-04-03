@@ -16,4 +16,5 @@ public interface JobInfo {
 
   Map<String, Object> getJobData();
 
+  String getCron();
 }

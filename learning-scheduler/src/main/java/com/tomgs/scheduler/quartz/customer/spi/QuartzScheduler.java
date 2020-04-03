@@ -3,7 +3,9 @@ package com.tomgs.scheduler.quartz.customer.spi;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import com.tomgs.scheduler.quartz.job.InitJob;
+import java.util.List;
 import java.util.Properties;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -11,7 +13,6 @@ import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -40,10 +41,10 @@ public class QuartzScheduler implements BasicScheduler {
     Properties result = new Properties();
     result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
     result.put("org.quartz.threadPool.threadCount", "1");
-    result.put("org.quartz.scheduler.instanceName", "scheduler");
+    result.put("org.quartz.scheduler.instanceName", "tomgs-scheduler");
     result.put("org.quartz.jobStore.misfireThreshold", "1");
-    result.put("org.quartz.plugin.shutdownhook.class", Class.class);
-    result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
+    //result.put("org.quartz.plugin.shutdownhook.class", Class.class);
+    //result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
     return result;
   }
 
@@ -79,12 +80,16 @@ public class QuartzScheduler implements BasicScheduler {
         .withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
         .setJobData(new JobDataMap(jobInfo.getJobData()))
         .build();
-    Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(),
-        jobInfo.getGroupName())
+    /*Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(3))
-        .startNow()
+        .withPriority(jobInfo.getPriority().getValue())
+        .build();*/
+
+    Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
+        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()))
         .withPriority(jobInfo.getPriority().getValue())
         .build();
+
     //scheduler.addJob(jobDetail, true);
     scheduler.scheduleJob(jobDetail, trigger);
   }
@@ -92,6 +97,15 @@ public class QuartzScheduler implements BasicScheduler {
   @Override
   public boolean deleteJob(JobInfo jobInfo) throws Exception {
     return scheduler.deleteJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  }
+
+  @Override
+  public boolean deleteJobs(List<JobInfo> jobInfoList) throws Exception {
+    boolean result = true;
+    for (JobInfo jobInfo : jobInfoList) {
+      result = deleteJob(jobInfo);
+    }
+    return result;
   }
 
   @Override
