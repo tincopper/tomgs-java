@@ -1,8 +1,10 @@
 package com.tomgs.scheduler.quartz.customer.spi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
-import com.tomgs.scheduler.quartz.job.InitJob;
+import com.tomgs.scheduler.quartz.customer.JobTypeManager;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
 import org.quartz.CronScheduleBuilder;
@@ -22,7 +24,10 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author tangzy
  * @since 1.0
  */
-public class QuartzScheduler implements BasicScheduler {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class QuartzScheduler implements BasicScheduler, Serializable {
+
+  private static final long serialVersionUID = 9061110017357130630L;
 
   private Scheduler scheduler;
 
@@ -69,13 +74,9 @@ public class QuartzScheduler implements BasicScheduler {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void addJob(JobInfo jobInfo) throws Exception {
-    Class<? extends Job> jobClass;
-    if (jobInfo.getType() == 0) {
-      jobClass = InitJob.class;
-    } else {
-      jobClass = InitJob.class;
-    }
+    Class<? extends Job> jobClass = (Class<? extends Job>) JobTypeManager.INSTANCE.getJobClass(jobInfo.getType());
     JobDetail jobDetail = JobBuilder.newJob(jobClass)
         .withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
         .setJobData(new JobDataMap(jobInfo.getJobData()))
@@ -138,10 +139,10 @@ public class QuartzScheduler implements BasicScheduler {
     scheduler.triggerJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
   }
 
-  @Override
+ /* @Override
   public int getCurrentlyExecutingJobs() throws Exception {
     return scheduler.getCurrentlyExecutingJobs().size();
-  }
+  }*/
 
   @Override
   public boolean isShutdown() throws Exception {

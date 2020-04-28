@@ -30,7 +30,7 @@ public interface BasicScheduler {
 
   void triggerJob(JobInfo jobInfo) throws Exception;
 
-  int getCurrentlyExecutingJobs() throws Exception;
+  //int getCurrentlyExecutingJobs() throws Exception;
 
   boolean isShutdown() throws Exception;
 
