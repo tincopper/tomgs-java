@@ -29,7 +29,94 @@ public class BaseTest {
 
     @Test
     public void test2() {
-        final String string = Integer.toBinaryString(6);
+        String string = Integer.toBinaryString(~1);
+        System.out.println(string);
+        System.out.println(~1);
+
+        string = Integer.toBinaryString(-1);
         System.out.println(string);
     }
+
+    /**
+     * 汉明距离</br>
+     * 求两个整数的二进制中对应位置不同数字的个数
+     * input: 1， 4  output: 2
+     *
+     * 1 : 0 0 0 1
+     * 4 : 0 1 0 0
+     *
+     * https://m.toutiaocdn.com/group/6823987167295963660
+     *
+     * 采用异或运算的方式，异或之后之前不同的位置现在则为1，所以只需要统计异或之后数值中1的个数即可。
+     */
+    @Test
+    public void test3() {
+        int count = hammingDistance(1, 4);
+        System.out.println(count);
+        count = hammingDistance2(1, 4);
+        System.out.println(count);
+        count = hammingDistance3(1, 4);
+        System.out.println(count);
+
+    }
+
+    // 内置函数实现
+    public int hammingDistance(int x, int y) {
+        return Integer.bitCount(x ^ y);
+    }
+
+
+    /*
+        位移实现
+        为了计算等于 1 的位数，可以将每个位移动到最左侧或最右侧，然后检查该位是否为 1。
+        更准确的说，应该进行逻辑移位，移入零替换丢弃的位。
+        使用最右侧要方便些，只需要对最右侧的数使用取模运算（i % 2）或者 AND 操作（i & 1）即可判断是否为1
+        时间复杂度：O(1)，在 Python 和 Java 中 Integer 的大小是固定的，处理时间也是固定的。32 位整数需要 32 次迭代。
+        空间复杂度：O(1)，使用恒定大小的空间。
+     */
+    public int hammingDistance2(int x, int y) {
+        int xor = x ^ y;
+        int distance = 0;
+        while (xor != 0) {
+            if ((xor & 1) == 1) {
+                distance += 1;
+            }
+            xor = xor >> 1;
+        }
+        return distance;
+    }
+
+    /*
+      布赖恩·克尼根算法
+      方法二是逐位移动，逐位比较边缘位置是否为 1。寻找一种更快的方法找出等于 1 的位数。
+    是否可以像人类直观的计数比特为 1 的位数，跳过两个 1 之间的 0。例如：10001000。
+    上面例子中，遇到最右边的 1 后，如果可以跳过中间的 0，直接跳到下一个 1，效率会高很多。
+    这是布赖恩·克尼根位计数算法的基本思想。该算法使用特定比特位和算术运算移除等于 1 的最右比特位。
+    当我们在 number 和 number-1 上做 AND 位运算时，原数字 number 的最右边等于 1 的比特会被移除。
+        x = 1 0 0 0 1 0 0 0
+    x - 1 = 1 0 0 0 0 1 1 1
+ x -1 & x = 1 0 0 0 0 0 0 0
+
+    基于以上思路，通过 2 次迭代就可以知道 10001000 中 1 的位数，而不需要 8 次。
+
+    注意：该算法发布在 1988 年 《C 语言编程第二版》的练习中（由 Brian W. Kernighan 和 Dennis M. Ritchie 编写），
+    但是 Donald Knuth 在 2006 年 4 月 19 日指出，该方法第一次是由 Peter Wegner 在 1960 年的 CACM3 上出版。顺便说一句，可以在上述书籍中找到更多位操作的技巧。
+
+    复杂度分析
+    时间复杂度：O(1)。
+
+    与移位方法相似，由于整数的位数恒定，因此具有恒定的时间复杂度。
+    但是该方法需要的迭代操作更少。
+    空间复杂度：O(1)。与输入无关，使用恒定大小的空间。
+     */
+    public int hammingDistance3(int x, int y) {
+        int xor = x ^ y;
+        int distance = 0;
+        while (xor != 0) {
+            distance += 1;
+            xor = xor & (xor - 1);
+        }
+        return distance;
+    }
+
 }
