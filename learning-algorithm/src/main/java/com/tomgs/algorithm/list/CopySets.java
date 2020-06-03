@@ -1,11 +1,6 @@
 package com.tomgs.algorithm.list;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * https://github.com/chartbeat-labs/trepl
@@ -63,13 +58,27 @@ public class CopySets {
             tmp.add(n);
             Set<String> result = new HashSet<>(cs);
             result.removeAll(tmp);
-            scatterSets.getOrDefault(n, new HashSet<>()).addAll(result);
+            Set<String> strings = scatterSets.get(n);
+            if (strings == null) {
+              Set<String> objects = new HashSet<>();
+              scatterSets.put(n, objects);
+            }
+            strings = scatterSets.get(n);
+            strings.addAll(result);
           }
         }
+        scatterSets.forEach((k, v) -> scatterWidths.put(k, v.size()));
+      }
+      if (!modified) {
+        throw new RuntimeException("Couldn't create valid copysets");
+      }
+      boolean present = nodes.stream().anyMatch(n -> scatterWidths.get(n) < s);
+      if (!present) {
+        break;
       }
     }
-
-    //return copysets;
+    copysets.sort(Comparator.comparingInt(Set::size));
+    return copysets;
   }
 
   private static boolean checker(List<Set<String>> copysets, Set<String> copyset) {
@@ -82,8 +91,8 @@ public class CopySets {
     nodes.add("node2");
     nodes.add("node3");
 
-    //List<String> result = buildCopySets(nodes, 2, 1);
-    //System.out.println(result);
+    List<Set<String>> result = buildCopySets(nodes, 2, 2);
+    System.out.println(result);
 
   }
 
