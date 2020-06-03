@@ -60,7 +60,9 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
 
   @Override
   public void start() throws Exception {
-    scheduler.start();
+    if (!scheduler.isStarted()) {
+      scheduler.start();
+    }
   }
 
   @Override

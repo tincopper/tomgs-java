@@ -8,6 +8,15 @@ import java.util.List;
 /**
  * 通过hash的方式将任务分配到对应的调度节点，然后调度节点与真实的节点建立关联，可以通过调度节点找到对应的真实节点，同时可以在真实节点上面查询到调度节点列表
  * 任务通过hash的方式去找到对应的scheduler，通过scheduler找到对应执行节点
+ *
+ * 在新增/下线节点时：任务添加成功之后再移除之前旧的
+ *
+ * 1、启动时先注册节点，然后选举，只有在选举成功之后再做后面的操作
+ * 2、这里使用异步：任务分配到对应的槽中0-32（可配置）
+ * 3、然后根据注册上来的节点，将槽映射到节点（后续任务的删除新增只需要添加到对应的槽里面即可，无需进行节点之间的迁移，降低了在新增任务和删除任务时的hash不均匀的问题）
+ * 4、然后根据节点数量确认每一个节点需要分配调度节点副本数（3台，3个调度对象，一个工作的两个用于其余两个节点的冗余，即一个主副本一个备份副本）
+ * 5、
+ *
  * @author tangzy
  * @since 1.0
  */
@@ -37,12 +46,13 @@ public class ClusterNode {
   public void mappingNode() {
     // 根据具体的节点来完成任务节点的映射。。。。
     // 先弄一些固定数量的虚拟节点，把任务往这些虚拟节点上面加，这样就可以避免物理节点动态上下线引起大量任务的迁移
-    int nums = getNodeListLen();
+    int nums = getNodeListSize();
     int size = jobInfoList.size();
     // 根据这两个值去分配任务
     int r = size / nums;
     if (r <= nums) {
       // 任务比节点少，那么直接放在第一个节点即可。
+
     } else {
 
     }
@@ -57,8 +67,8 @@ public class ClusterNode {
   /**
    * 获取当前可用节点数，这个可以通过节点之间互相通信进行统计
    */
-  private int getNodeListLen() {
-    return 3;
+  private int getNodeListSize() {
+    return nodeList.size();
   }
 
   private List<Node> getNodeList() {
