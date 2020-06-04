@@ -10,16 +10,12 @@ import java.util.*;
  */
 public class CopySets {
 
-  // checker = checker or checkers.defalut
-  List<String> nodes = new ArrayList<>();
-
-  public static List<Set<String>> buildCopySets(List<String> nodes, int r, int s) {
+  public static List<List<String>> buildCopySets(List<String> nodes, int r, int s) {
     nodes.sort(Comparable::compareTo);
-    System.out.println(nodes);
+    //System.out.println(nodes);
 
     List<Set<String>> copysets = new ArrayList<>();
     Map<String, Integer> scatterWidths = new HashMap<>();
-    Set<String> copyset = new HashSet<>();
 
     for (;;) {
       boolean modified = false;
@@ -27,18 +23,28 @@ public class CopySets {
         if (scatterWidths.getOrDefault(node, 0) >= s) {
           continue;
         }
+        Set<String> copyset = new HashSet<>();
         copyset.add(node);
 
         List<String> sortedNodes = new ArrayList<>();
         for (String n : nodes) {
+          scatterWidths.putIfAbsent(n, 0);
           if (!n.equals(node)) {
             sortedNodes.add(n);
-            sortedNodes.sort(Comparable::compareTo);
+            sortedNodes.sort(Comparator.comparingInt(scatterWidths::get));
           }
         }
 
+        System.out.println("copyset：" + copyset);
+        System.out.println("copysets:" + copysets);
+        System.out.println("sortedNodes:" + sortedNodes);
+        System.out.println("scatterWidths:" + scatterWidths);
+
+        System.out.println("--------------------------------");
+
         for (String sortedNode : sortedNodes) {
           copyset.add(sortedNode);
+          System.out.println("n:" + sortedNode);
           // 进行条件检查
           if (!checker(copysets, copyset) || copysets.contains(copyset)) {
             copyset.remove(sortedNode);
@@ -77,8 +83,13 @@ public class CopySets {
         break;
       }
     }
-    copysets.sort(Comparator.comparingInt(Set::size));
-    return copysets;
+    List<List<String>> result = new ArrayList<>();
+    copysets.forEach(e -> {
+      ArrayList<String> list = new ArrayList<>(e);
+      list.sort(Comparable::compareTo);
+      result.add(list);
+    });
+    return result;
   }
 
   private static boolean checker(List<Set<String>> copysets, Set<String> copyset) {
@@ -91,9 +102,16 @@ public class CopySets {
     nodes.add("node2");
     nodes.add("node3");
 
-    List<Set<String>> result = buildCopySets(nodes, 2, 2);
-    System.out.println(result);
+    List<List<String>> result = buildCopySets(nodes, 2, 1);
+    System.out.println(">>>>>>" + result);
+    List<List<String>> result1 = buildCopySets(nodes, 2, 2);
+    System.out.println(">>>>>>" + result1);
 
+    nodes.add("node4");
+    nodes.add("node5");
+    nodes.add("node6");
+    List<List<String>> result2 = buildCopySets(nodes, 3, 3);
+    System.out.println(">>>>>>" + result2);
   }
 
 }
