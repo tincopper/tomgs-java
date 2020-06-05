@@ -17,6 +17,13 @@ import java.util.List;
  * 4、然后根据节点数量确认每一个节点需要分配调度节点副本数（3台，3个调度对象，一个工作的两个用于其余两个节点的冗余，即一个主副本一个备份副本）
  * 5、
  *
+ * 任务状态： 提交中、队列中、运行中、运行成功、运行失败、重试成功、重试失败
+ * https://baijiahao.baidu.com/s?id=1663391747827568685&wfr=spider&for=pc
+ * https://developer.aliyun.com/article/709946
+ * https://doc.akka.io/docs/akka/current/index.html?spm=a2c6h.12873639.0.0.2d7e3458B8hMEF&language=java
+ * https://cn.aliyun.com/aliware/schedulerx
+ * https://help.aliyun.com/document_detail/148187.html?spm=a2c4g.11186623.6.544.3e6a158azuuB0R
+ *
  * @author tangzy
  * @since 1.0
  */
