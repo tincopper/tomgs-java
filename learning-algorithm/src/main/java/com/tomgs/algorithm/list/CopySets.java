@@ -35,16 +35,16 @@ public class CopySets {
           }
         }
 
-        System.out.println("copyset：" + copyset);
-        System.out.println("copysets:" + copysets);
-        System.out.println("sortedNodes:" + sortedNodes);
-        System.out.println("scatterWidths:" + scatterWidths);
+        //System.out.println("copyset：" + copyset);
+        //System.out.println("copysets:" + copysets);
+        //System.out.println("sortedNodes:" + sortedNodes);
+        //System.out.println("scatterWidths:" + scatterWidths);
 
-        System.out.println("--------------------------------");
+        //System.out.println("--------------------------------");
 
         for (String sortedNode : sortedNodes) {
           copyset.add(sortedNode);
-          System.out.println("n:" + sortedNode);
+          //System.out.println("n:" + sortedNode);
           // 进行条件检查
           if (!checker(copysets, copyset) || copysets.contains(copyset)) {
             copyset.remove(sortedNode);
@@ -104,14 +104,16 @@ public class CopySets {
 
     List<List<String>> result = buildCopySets(nodes, 2, 1);
     System.out.println(">>>>>>" + result);
-    List<List<String>> result1 = buildCopySets(nodes, 2, 2);
+    List<List<String>> result1 = buildCopySets(nodes, 3, 2);
     System.out.println(">>>>>>" + result1);
 
     nodes.add("node4");
-    nodes.add("node5");
-    nodes.add("node6");
     List<List<String>> result2 = buildCopySets(nodes, 3, 3);
     System.out.println(">>>>>>" + result2);
+    nodes.add("node5");
+    nodes.add("node6");
+    List<List<String>> result3 = buildCopySets(nodes, 3, 3);
+    System.out.println(">>>>>>" + result3);
   }
 
 }
