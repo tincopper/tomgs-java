@@ -2,7 +2,6 @@ package com.tomgs.scheduler.quartz.customer;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,7 +21,7 @@ public class Main {
     } else {
       ServiceLoader<BasicScheduler> schedulers = ServiceLoader.load(BasicScheduler.class);
       BasicScheduler scheduler = schedulers.iterator().next();
-      DemoJob job = new DemoJob();
+      NewJobRequest job = new NewJobRequest();
       scheduler.addJob(job);
       scheduler.start();
       System.out.println("---------------start-------------");

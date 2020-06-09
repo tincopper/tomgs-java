@@ -83,6 +83,8 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
         .withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
         .setJobData(new JobDataMap(jobInfo.getJobData()))
         .build();
+    // 添加job data
+    // jobDetail.getJobDataMap().put("", "");
     /*Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(3))
         .withPriority(jobInfo.getPriority().getValue())

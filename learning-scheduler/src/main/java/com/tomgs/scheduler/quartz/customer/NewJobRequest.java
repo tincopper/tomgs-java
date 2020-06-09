@@ -7,7 +7,7 @@ import java.util.Map;
  * @author tangzy
  * @since 1.0
  */
-public class DemoJob implements JobInfo {
+public class NewJobRequest implements JobInfo {
 
   @Override
   public String getJobKey() {

@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.quartz.Job;
 
 /**
  * 通过hash的方式将任务分配到对应的调度节点，然后调度节点与真实的节点建立关联，可以通过调度节点找到对应的真实节点，同时可以在真实节点上面查询到调度节点列表
@@ -17,6 +19,17 @@ import java.util.List;
  * 4、然后根据节点数量确认每一个节点需要分配调度节点副本数（3台，3个调度对象，一个工作的两个用于其余两个节点的冗余，即一个主副本一个备份副本）
  * 5、
  *
+ * 3副本情况：
+ * 3个节点>>>>>>[[node1, node2, node3]]
+ * 4个节点>>>>>>[[node1, node2, node3], [node1, node2, node4], [node1, node3, node4]]
+ * 6个节点>>>>>>[[node1, node2, node3], [node2, node4, node5], [node1, node3, node6], [node4, node5, node6]]
+ * 在新增节点时，先进行任务的预分配，根据任务id区间进行预分配，然后创建新的scheduler（即还未启动），
+ * 将重新分配的任务添加进去，此时新的任务已经分配，然后启动的同时将旧分配的scheduler进行删除回收，此时完成新增节点的任务迁移工作。
+ *
+ * 如果是删除节点的话，不需要进行迁移工作，只需要把对应copyset中的节点重新定位到主节点即可。
+ * 比如4个节点的情况，，node4挂掉，此时copyset2可以在node1和node2继续执行任务，copyset3可以在node1和node3继续执行任务，此时不需要进行重新迁移。
+ * 只是需要考虑尽可能一个节点执行一个scheduler实例，避免多个scheduler实例在同一个节点执行，除非节点不够了。
+ *
  * 任务状态： 提交中、队列中、运行中、运行成功、运行失败、重试成功、重试失败
  * https://baijiahao.baidu.com/s?id=1663391747827568685&wfr=spider&for=pc
  * https://developer.aliyun.com/article/709946
@@ -29,9 +42,9 @@ import java.util.List;
  */
 public class ClusterNode {
 
-  List<Node> nodeList = Lists.newArrayList(new Node("node1", "127.0.0.1:8080"),
-      new Node("node2", "127.0.0.1:8081"),
-      new Node("node3", "127.0.0.1:8082"));
+  List<Node> nodeList = Lists.newArrayList(new Node("127.0.0.1:8080", "node1", "127.0.0.1", 8080),
+      new Node("127.0.0.1:8081", "node2", "127.0.0.1", 8081),
+      new Node("127.0.0.1:8082", "node3", "127.0.0.1", 8082));
 
   // 任务与调度节点映射
   List<BasicScheduler> schedulers = Lists.newArrayListWithCapacity(8);
@@ -80,6 +93,38 @@ public class ClusterNode {
 
   private List<Node> getNodeList() {
     return nodeList;
+  }
+
+  private List<String> getNodeIds() {
+    return nodeList.stream().map(Node::getId).collect(Collectors.toList());
+  }
+
+  private List<JobInfo> getJobInfoList() {
+    return jobInfoList;
+  }
+
+  private int getJobSize() {
+    return 0;
+  }
+
+  private List<List<String>> deliverCopySets(List<String> nodeIds, int replicaNum, int scatter) {
+    List<List<String>> copySets = CopySets.buildCopySets(nodeIds, replicaNum, scatter);
+    return copySets;
+  }
+
+  private void deliverJob() {
+    int jobSize = getJobSize();
+    if (jobSize <= 0) {
+      return;
+    }
+    int nodeSize = getNodeListSize();
+
+  }
+
+  public void init() {
+
+    List<List<String>> copySets = deliverCopySets(getNodeIds(), 3, 2);
+
   }
 
 }

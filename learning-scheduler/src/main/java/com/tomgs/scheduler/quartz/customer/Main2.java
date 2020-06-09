@@ -15,19 +15,27 @@ public class Main2 {
 
   public static void main(String[] args) throws Exception {
     // 这个序列化没啥用，序列化之后调度器里面的任务是空的。
-    QuartzScheduler bs = readObject();
-    if (bs != null) {
-      bs.start();
-    } else {
+    //QuartzScheduler bs = readObject();
+    //if (bs != null) {
+      //bs.start();
+    //} else {
       ServiceLoader<BasicScheduler> schedulers = ServiceLoader.load(BasicScheduler.class);
       BasicScheduler scheduler = schedulers.iterator().next();
-      DemoJob job = new DemoJob();
+
+      ServiceLoader<BasicScheduler> schedulers1 = ServiceLoader.load(BasicScheduler.class);
+      BasicScheduler scheduler1 = schedulers.iterator().next();
+
+    if (scheduler == scheduler1) {
+      System.out.println("=================");
+    }
+
+      NewJobRequest job = new NewJobRequest();
       scheduler.addJob(job);
       scheduler.start();
       System.out.println("---------------start-------------");
       // 序列化测试
       writeObject(scheduler);
-    }
+    //}
   }
 
   // 这种方式不行，这种一定要实现Serializable接口
