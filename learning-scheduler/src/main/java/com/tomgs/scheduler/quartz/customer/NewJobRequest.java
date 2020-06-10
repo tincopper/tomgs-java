@@ -2,12 +2,20 @@ package com.tomgs.scheduler.quartz.customer;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 
 /**
  * @author tangzy
  * @since 1.0
  */
+@Data
 public class NewJobRequest implements JobInfo {
+
+  private String groupName;
+
+  private String jobName;
+
+  private String cron;
 
   @Override
   public String getJobKey() {
@@ -16,12 +24,12 @@ public class NewJobRequest implements JobInfo {
 
   @Override
   public String getGroupName() {
-    return "initJob";
+    return groupName;
   }
 
   @Override
   public String getJobName() {
-    return "initJob";
+    return jobName;
   }
 
   @Override
@@ -41,7 +49,7 @@ public class NewJobRequest implements JobInfo {
 
   @Override
   public String getCron() {
-    return "*/3 * * * * ?";
+    return cron;
   }
 
 }

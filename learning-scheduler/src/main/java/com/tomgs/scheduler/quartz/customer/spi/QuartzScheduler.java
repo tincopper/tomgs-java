@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import com.tomgs.scheduler.quartz.customer.JobTypeManager;
+import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
+import com.tomgs.scheduler.quartz.customer.extension.Join;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
@@ -14,7 +16,6 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -24,22 +25,17 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author tangzy
  * @since 1.0
  */
+@Join
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuartzScheduler implements BasicScheduler, Serializable {
 
   private static final long serialVersionUID = 9061110017357130630L;
 
   private Scheduler scheduler;
+  private StdSchedulerFactory factory;
 
-  public QuartzScheduler() throws SchedulerException {
-    //this(StdSchedulerFactory.getDefaultScheduler());
-    StdSchedulerFactory factory = new StdSchedulerFactory();
-    factory.initialize(getBaseQuartzProperties());
-    this.scheduler = factory.getScheduler();
-  }
-
-  public QuartzScheduler(final Scheduler scheduler) {
-    this.scheduler = scheduler;
+  public QuartzScheduler() {
+    factory = new StdSchedulerFactory();
   }
 
   private Properties getBaseQuartzProperties() {
@@ -54,8 +50,15 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
   }
 
   @Override
-  public void config() throws Exception {
+  public void config(SchedulerConfig config) throws Exception {
+    Properties result = new Properties();
+    result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
+    result.put("org.quartz.threadPool.threadCount", config.getThreadCount());
+    result.put("org.quartz.scheduler.instanceName", config.getSchedulerName());
+    result.put("org.quartz.jobStore.misfireThreshold", config.getMisfireThreshold());
 
+    this.factory.initialize(result);
+    this.scheduler = factory.getScheduler();
   }
 
   @Override

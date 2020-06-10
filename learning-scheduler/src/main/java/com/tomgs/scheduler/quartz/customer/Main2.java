@@ -1,5 +1,8 @@
 package com.tomgs.scheduler.quartz.customer;
 
+import com.tomgs.scheduler.quartz.customer.extension.ExtensionFactory;
+import com.tomgs.scheduler.quartz.customer.extension.ExtensionLoader;
+import com.tomgs.scheduler.quartz.customer.extension.SpiExtensionFactory;
 import com.tomgs.scheduler.quartz.customer.spi.QuartzScheduler;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,27 +18,25 @@ public class Main2 {
 
   public static void main(String[] args) throws Exception {
     // 这个序列化没啥用，序列化之后调度器里面的任务是空的。
-    //QuartzScheduler bs = readObject();
-    //if (bs != null) {
-      //bs.start();
-    //} else {
-      ServiceLoader<BasicScheduler> schedulers = ServiceLoader.load(BasicScheduler.class);
-      BasicScheduler scheduler = schedulers.iterator().next();
+    ExtensionLoader<BasicScheduler> extensionLoader = ExtensionLoader.getExtensionLoader(BasicScheduler.class);
+    BasicScheduler scheduler = extensionLoader.getProtoJoin("scheduler");
+    BasicScheduler scheduler1 = extensionLoader.getProtoJoin("scheduler");
 
-      ServiceLoader<BasicScheduler> schedulers1 = ServiceLoader.load(BasicScheduler.class);
-      BasicScheduler scheduler1 = schedulers.iterator().next();
+    NewJobRequest job = new NewJobRequest();
+    job.setGroupName("groupName");
+    job.setJobName("jobName");
+    job.setCron("*/3 * * * * ?");
+    scheduler.addJob(job);
+    scheduler.start();
+    System.out.println("---------------start1-------------");
 
-    if (scheduler == scheduler1) {
-      System.out.println("=================");
-    }
-
-      NewJobRequest job = new NewJobRequest();
-      scheduler.addJob(job);
-      scheduler.start();
-      System.out.println("---------------start-------------");
-      // 序列化测试
-      writeObject(scheduler);
-    //}
+    NewJobRequest job1 = new NewJobRequest();
+    job1.setGroupName("groupName1");
+    job1.setJobName("jobName1");
+    job1.setCron("*/4 * * * * ?");
+    scheduler1.addJob(job1);
+    scheduler1.start();
+    System.out.println("---------------start2-------------");
   }
 
   // 这种方式不行，这种一定要实现Serializable接口

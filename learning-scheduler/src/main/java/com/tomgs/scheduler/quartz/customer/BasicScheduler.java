@@ -1,10 +1,13 @@
 package com.tomgs.scheduler.quartz.customer;
 
+import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
+import com.tomgs.scheduler.quartz.customer.extension.SPI;
 import java.util.List;
 
+@SPI("scheduler")
 public interface BasicScheduler {
 
-  void config() throws Exception;
+  void config(SchedulerConfig config) throws Exception;
 
   void start() throws Exception;
 
