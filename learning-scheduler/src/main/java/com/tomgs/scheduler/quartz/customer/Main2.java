@@ -30,16 +30,18 @@ public class Main2 {
     job.setJobName("jobName");
     job.setCron("*/3 * * * * ?");
     scheduler.addJob(job);
-    scheduler.start();
-    System.out.println("---------------start1-------------");
 
     NewJobRequest job1 = new NewJobRequest();
     job1.setGroupName("groupName1");
     job1.setJobName("jobName1");
     job1.setCron("*/4 * * * * ?");
     scheduler1.addJob(job1);
-    scheduler1.start();
-    System.out.println("---------------start2-------------");
+
+    System.out.println("---------------start-------------");
+
+    SchedulerManager.INSTANCE.addActiveScheduler(scheduler);
+    SchedulerManager.INSTANCE.addStandByScheduler(scheduler1);
+
   }
 
   // 这种方式不行，这种一定要实现Serializable接口

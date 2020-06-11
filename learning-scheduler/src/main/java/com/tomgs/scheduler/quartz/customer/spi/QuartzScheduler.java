@@ -1,14 +1,14 @@
 package com.tomgs.scheduler.quartz.customer.spi;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import com.tomgs.scheduler.quartz.customer.JobTypeManager;
 import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
+import com.tomgs.scheduler.quartz.customer.exeception.TomgsSchedulerException;
 import com.tomgs.scheduler.quartz.customer.extension.Join;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -16,6 +16,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
@@ -26,57 +27,84 @@ import org.quartz.impl.StdSchedulerFactory;
  * @since 1.0
  */
 @Join
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class QuartzScheduler implements BasicScheduler, Serializable {
+public class QuartzScheduler implements BasicScheduler {
 
-  private static final long serialVersionUID = 9061110017357130630L;
-
+  private String schedulerName;
   private Scheduler scheduler;
   private StdSchedulerFactory factory;
+  private ReentrantLock lock;
 
   public QuartzScheduler() {
     factory = new StdSchedulerFactory();
+    lock = new ReentrantLock();
   }
 
-  public QuartzScheduler(SchedulerConfig config) throws Exception {
-    factory = new StdSchedulerFactory();
+  public QuartzScheduler(SchedulerConfig config) {
+    this();
     config(config);
   }
 
   @Override
-  public void config(SchedulerConfig config) throws Exception {
+  public void config(SchedulerConfig config) {
+    try {
+      Properties result = getBaseProperties(config);
+      this.factory.initialize(result);
+      this.scheduler = factory.getScheduler();
+      this.schedulerName = config.getSchedulerName();
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
+  }
+
+  private Properties getBaseProperties(SchedulerConfig config) {
     Properties result = new Properties();
     result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
     result.put("org.quartz.threadPool.threadCount", String.valueOf(config.getThreadCount()));
     result.put("org.quartz.scheduler.instanceName", config.getSchedulerName());
     result.put("org.quartz.jobStore.misfireThreshold", String.valueOf(config.getMisfireThreshold()));
-    //result.put("org.quartz.plugin.shutdownhook.class", Class.class);
-    //result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
-
-    this.factory.initialize(result);
-    this.scheduler = factory.getScheduler();
+    return result;
   }
 
   @Override
-  public void start() throws Exception {
-    if (!scheduler.isStarted()) {
-      scheduler.start();
+  public String getSchedulerName() {
+    return schedulerName;
+  }
+
+  @Override
+  public void start() {
+    lock.lock();
+    try {
+      if (!scheduler.isStarted()) {
+        scheduler.start();
+      }
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    } finally {
+      lock.unlock();
     }
   }
 
   @Override
-  public void startDelayed(int seconds) throws Exception {
-    scheduler.startDelayed(seconds);
+  public void startDelayed(int seconds) {
+    try {
+      scheduler.startDelayed(seconds);
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public void stop() throws Exception {
-    scheduler.shutdown();
+  public void stop() {
+    try {
+      scheduler.shutdown();
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public void addJob(JobInfo jobInfo) throws Exception {
+  public void addJob(JobInfo jobInfo) {
     Class<? extends Job> jobClass = (Class<? extends Job>) JobTypeManager.INSTANCE.getJobClass(jobInfo.getType());
     JobDetail jobDetail = JobBuilder.newJob(jobClass)
         .withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
@@ -95,16 +123,27 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
         .build();
 
     //scheduler.addJob(jobDetail, true);
-    scheduler.scheduleJob(jobDetail, trigger);
+    try {
+      scheduler.scheduleJob(jobDetail, trigger);
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public boolean deleteJob(JobInfo jobInfo) throws Exception {
-    return scheduler.deleteJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public boolean deleteJob(JobInfo jobInfo) {
+    try {
+      if (scheduler.checkExists(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()))) {
+        return scheduler.deleteJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+      }
+      return false;
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public boolean deleteJobs(List<JobInfo> jobInfoList) throws Exception {
+  public boolean deleteJobs(List<JobInfo> jobInfoList) {
     boolean result = true;
     for (JobInfo jobInfo : jobInfoList) {
       result = deleteJob(jobInfo);
@@ -113,33 +152,57 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
   }
 
   @Override
-  public boolean checkExists(JobInfo jobInfo) throws Exception {
-    return scheduler.checkExists(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public boolean checkExists(JobInfo jobInfo) {
+    try {
+      return scheduler.checkExists(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public void pauseJob(JobInfo jobInfo) throws Exception {
-    scheduler.pauseJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public void pauseJob(JobInfo jobInfo) {
+    try {
+      scheduler.pauseJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public boolean isPaused(JobInfo jobInfo) throws Exception {
-    return scheduler.isShutdown() && Trigger.TriggerState.PAUSED == scheduler.getTriggerState(new TriggerKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public boolean isPaused(JobInfo jobInfo) {
+    try {
+      return scheduler.isShutdown() && Trigger.TriggerState.PAUSED == scheduler.getTriggerState(new TriggerKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public void clear() throws Exception {
-    scheduler.clear();
+  public void clear() {
+    try {
+      scheduler.clear();
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public void resumeJob(JobInfo jobInfo) throws Exception {
-    scheduler.resumeJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public void resumeJob(JobInfo jobInfo) {
+    try {
+      scheduler.resumeJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public void triggerJob(JobInfo jobInfo) throws Exception {
-    scheduler.triggerJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+  public void triggerJob(JobInfo jobInfo) {
+    try {
+      scheduler.triggerJob(JobKey.jobKey(jobInfo.getJobName(), jobInfo.getGroupName()));
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
  /* @Override
@@ -148,13 +211,21 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
   }*/
 
   @Override
-  public boolean isShutdown() throws Exception {
-    return scheduler.isShutdown();
+  public boolean isShutdown() {
+    try {
+      return scheduler.isShutdown();
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
   @Override
-  public boolean isStarted() throws Exception {
-    return scheduler.isStarted();
+  public boolean isStarted() {
+    try {
+      return scheduler.isStarted();
+    } catch (SchedulerException e) {
+      throw new TomgsSchedulerException(e);
+    }
   }
 
 }
