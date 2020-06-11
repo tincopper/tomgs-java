@@ -1,14 +1,11 @@
 package com.tomgs.scheduler.quartz.customer;
 
-import com.tomgs.scheduler.quartz.customer.extension.ExtensionFactory;
-import com.tomgs.scheduler.quartz.customer.extension.ExtensionLoader;
-import com.tomgs.scheduler.quartz.customer.extension.SpiExtensionFactory;
+import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
 import com.tomgs.scheduler.quartz.customer.spi.QuartzScheduler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ServiceLoader;
 
 /**
  * @author tangzy
@@ -17,10 +14,16 @@ import java.util.ServiceLoader;
 public class Main2 {
 
   public static void main(String[] args) throws Exception {
+    int processors = Runtime.getRuntime().availableProcessors();
     // 这个序列化没啥用，序列化之后调度器里面的任务是空的。
-    ExtensionLoader<BasicScheduler> extensionLoader = ExtensionLoader.getExtensionLoader(BasicScheduler.class);
-    BasicScheduler scheduler = extensionLoader.getProtoJoin("scheduler");
-    BasicScheduler scheduler1 = extensionLoader.getProtoJoin("scheduler");
+    SchedulerConfig config = SchedulerConfig.builder().misfireThreshold(1).schedulerName("scheduler1").threadCount(processors / 2).build();
+    SchedulerConfig config1 = SchedulerConfig.builder().misfireThreshold(1).schedulerName("scheduler2").threadCount(processors / 3).build();
+
+    BasicScheduler scheduler = SchedulerManager.INSTANCE.createScheduler(config);
+    BasicScheduler scheduler1 = SchedulerManager.INSTANCE.createScheduler(config1);
+
+    //scheduler.config(config);
+    //scheduler1.config(config1);
 
     NewJobRequest job = new NewJobRequest();
     job.setGroupName("groupName");
