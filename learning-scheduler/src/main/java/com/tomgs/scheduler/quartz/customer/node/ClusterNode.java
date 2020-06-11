@@ -5,7 +5,6 @@ import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.quartz.Job;
 
 /**
  * 通过hash的方式将任务分配到对应的调度节点，然后调度节点与真实的节点建立关联，可以通过调度节点找到对应的真实节点，同时可以在真实节点上面查询到调度节点列表
@@ -48,7 +47,6 @@ public class ClusterNode {
 
   // 任务与调度节点映射
   List<BasicScheduler> schedulers = Lists.newArrayListWithCapacity(8);
-
   List<JobInfo> jobInfoList = Lists.newArrayList();
 
   // 调度节点与真实节点映射

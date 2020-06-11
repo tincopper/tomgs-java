@@ -38,24 +38,20 @@ public class QuartzScheduler implements BasicScheduler, Serializable {
     factory = new StdSchedulerFactory();
   }
 
-  private Properties getBaseQuartzProperties() {
-    Properties result = new Properties();
-    result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
-    result.put("org.quartz.threadPool.threadCount", "1");
-    result.put("org.quartz.scheduler.instanceName", "tomgs-scheduler");
-    result.put("org.quartz.jobStore.misfireThreshold", "1");
-    //result.put("org.quartz.plugin.shutdownhook.class", Class.class);
-    //result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
-    return result;
+  public QuartzScheduler(SchedulerConfig config) throws Exception {
+    factory = new StdSchedulerFactory();
+    config(config);
   }
 
   @Override
   public void config(SchedulerConfig config) throws Exception {
     Properties result = new Properties();
     result.put("org.quartz.threadPool.class", org.quartz.simpl.SimpleThreadPool.class.getName());
-    result.put("org.quartz.threadPool.threadCount", config.getThreadCount());
+    result.put("org.quartz.threadPool.threadCount", String.valueOf(config.getThreadCount()));
     result.put("org.quartz.scheduler.instanceName", config.getSchedulerName());
-    result.put("org.quartz.jobStore.misfireThreshold", config.getMisfireThreshold());
+    result.put("org.quartz.jobStore.misfireThreshold", String.valueOf(config.getMisfireThreshold()));
+    //result.put("org.quartz.plugin.shutdownhook.class", Class.class);
+    //result.put("org.quartz.plugin.shutdownhook.cleanShutdown", Boolean.TRUE.toString());
 
     this.factory.initialize(result);
     this.scheduler = factory.getScheduler();

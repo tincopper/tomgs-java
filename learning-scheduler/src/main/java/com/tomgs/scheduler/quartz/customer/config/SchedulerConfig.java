@@ -1,9 +1,12 @@
 package com.tomgs.scheduler.quartz.customer.config;
 
+import lombok.Builder;
+
 /**
  * scheduler config
  * @author tangzy
  */
+@Builder
 public class SchedulerConfig {
 
   private String schedulerName;
