@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class Main2 {
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     int processors = Runtime.getRuntime().availableProcessors();
     // 这个序列化没啥用，序列化之后调度器里面的任务是空的。
     SchedulerConfig config = SchedulerConfig.builder().misfireThreshold(1).schedulerName("scheduler1").threadCount(processors / 2).build();
