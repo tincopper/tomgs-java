@@ -7,36 +7,38 @@ import java.util.List;
 @SPI("scheduler")
 public interface BasicScheduler {
 
-  void config(SchedulerConfig config) throws Exception;
+  String getSchedulerName();
 
-  void start() throws Exception;
+  void config(SchedulerConfig config);
 
-  void startDelayed(int seconds) throws Exception;
+  void start();
 
-  void stop() throws Exception;
+  void startDelayed(int seconds);
 
-  void addJob(JobInfo jobInfo) throws Exception;
+  void stop();
 
-  boolean deleteJob(JobInfo jobInfo) throws Exception;
+  void addJob(JobInfo jobInfo);
 
-  boolean deleteJobs(List<JobInfo> jobInfoList) throws Exception;
+  boolean deleteJob(JobInfo jobInfo);
 
-  boolean checkExists(JobInfo jobInfo) throws Exception;
+  boolean deleteJobs(List<JobInfo> jobInfoList);
 
-  void pauseJob(JobInfo jobInfo) throws Exception;
+  boolean checkExists(JobInfo jobInfo);
 
-  boolean isPaused(JobInfo jobInfo) throws Exception;
+  void pauseJob(JobInfo jobInfo);
 
-  void clear() throws Exception;
+  boolean isPaused(JobInfo jobInfo);
 
-  void resumeJob(JobInfo jobInfo) throws Exception;
+  void clear();
 
-  void triggerJob(JobInfo jobInfo) throws Exception;
+  void resumeJob(JobInfo jobInfo);
 
-  //int getCurrentlyExecutingJobs() throws Exception;
+  void triggerJob(JobInfo jobInfo);
 
-  boolean isShutdown() throws Exception;
+  //int getCurrentlyExecutingJobs();
 
-  boolean isStarted() throws Exception;
+  boolean isShutdown();
+
+  boolean isStarted();
 
 }
