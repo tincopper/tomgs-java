@@ -5,6 +5,7 @@ import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 通过hash的方式将任务分配到对应的调度节点，然后调度节点与真实的节点建立关联，可以通过调度节点找到对应的真实节点，同时可以在真实节点上面查询到调度节点列表
@@ -39,11 +40,12 @@ import java.util.stream.Collectors;
  * @author tangzy
  * @since 1.0
  */
+@Slf4j
 public class ClusterNode {
 
-  List<Node> nodeList = Lists.newArrayList(new Node("127.0.0.1:8080", "node1", "127.0.0.1", 8080),
-      new Node("127.0.0.1:8081", "node2", "127.0.0.1", 8081),
-      new Node("127.0.0.1:8082", "node3", "127.0.0.1", 8082));
+  List<Node> nodeList = Lists.newArrayList(new Node("127.0.0.1:8080", "node1", "127.0.0.1", 8080, 0),
+      new Node("127.0.0.1:8081", "node2", "127.0.0.1", 8081, 0),
+      new Node("127.0.0.1:8082", "node3", "127.0.0.1", 8082, 0));
 
   // 任务与调度节点映射
   List<BasicScheduler> schedulers = Lists.newArrayListWithCapacity(8);
@@ -120,8 +122,19 @@ public class ClusterNode {
   }
 
   public void init() {
-
+    /*
+      这里分为节点选举，和scheduler选举。
+      节点选举用于选择出master来分配copysets的落点。
+      scheduler选举，用于在对应的copyset中选举出唯一的可以调度的节点。
+      master节点负责分配copy sets，然后将请求转发给相应的节点处理。
+      节点接受到了请求之后进行scheduler的分配，和scheduler之间的选举。
+      master节点可以权重设置的相比其他节点小一点。
+     */
+    // 获取copy sets分布
     List<List<String>> copySets = deliverCopySets(getNodeIds(), 3, 2);
+    log.info("copysets >>> {}", copySets);
+    // 根据copy sets分布创建scheduler节点
+
 
   }
 

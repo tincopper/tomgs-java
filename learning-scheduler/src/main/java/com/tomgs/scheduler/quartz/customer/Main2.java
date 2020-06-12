@@ -22,6 +22,9 @@ public class Main2 {
     BasicScheduler scheduler = SchedulerManager.INSTANCE.createScheduler(config);
     BasicScheduler scheduler1 = SchedulerManager.INSTANCE.createScheduler(config1);
 
+    SchedulerManager.INSTANCE.addActiveScheduler(scheduler);
+    SchedulerManager.INSTANCE.addStandByScheduler(scheduler1);
+
     //scheduler.config(config);
     //scheduler1.config(config1);
 
@@ -29,18 +32,16 @@ public class Main2 {
     job.setGroupName("groupName");
     job.setJobName("jobName");
     job.setCron("*/3 * * * * ?");
-    scheduler.addJob(job);
 
     NewJobRequest job1 = new NewJobRequest();
     job1.setGroupName("groupName1");
     job1.setJobName("jobName1");
     job1.setCron("*/4 * * * * ?");
+
+    scheduler.addJob(job);
     scheduler1.addJob(job1);
 
     System.out.println("---------------start-------------");
-
-    SchedulerManager.INSTANCE.addActiveScheduler(scheduler);
-    SchedulerManager.INSTANCE.addStandByScheduler(scheduler1);
 
   }
 

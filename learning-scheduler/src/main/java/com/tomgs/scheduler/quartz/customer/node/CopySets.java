@@ -91,12 +91,14 @@ public class CopySets {
     System.out.println(">>>>>>" + result);
     List<List<String>> result1 = buildCopySets(nodes, 2, 2);
     System.out.println(">>>>>>" + result1);
+    List<List<String>> result2 = buildCopySets(nodes, 3, 2);
+    System.out.println(">>>>>>" + result2);
 
     nodes.add("node4");
     nodes.add("node5");
     nodes.add("node6");
-    List<List<String>> result2 = buildCopySets(nodes, 3, 3);
-    System.out.println(">>>>>>" + result2);
+    List<List<String>> result3 = buildCopySets(nodes, 3, 3);
+    System.out.println(">>>>>>" + result3);
   }
 
 }
