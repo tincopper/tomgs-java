@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Node {
+public class Node implements Comparable<Node> {
 
   private String id;
 
@@ -20,5 +20,13 @@ public class Node {
   private String ip;
 
   private Integer port;
+
+  // 权重，用于节点之间的排序，此权重用在节点转移copyset的优先级选择
+  private Integer weight;
+
+  @Override
+  public int compareTo(Node o) {
+    return this.getWeight() - o.getWeight();
+  }
 
 }

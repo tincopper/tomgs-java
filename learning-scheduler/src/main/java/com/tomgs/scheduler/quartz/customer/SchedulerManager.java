@@ -39,7 +39,7 @@ public final class SchedulerManager {
     try {
       standBySchedulerMap.remove(scheduler.getSchedulerName());
       activeSchedulerMap.putIfAbsent(scheduler.getSchedulerName(), scheduler);
-      if (scheduler.isShutdown()) {
+      if (!scheduler.isStarted()) {
         scheduler.start();
       }
     } finally {
