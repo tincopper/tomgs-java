@@ -140,7 +140,10 @@ public class ClusterNode {
     // 获取任务数量进行copySets分配
     int jobSize = getJobSize();
     int unitSize = jobSize / copySets.size();
-    int index = (int) Math.ceil((double) jobSize / unitSize);
+    int segment = (int) Math.ceil((double) jobSize / unitSize);
+    //0 * segment, segment
+    //1 * segment, segment
+    //index * segment, segment
 
   }
 
