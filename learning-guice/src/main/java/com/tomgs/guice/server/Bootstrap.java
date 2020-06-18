@@ -11,12 +11,10 @@ import java.util.concurrent.CountDownLatch;
  **/
 public class Bootstrap {
 
-    private static volatile Bootstrap INSTANCE;
-
     private final CountDownLatch keepAliveLatch = new CountDownLatch(1);
     private final Thread keepAliveThread;
 
-    private Bootstrap() {
+    public Bootstrap() {
         keepAliveThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -37,25 +35,19 @@ public class Bootstrap {
         });
     }
 
-    static void init() {
-        INSTANCE = new Bootstrap();
-        //do somethings ...
-        INSTANCE.start();
-    }
-
-    private void start() {
+    void start() {
         //node.start();
-        NettyServer nettyServer = ServiceProvider.SERVICE_PROVIDER.getInstance(NettyServer.class);
-        NettyServer.start(nettyServer);
+        //NettyServer nettyServer = ServiceProvider.SERVICE_PROVIDER.getInstance(NettyServer.class);
+        //NettyServer.start(nettyServer);
 
         keepAliveThread.start();
     }
 
-    static void stop() throws IOException {
+    void stop() throws IOException {
         try {
             //IOUtils.close(INSTANCE.node, INSTANCE.spawner);
         } finally {
-            INSTANCE.keepAliveLatch.countDown();
+            keepAliveLatch.countDown();
         }
     }
 }

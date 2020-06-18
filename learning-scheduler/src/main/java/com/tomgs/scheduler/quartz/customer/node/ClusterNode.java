@@ -3,6 +3,8 @@ package com.tomgs.scheduler.quartz.customer.node;
 import com.google.common.collect.Lists;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
+import com.tomgs.scheduler.quartz.customer.SchedulerManager;
+import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ClusterNode {
+
+  private final int processors = Runtime.getRuntime().availableProcessors();
 
   List<Node> nodeList = Lists.newArrayList(new Node("127.0.0.1:8080", "node1", "127.0.0.1", 8080, 0),
       new Node("127.0.0.1:8081", "node2", "127.0.0.1", 8081, 0),
@@ -133,8 +137,10 @@ public class ClusterNode {
     // 获取copy sets分布
     List<List<String>> copySets = deliverCopySets(getNodeIds(), 3, 2);
     log.info("copysets >>> {}", copySets);
-    // 根据copy sets分布创建scheduler节点
-
+    // 获取任务数量进行copySets分配
+    int jobSize = getJobSize();
+    int unitSize = jobSize / copySets.size();
+    int index = (int) Math.ceil((double) jobSize / unitSize);
 
   }
 
