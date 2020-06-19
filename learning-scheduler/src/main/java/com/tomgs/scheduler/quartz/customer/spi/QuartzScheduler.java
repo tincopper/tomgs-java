@@ -1,5 +1,8 @@
 package com.tomgs.scheduler.quartz.customer.spi;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
 import com.tomgs.scheduler.quartz.customer.JobTypeManager;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
@@ -118,8 +122,9 @@ public class QuartzScheduler implements BasicScheduler {
         .build();*/
 
     Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
-        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()))
+        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()).withMisfireHandlingInstructionDoNothing())
         .withPriority(jobInfo.getPriority().getValue())
+        .forJob(jobDetail)
         .build();
 
     //scheduler.addJob(jobDetail, true);

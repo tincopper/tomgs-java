@@ -3,8 +3,6 @@ package com.tomgs.scheduler.quartz.customer.node;
 import com.google.common.collect.Lists;
 import com.tomgs.scheduler.quartz.customer.BasicScheduler;
 import com.tomgs.scheduler.quartz.customer.JobInfo;
-import com.tomgs.scheduler.quartz.customer.SchedulerManager;
-import com.tomgs.scheduler.quartz.customer.config.SchedulerConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -134,17 +132,34 @@ public class ClusterNode {
       节点接受到了请求之后进行scheduler的分配，和scheduler之间的选举。
       master节点可以权重设置的相比其他节点小一点。
      */
+    // 判断节点是否满足要求
+    while (getNodeListSize() < 3) {
+      log.warn("waiting node join cluster.");
+      sleep(1000);
+    }
+
     // 获取copy sets分布
     List<List<String>> copySets = deliverCopySets(getNodeIds(), 3, 2);
     log.info("copysets >>> {}", copySets);
     // 获取任务数量进行copySets分配
     int jobSize = getJobSize();
+    if (jobSize <= 0) {
+      return;
+    }
     int unitSize = jobSize / copySets.size();
     int segment = (int) Math.ceil((double) jobSize / unitSize);
     //0 * segment, segment
     //1 * segment, segment
     //index * segment, segment
 
+  }
+
+  private void sleep(long millis) {
+    try {
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+      // ignore
+    }
   }
 
 }
