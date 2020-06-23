@@ -42,6 +42,7 @@ public class Main2 {
     scheduler1.addJob(job1);
 
     System.out.println("---------------start-------------");
+    //scheduler1.start();
 
   }
 
