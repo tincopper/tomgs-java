@@ -18,6 +18,7 @@
         <commons-codec.version>1.10</commons-codec.version>
         <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
         <cglib.version>3.2.4</cglib.version>
+        <easyexcel.version>2.1.6</easyexcel.version>
     </properties>
 
     <modules>
@@ -87,6 +88,18 @@
                 <groupId>cglib</groupId>
                 <artifactId>cglib</artifactId>
                 <version>${cglib.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
 
         </dependencies>

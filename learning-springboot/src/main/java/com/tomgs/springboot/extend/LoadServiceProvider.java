@@ -1,6 +1,7 @@
 package com.tomgs.springboot.extend;
 
-import java.util.List;
+import com.google.common.collect.Sets;
+import java.util.Set;
 
 /**
  *  
@@ -8,11 +9,22 @@ import java.util.List;
  * @author tomgs
  * @version 2020/7/5 1.0 
  */
-public class LoadServiceProvider implements ServiceProvivder {
+public class LoadServiceProvider implements ServiceProvider {
+
+    private final Set<Class<?>> classSet;
+
+    public LoadServiceProvider() {
+        this.classSet = Sets.newConcurrentHashSet();
+    }
 
     @Override
-    public List<Class<?>> getServices() {
-        return null;
+    public Set<Class<?>> getServices() {
+        return classSet;
+    }
+
+    @Override
+    public void loadService(Class<?> type) {
+        classSet.add(type);
     }
 
 }
