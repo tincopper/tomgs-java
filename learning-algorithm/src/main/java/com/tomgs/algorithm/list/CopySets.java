@@ -106,6 +106,8 @@ public class CopySets {
     System.out.println(">>>>>>" + result);
     List<List<String>> result1 = buildCopySets(nodes, 3, 2);
     System.out.println(">>>>>>" + result1);
+    List<List<String>> result11 = buildCopySets(nodes, 3, 1);
+    System.out.println(">>>>>>" + result11);
 
     nodes.add("node4");
     List<List<String>> result2 = buildCopySets(nodes, 3, 3);
@@ -114,6 +116,7 @@ public class CopySets {
     nodes.add("node6");
     List<List<String>> result3 = buildCopySets(nodes, 3, 3);
     System.out.println(">>>>>>" + result3);
+
   }
 
 }
