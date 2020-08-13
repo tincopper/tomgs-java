@@ -19,6 +19,7 @@
         <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
         <cglib.version>3.2.4</cglib.version>
         <easyexcel.version>2.1.6</easyexcel.version>
+        <disruptor.version>3.4.0</disruptor.version>
     </properties>
 
     <modules>
@@ -35,8 +36,9 @@
         <module>learning-drools</module>
         <module>learning-spring</module>
         <module>learning-sentinel</module>
-      <module>learning-scheduler</module>
+        <module>learning-scheduler</module>
         <module>learning-bigdata</module>
+        <module>learning-disruptor</module>
     </modules>
 
     <parent>
@@ -102,6 +104,11 @@
                 <version>${jackson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.lmax</groupId>
+                <artifactId>disruptor</artifactId>
+                <version>${disruptor.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

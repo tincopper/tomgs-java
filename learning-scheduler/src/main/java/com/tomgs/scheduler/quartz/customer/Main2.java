@@ -33,12 +33,18 @@ public class Main2 {
     job.setJobName("jobName");
     job.setCron("*/3 * * * * ?");
 
+    NewJobRequest job2 = new NewJobRequest();
+    job2.setGroupName("groupName");
+    job2.setJobName("jobName");
+    job2.setCron("*/3 * * * * ?");
+
     NewJobRequest job1 = new NewJobRequest();
     job1.setGroupName("groupName1");
     job1.setJobName("jobName1");
     job1.setCron("*/4 * * * * ?");
 
     scheduler.addJob(job);
+    scheduler.addJob(job2);
     scheduler1.addJob(job1);
 
     System.out.println("---------------start-------------");
