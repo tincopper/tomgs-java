@@ -101,7 +101,7 @@ public class QueueProviderManager<T> {
         executor = new ThreadPoolExecutor(threadSize, threadSize, 0, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
                 DemoThreadFactory
-                    .create("disruptor_queue_exe_" + queueConsumerFactory.fixName(), false),
+                    .create("disruptor_queue_exe-" + queueConsumerFactory.fixName(), false),
                 new ThreadPoolExecutor.AbortPolicy());
     }
 
@@ -116,7 +116,7 @@ public class QueueProviderManager<T> {
         Disruptor<QueueEvent<T>> disruptor = new Disruptor<>(factory,
                 size,
                 DemoThreadFactory
-                    .create("disruptor_queue_consumer_" + queueConsumerFactory.fixName(), false),
+                    .create("disruptor_queue_consumer-" + queueConsumerFactory.fixName(), false),
                 ProducerType.MULTI,
                 new BlockingWaitStrategy());
         QueueConsumer<T>[] consumers = new QueueConsumer[this.consumerSize];
