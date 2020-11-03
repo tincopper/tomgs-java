@@ -101,7 +101,7 @@ public class EasyExcelTest {
   @Test
   public void testReadExcel() throws IOException {
     // 读取 excel 表格的路径
-    String readPath = "src/test/java/com/kingdee/data/common/utils/tmp.xlsx";
+    String readPath = "src/test/java/com/tomgs/data/common/utils/tmp.xlsx";
     List<Object> objects = EasyExcel.read(new FileInputStream(readPath)).sheet("Sheet1").doReadSync();
     System.out.println(objects);
     StringBuilder sb = new StringBuilder();
@@ -148,7 +148,7 @@ public class EasyExcelTest {
     //String tableDesc = "企业指数明细表";
 
     // 读取 excel 表格的路径
-    String readPath = "src/test/java/com/kingdee/data/common/utils/create_table.xls";
+    String readPath = "src/test/java/com/tomgs/data/common/utils/create_table.xls";
     List<Map<Integer, String>> objects = EasyExcel.read(new FileInputStream(readPath)).sheet("Sheet1").doReadSync();
     // 注释
     StringBuilder comments = new StringBuilder();
@@ -215,7 +215,7 @@ public class EasyExcelTest {
       String tableDesc = tableDescList.get(sheetNo);
 
       // 读取 excel 表格的路径
-      String readPath = "src/test/java/com/kingdee/data/common/utils/create_table.xls";
+      String readPath = "src/test/java/com/tomgs/data/common/utils/create_table.xls";
       List<Map<Integer, String>> objects = EasyExcel.read(new FileInputStream(readPath)).sheet(sheetNo).doReadSync();
       // 表结构
       StringBuilder sql = new StringBuilder();
