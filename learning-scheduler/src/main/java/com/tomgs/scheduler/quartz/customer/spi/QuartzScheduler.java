@@ -121,11 +121,20 @@ public class QuartzScheduler implements BasicScheduler {
         .withPriority(jobInfo.getPriority().getValue())
         .build();*/
 
-    Trigger trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
-        .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()).withMisfireHandlingInstructionDoNothing())
-        .withPriority(jobInfo.getPriority().getValue())
-        .forJob(jobDetail)
-        .build();
+    Trigger trigger;
+    if (jobInfo.getCron() == null) {
+      trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
+          //.withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()).withMisfireHandlingInstructionDoNothing())
+          .withPriority(jobInfo.getPriority().getValue())
+          .forJob(jobDetail)
+          .build();
+    } else {
+      trigger = TriggerBuilder.newTrigger().withIdentity(jobInfo.getJobName(), jobInfo.getGroupName())
+          .withSchedule(CronScheduleBuilder.cronSchedule(jobInfo.getCron()).withMisfireHandlingInstructionDoNothing())
+          .withPriority(jobInfo.getPriority().getValue())
+          .forJob(jobDetail)
+          .build();
+    }
 
     //scheduler.addJob(jobDetail, true);
     try {

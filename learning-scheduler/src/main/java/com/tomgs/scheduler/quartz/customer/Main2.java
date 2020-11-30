@@ -31,12 +31,12 @@ public class Main2 {
     NewJobRequest job = new NewJobRequest();
     job.setGroupName("groupName");
     job.setJobName("jobName");
-    job.setCron("*/3 * * * * ?");
+    //job.setCron("*/3 * * * * ?");
 
     NewJobRequest job2 = new NewJobRequest();
-    job2.setGroupName("groupName");
-    job2.setJobName("jobName");
-    job2.setCron("*/3 * * * * ?");
+    job2.setGroupName("groupName2");
+    job2.setJobName("jobName2");
+    //job2.setCron("*/3 * * * * ?");
 
     NewJobRequest job1 = new NewJobRequest();
     job1.setGroupName("groupName1");
@@ -45,7 +45,7 @@ public class Main2 {
 
     scheduler.addJob(job);
     scheduler.addJob(job2);
-    scheduler1.addJob(job1);
+    scheduler.addJob(job1);
 
     System.out.println("---------------start-------------");
     //scheduler1.start();
