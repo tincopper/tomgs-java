@@ -1,10 +1,12 @@
 package com.tomgs.spring.core;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.*;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +38,14 @@ public class AnnotationRequestHandler {
     @SuppressWarnings("unchecked")
     public void doScanAnnotation(String... basePackages) {
         //入参 要扫描的包名
-        Reflections f = new Reflections(new ConfigurationBuilder().forPackages(basePackages));
+        Reflections f = new Reflections(new ConfigurationBuilder().forPackages(basePackages).setScanners(
+                new SubTypesScanner(false),
+                new TypeAnnotationsScanner(),
+                new FieldAnnotationsScanner(),
+                new MethodAnnotationsScanner(),
+                new MethodParameterScanner(),
+                new MethodParameterNamesScanner(),
+                new MemberUsageScanner()));
 
         //入参 目标注解类
         Set<Class<?>> pageServiceSet = f.getTypesAnnotatedWith(Page.class);
@@ -52,14 +61,17 @@ public class AnnotationRequestHandler {
             for (Method clickMethod : clickMethods) {
                 Click click = clickMethod.getDeclaredAnnotation(Click.class);
                 String clickIdentity = click.value();
-                String id = pageIdentity + "_" + clickIdentity;
+                String id = pageIdentity + "-" + clickIdentity;
                 clickMaps.put(id, clickMethod);
+
+                List<String> paramNames = f.getMethodParamNames(clickMethod);
+                System.out.println(paramNames);
             }
 
             for (Method clickMethod : itemClickMethods) {
                 ItemClick itemClick = clickMethod.getDeclaredAnnotation(ItemClick.class);
                 String itemClickIdentity = itemClick.value();
-                String id = pageIdentity + "_" + itemClickIdentity;
+                String id = pageIdentity + "-" + itemClickIdentity;
                 itemClickMaps.put(id, clickMethod);
             }
         }
