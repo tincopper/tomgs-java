@@ -14,6 +14,11 @@ public class TestService {
         System.out.println("click...");
     }
 
+    @Click("test_add1")
+    public void testClick1(String test, Integer num) {
+        System.out.println("click..." + test + num);
+    }
+
     @ItemClick("test_item_add")
     public void testItemClick() {
         System.out.println("item click");
