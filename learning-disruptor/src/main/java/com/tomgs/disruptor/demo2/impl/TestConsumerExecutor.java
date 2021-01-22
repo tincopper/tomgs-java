@@ -10,7 +10,12 @@ public class TestConsumerExecutor extends QueueConsumerExecutor<String> {
 
   @Override
   public void run() {
-    System.out.println(Thread.currentThread().getName() + "--------------" + getData());
+    try {
+      Thread.sleep(3000);
+      System.out.println(Thread.currentThread().getName() + "--------------" + getData());
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
 }

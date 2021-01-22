@@ -8,9 +8,19 @@ import com.lmax.disruptor.EventHandler;
  */
 public class LongEventHandler implements EventHandler<LongEvent> {
 
+  private String name;
+
   @Override
   public void onEvent(LongEvent longEvent, long l, boolean b) throws Exception {
-    System.out.println(longEvent.getValue());
+    System.out.println(Thread.currentThread().getName() + ": " + getName() + ": " + longEvent.getValue());
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 }
