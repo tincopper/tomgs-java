@@ -13,8 +13,11 @@ public class LongEventMain {
 
   public static void main(String[] args) throws InterruptedException {
     LongEventFactory factory = new LongEventFactory();
+    LongEventHandler longEventHandler = new LongEventHandler();
+    longEventHandler.setName("a");
+
     Disruptor<LongEvent> disruptor = new Disruptor<>(factory, 1024, DaemonThreadFactory.INSTANCE);
-    disruptor.handleEventsWith(new LongEventHandler());
+    disruptor.handleEventsWith(longEventHandler);
     // Start the Disruptor, starts all threads running
     disruptor.start();
 
@@ -25,6 +28,11 @@ public class LongEventMain {
     ByteBuffer bb = ByteBuffer.allocate(8);
     for (long l = 0; true; l++) {
       bb.putLong(0, l);
+      if (l % 2 == 0) {
+        longEventHandler.setName("b");
+      } else {
+        longEventHandler.setName("a");
+      }
       // 生产数据
       longEventProducer.onData(bb);
       Thread.sleep(1000);

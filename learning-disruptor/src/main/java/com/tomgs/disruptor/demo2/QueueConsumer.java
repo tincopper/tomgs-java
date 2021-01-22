@@ -54,7 +54,8 @@ public class QueueConsumer<T> implements WorkHandler<QueueEvent<T>> {
         if (t != null) {
             QueueConsumerExecutor<T> queueConsumerExecutor = factory.create();
             queueConsumerExecutor.setData(t.getData());
-            executor.execute(queueConsumerExecutor);
+            //executor.execute(queueConsumerExecutor);
+            queueConsumerExecutor.run();
         }
     }
 }
