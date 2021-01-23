@@ -81,4 +81,40 @@ public class CircleQueueTest {
     Assert.assertEquals(queue.getCapacity(), 10);
   }
 
+  @Test
+  public void testPerformance() {
+    long maxMemory = Runtime.getRuntime().maxMemory();
+    long freeMemory = Runtime.getRuntime().freeMemory();
+
+    System.out.println("maxMemory(MB)：" + maxMemory / (1024 * 1024));
+    System.out.println("freeMemory(MB)：" + freeMemory / (1024 * 1024));
+    // jvm args: -Xmx1G -Xms1G
+    // offer 1954ms, poll 51ms
+    // CircleQueue<String> queue = new CircleQueue<>(10000000, new AbortEnqueuePolicy<>());
+    // offer 1977ms, poll 62ms
+    CircleQueue<String> queue = new CircleQueue<>(16, new ResizeQueuePolicy<>());
+
+    long startTime = System.currentTimeMillis();
+
+    for (int i = 0; i < 10000000; i++) {
+      queue.offer("" + i);
+    }
+    long endOfferTime = System.currentTimeMillis();
+
+    System.out.println("入队时间（ms）：" + (endOfferTime - startTime));
+
+    maxMemory = Runtime.getRuntime().maxMemory();
+    freeMemory = Runtime.getRuntime().freeMemory();
+    System.out.println("maxMemory(MB)：" + maxMemory / (1024 * 1024));
+    System.out.println("freeMemory(MB)：" + freeMemory / (1024 * 1024));
+
+    startTime = System.currentTimeMillis();
+    // 51ms
+    for (int i = 0; i < 10000000; i++) {
+      queue.poll();
+    }
+    long endPollTime = System.currentTimeMillis();
+    System.out.println("出队时间（ms）：" + (endPollTime - startTime));
+  }
+
 }
