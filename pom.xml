@@ -39,6 +39,7 @@
         <module>learning-scheduler</module>
         <module>learning-bigdata</module>
         <module>learning-disruptor</module>
+        <module>learning-springwebflux</module>
     </modules>
 
     <parent>
