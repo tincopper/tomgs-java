@@ -53,7 +53,7 @@ public class Log4j2Dem2 {
         config.addAppender(appender);
         AppenderRef ref = AppenderRef.createAppenderRef("" + jobId, null, null);
         AppenderRef[] refs = new AppenderRef[]{ref};
-        LoggerConfig loggerConfig = LoggerConfig.createLogger("false", Level.ALL, "" + jobId,
+        LoggerConfig loggerConfig = LoggerConfig.createLogger(false, Level.ALL, "" + jobId,
                 "true", refs, null, config, null);
         loggerConfig.addAppender(appender, null, null);
         config.addLogger("" + jobId, loggerConfig);
