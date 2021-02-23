@@ -26,13 +26,13 @@ public class PodExecEquivalent {
 
   public static void main(String[] args) {
     Config config = new ConfigBuilder()
-        .withMasterUrl("https://172.20.183.149:6443")
+        .withMasterUrl("https://k8s-master.com")
         .build();
     try (final KubernetesClient k8s = new DefaultKubernetesClient(config)) {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       ByteArrayOutputStream error = new ByteArrayOutputStream();
 
-      ExecWatch execWatch = k8s.pods().inNamespace("ide").withName("theia-bos-maven-release-v1-b699c999d-grlqp")
+      ExecWatch execWatch = k8s.pods().inNamespace("ide").withName("theia-maven-release-v1-b699c999d-grlqp")
           .writingOutput(out)
           .writingError(error)
           .usingListener(new MyPodExecListener())
