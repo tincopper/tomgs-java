@@ -40,6 +40,7 @@
         <module>learning-bigdata</module>
         <module>learning-disruptor</module>
         <module>learning-springwebflux</module>
+      <module>learning-k8s</module>
     </modules>
 
     <parent>
