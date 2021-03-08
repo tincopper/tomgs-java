@@ -1,5 +1,7 @@
 package com.tomgs.core.base;
 
+import org.junit.Test;
+
 /**
  * @author tomgs
  * @version 2019/10/30 1.0
@@ -22,6 +24,13 @@ public class StringTest {
         s = s + 1;
         int length = s.length();
 
+    }
+
+    @Test
+    public void testSubstr() {
+        String str = "task buildTest()";
+        String substring = str.substring(5, str.indexOf("("));
+        System.out.println(substring);
     }
 
 }
