@@ -20,6 +20,7 @@ activemq-data/
 
 git
 git.pub
+h2
 *.gz
 *.ini
 *.log.*
