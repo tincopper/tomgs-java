@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.junit.Test;
 
 /**
  * @author tomgs
@@ -35,6 +36,11 @@ public class GitDemo {
     // push
     git.push().call();
     //
+  }
+
+  @Test
+  public void testAdd() throws IOException {
+    Git.open(new File("E:\\typescript_workspace\\theia-plugin-test\\bos-ext-plugin"));
   }
 
 }
