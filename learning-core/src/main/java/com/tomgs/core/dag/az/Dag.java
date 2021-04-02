@@ -160,13 +160,13 @@ public class Dag {
     return this.nodes;
   }
 
-  public Map<Integer, List<Node>> getLevelNodes() {
+  public Map<Integer, List<Node>> getLayerNodeMap() {
     return this.getNodes().stream()
         .collect(Collectors.groupingBy(Node::getLayer, TreeMap::new, Collectors.toList()));
   }
 
   public void buildNodeLayers() {
-    Map<Integer, List<Node>> levelNodes = getLevelNodes();
+    Map<Integer, List<Node>> levelNodes = this.getLayerNodeMap();
     levelNodes.forEach((layer, nodes) -> {
       NodeLayer nodeLayer = new NodeLayer();
       nodeLayer.setLayer(layer);
@@ -180,13 +180,17 @@ public class Dag {
   }
 
   /**
-   * 获取指定层状态
+   * 获取指定节点层
    *
-   * @param level
-   * @return
+   * @param layer 第几层
+   * @return 当前层信息
    */
-  public Status getLevelStatus(int level) {
-    return Status.READY;
+  public NodeLayer getLayer(int layer) {
+    List<NodeLayer> nodeLayers = this.getNodeLayers();
+    if (layer - nodeLayers.size() >= 0) {
+      throw new DagException("layer is illegal, exceed max layer.");
+    }
+    return nodeLayers.get(layer);
   }
 
 }
