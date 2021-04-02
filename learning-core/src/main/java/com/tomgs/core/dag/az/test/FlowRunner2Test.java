@@ -86,7 +86,7 @@ public class FlowRunner2Test {
     //NodeBean flowNode = createFlowNode2();
     NodeBean flowNode = createFlowNode3();
     final Dag dag = createDag(flowNode);
-    Map<Integer, List<Node>> collect = dag.getLevelNodes();
+    Map<Integer, List<Node>> collect = dag.getLayerNodeMap();
     for (List<Node> nodes : collect.values()) {
       System.out.println("------------------");
       CountDownLatch countDownLatch = new CountDownLatch(nodes.size());

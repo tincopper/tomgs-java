@@ -111,23 +111,23 @@ public class DagBuilder {
 
     if (child.getLayer() < parent.getLayer() + 1) {
       child.setLayer(parent.getLayer() + 1);
-      adjustChildNodeLevel(child);
+      adjustChildNodeLayer(child);
     }
 
     child.addParent(parent);
   }
 
   /**
-   * 调整子节点对应层数
+   * 调整子节点对应分层
    *
    * @param child 子节点
    */
-  private void adjustChildNodeLevel(Node child) {
+  private void adjustChildNodeLayer(Node child) {
     for (Node childChild : child.getChildren()) {
       if (child.getLayer() >= childChild.getLayer()) {
         childChild.setLayer(child.getLayer() + 1);
       }
-      adjustChildNodeLevel(childChild);
+      adjustChildNodeLayer(childChild);
     }
   }
 
