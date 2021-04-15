@@ -17,6 +17,8 @@ import org.junit.Test;
 /**
  * data stream api
  *
+ * 下面这个是有界的数据，所以在处理timeWindow看不到效果，可以在{@link DataStreamAPIDemo}查看
+ *
  * @author tomgs
  * @since 2021/4/15
  */
