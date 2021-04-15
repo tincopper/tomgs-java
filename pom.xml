@@ -42,6 +42,7 @@
         <module>learning-springwebflux</module>
       <module>learning-k8s</module>
         <module>learning-storage</module>
+      <module>learning-flink</module>
     </modules>
 
     <parent>
