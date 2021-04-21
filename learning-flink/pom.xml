@@ -12,6 +12,7 @@
   <artifactId>learning-flink</artifactId>
 
   <properties>
+    <hutool.version>4.1.12</hutool.version>
     <flink.version>1.11.1</flink.version>
     <es.restclient.version>6.8.3</es.restclient.version>
     <log4j.version>2.11.1</log4j.version>
@@ -19,6 +20,12 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>${hutool.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-java_2.12</artifactId> <!--2.12为scala.binary.version-->
