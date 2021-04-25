@@ -63,4 +63,31 @@ public class AviatorDemo {
     //AviatorEvaluator.exec("a[0][1]+a[0][0]",a);
   }
 
+  @Test
+  public void test5() {
+    System.out.println(
+        AviatorEvaluator.execute("string.contains(\"test\", string.substring('hello', 1,2))"));
+
+    Map<String, Object> env = new HashMap<>();
+    env.put("name", "tomgs");
+    System.out.println(
+        AviatorEvaluator.execute("string.contains(name, 'to')", env));
+  }
+
+  @Test
+  public void test6() {
+    Map<String, Object> env = new HashMap<>();
+    env.put("level", "Error");
+    env.put("level1", "Info");
+    System.out.println(
+        AviatorEvaluator.execute("level == Error || level1 == Info"));
+  }
+
+  @Test
+  public void testCustomFunction() {
+    AviatorEvaluator.addFunction(new AddFunction());
+    System.out.println(AviatorEvaluator.execute("add(1,2)"));
+    System.out.println(AviatorEvaluator.execute("add(add(1,2),100)"));
+  }
+
 }

@@ -1,5 +1,6 @@
 package com.tomgs.flink.demo.log;
 
+import com.tomgs.flink.demo.log.model.AlertEvent;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 @PublicEvolving
 @SuppressWarnings("unused")
-public class AlertSink implements SinkFunction<String> {
+public class AlertSink implements SinkFunction<AlertEvent> {
 
   private static final long serialVersionUID = 1L;
 
@@ -18,8 +19,8 @@ public class AlertSink implements SinkFunction<String> {
       .getLogger(org.apache.flink.walkthrough.common.sink.AlertSink.class);
 
   @Override
-  public void invoke(String value, Context context) {
-    LOG.info(value);
+  public void invoke(AlertEvent value, Context context) {
+    LOG.info(value.toString());
   }
 
 }

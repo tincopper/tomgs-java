@@ -25,6 +25,10 @@ public class AlarmRule {
 
   private String alarmType;
 
-  private int thresholds;
+  private AlarmMatchMode alarmMatchMode;
+
+  private String matchCondition;
+
+  private String alertCondition;
 
 }

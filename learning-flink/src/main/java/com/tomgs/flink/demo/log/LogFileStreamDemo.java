@@ -4,9 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.tomgs.flink.demo.log.model.AlarmRule;
+import com.tomgs.flink.demo.log.model.RuleMatchedLogEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -77,7 +79,7 @@ public class LogFileStreamDemo {
               return;
             }
             // 根据规则进行匹配
-            List<JSONObject> messageBeanList = RuleEngine.matcherRules(alarmRules, message);
+            List<JSONObject> messageBeanList = matcherRules(alarmRules, message);
             // ...
             messageBeanList.forEach(out::collect);
           }
@@ -122,7 +124,7 @@ public class LogFileStreamDemo {
     // 处理聚合数据
     SingleOutputStreamOperator<String> aggAlert = aggAlertSideOutput
         .keyBy(message -> message.f0)
-        .process(new AggWindowFunction())
+        .process(new InnerAggWindowFunction())
         .map(new MapFunction<String, String>() {
           @Override
           public String map(String value) throws Exception {
@@ -136,10 +138,37 @@ public class LogFileStreamDemo {
 
     realtimeAlert
         .union(aggAlert)
-        .map(new AlertJudgeMapFunction())
-        .addSink(new AlertSink());
+//        .map(new AlertJudgeMapFunction())
+        //.addSink(new AlertSink());
+    .print();
 
     env.execute("log file demo");
+  }
+
+  private static List<JSONObject> matcherRules(List<AlarmRule> alarmRules, Tuple2<String, JSONObject> message) {
+    return alarmRules.stream().map(rule -> {
+      // 匹配数据
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put("ruleId", rule.getId());
+      jsonObject.put("ruleType", rule.getAlarmType());
+      jsonObject.put("ruleMessage", message);
+      jsonObject.put("appname", rule.getAppName());
+      // handle rule
+      if (message.f1.getStr("message").contains(rule.getAlarmName())) {
+        jsonObject.put("alarmMessage", message.f1.getStr("message"));
+      }
+
+      return jsonObject;
+    }).collect(Collectors.toList());
+  }
+
+  private static class InnerAggWindowFunction extends KeyedProcessFunction<String, Tuple2<String, JSONObject>, String> {
+
+    @Override
+    public void processElement(Tuple2<String, JSONObject> value, Context ctx, Collector<String> out)
+        throws Exception {
+      out.collect(value.f1.toString());
+    }
   }
 
 }

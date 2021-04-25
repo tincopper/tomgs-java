@@ -6,31 +6,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * 根据规则匹配的日志事件
+ *
  * @author tomgs
  * @since 2021/4/23
  */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AggResult {
+@NoArgsConstructor
+public class RuleMatchedLogEvent {
 
   private String ruleId;
 
   private AlarmRule alarmRule;
 
-  private Object matchedResult;
-
   private LogEvent logEvent;
 
-  private int sum;
-
-  private int count;
-
-  private int max;
-
-  private int min;
-
-  private double avg;
+  private Object matchedResult;
 
 }
