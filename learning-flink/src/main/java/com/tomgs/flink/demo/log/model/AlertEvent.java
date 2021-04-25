@@ -1,6 +1,5 @@
 package com.tomgs.flink.demo.log.model;
 
-import cn.hutool.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,19 +7,20 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author tomgs
- * @since 2021/4/22
+ * @since 2021/4/25
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogEvent {
-  // head
+public class AlertEvent {
+
   private String appName;
 
-  private Long timestamp;
+  private AlarmRule alarmRule;
 
-  // body
-  private JSONObject message;
+  private String message;
+
+  private Object alarmResult;
 
 }
