@@ -23,14 +23,6 @@ public class AggResult {
 
   private LogEvent logEvent;
 
-  private int sum;
-
-  private int count;
-
-  private int max;
-
-  private int min;
-
-  private double avg;
+  private SummaryStatistics statistics;
 
 }

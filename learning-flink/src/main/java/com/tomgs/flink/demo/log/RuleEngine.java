@@ -1,15 +1,14 @@
 package com.tomgs.flink.demo.log;
 
+import cn.hutool.json.JSONObject;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.tomgs.flink.demo.log.model.AlarmRule;
-import com.tomgs.flink.demo.log.model.AlertEvent;
 import com.tomgs.flink.demo.log.model.LogEvent;
 import com.tomgs.flink.demo.log.model.RuleMatchedLogEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.shaded.guava18.com.google.common.collect.Maps;
 
 /**
  * rule engine
@@ -17,6 +16,7 @@ import org.apache.flink.shaded.guava18.com.google.common.collect.Maps;
  * @author tomgs
  * @since 2021/4/22
  */
+@Slf4j
 public class RuleEngine {
 
   /**
@@ -43,18 +43,34 @@ public class RuleEngine {
     return matchedResults;
   }
 
-  public static boolean alertJudge(RuleMatchedLogEvent event) throws Exception {
+  public static boolean alertJudge(RuleMatchedLogEvent event) {
     AlarmRule alarmRule = event.getAlarmRule();
-
-    HashMap<String, Object> env = Maps.newHashMap();
-    env.put("result", event.getMatchedResult());
-
-    Object result = AviatorEvaluator.execute(alarmRule.getAlertCondition(), env, true);
-    if (!(result instanceof Boolean)) {
-      throw new IllegalArgumentException(String.format("告警条件[%s]配置错误", alarmRule.getAlertCondition()));
+    String alertCondition = alarmRule.getAlertCondition();
+    if (StringUtils.isBlank(alertCondition)) {
+      return false;
     }
 
-    return (boolean) result;
+    Object matchedResult = event.getMatchedResult();
+    if (matchedResult instanceof Boolean && !(boolean) matchedResult) {
+      return false;
+    }
+
+    JSONObject message = event.getLogEvent().getMessage();
+    message.put("result", event.getMatchedResult());
+    try {
+      Object result = AviatorEvaluator.execute(alertCondition, message, true);
+      if (result instanceof Boolean) {
+        return (boolean) result;
+      }
+    } catch (Exception e) {
+      log.error("execute alert condition exception, alertCondition: {}, msg: {}.", alertCondition, e.getMessage(), e);
+    }
+    return false;
+  }
+
+  public static boolean alertAggJudge() {
+
+    return false;
   }
 
 }

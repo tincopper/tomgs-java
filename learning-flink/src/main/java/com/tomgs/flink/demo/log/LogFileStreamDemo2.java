@@ -37,7 +37,7 @@ public class LogFileStreamDemo2 {
             .alarmName("test")
             .appName("jdy_retail_litepos_v7")
             .alarmType("AGG")
-            .matchCondition("level == Info")
+            .matchCondition("level == 'Info'")
             .alertCondition("count(result) > 1")
             .build()));
 
@@ -47,7 +47,7 @@ public class LogFileStreamDemo2 {
             .alarmName("test1")
             .appName("jdy_retail_smart_v7")
             .alarmType("REAL_TIME")
-            .matchCondition("level == Info")
+            .matchCondition("level == 'Info'")
             .alertCondition("result == true")
             .build()));
 
@@ -112,16 +112,15 @@ public class LogFileStreamDemo2 {
     SingleOutputStreamOperator<AlertEvent> realtimeAlert = realtimeAlertSideOutput
         .keyBy(RuleMatchedLogEvent::getRuleId) // 按规则进行聚合
         .filter(RuleEngine::alertJudge)
-        .process(new ProcessFunction<RuleMatchedLogEvent, AlertEvent>() {
+        .map(new MapFunction<RuleMatchedLogEvent, AlertEvent>() {
           @Override
-          public void processElement(RuleMatchedLogEvent event, Context ctx, Collector<AlertEvent> out) {
-            AlertEvent alertEvent = AlertEvent.builder()
+          public AlertEvent map(RuleMatchedLogEvent event) {
+            return AlertEvent.builder()
                 .appName(event.getAlarmRule().getAppName())
                 .message(event.getLogEvent().toString())
                 .alarmRule(event.getAlarmRule())
                 .alarmResult(event.getMatchedResult())
                 .build();
-            out.collect(alertEvent);
           }
         });
 
@@ -132,13 +131,12 @@ public class LogFileStreamDemo2 {
         .map(new MapFunction<AggResult, AlertEvent>() {
           @Override
           public AlertEvent map(AggResult event) {
-            AlertEvent alertEvent = AlertEvent.builder()
+            return AlertEvent.builder()
                 .appName(event.getAlarmRule().getAppName())
-                .message(event.getLogEvent().toString())
+                .message(event.toString())
                 .alarmRule(event.getAlarmRule())
                 .alarmResult(event.getMatchedResult())
                 .build();
-            return alertEvent;
           }
         });
 
