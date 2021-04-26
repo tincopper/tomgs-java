@@ -1,5 +1,6 @@
 package com.tomgs.aviator.demo;
 
+import cn.hutool.json.JSONObject;
 import com.googlecode.aviator.AviatorEvaluator;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,18 +77,31 @@ public class AviatorDemo {
 
   @Test
   public void test6() {
-    Map<String, Object> env = new HashMap<>();
+    JSONObject env = new JSONObject();
+//    Map<String, Object> env = new HashMap<>();
     env.put("level", "Error");
     env.put("level1", "Info");
+    env.put("result", "false");
     System.out.println(
-        AviatorEvaluator.execute("level == Error || level1 == Info"));
+        AviatorEvaluator.execute("level == 'Error' || level1 == 'Info'", env));
+
+    //count(result) 获取指定值的大小，集合的话返回size，字符串返回字符串长度
+    System.out.println(
+        AviatorEvaluator.execute("count(result)", env));
   }
 
   @Test
   public void testCustomFunction() {
     AviatorEvaluator.addFunction(new AddFunction());
+    AviatorEvaluator.addFunction(new MCountFunction());
+
     System.out.println(AviatorEvaluator.execute("add(1,2)"));
     System.out.println(AviatorEvaluator.execute("add(add(1,2),100)"));
+
+    JSONObject env = new JSONObject();
+    env.put("result", "true");
+    System.out.println(AviatorEvaluator.execute("result == 'true' && mcount(result) >= 1", env));
+
   }
 
 }
