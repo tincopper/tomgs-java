@@ -1,5 +1,7 @@
 package com.tomgs.core.base;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Test;
 
 /**
@@ -31,6 +33,19 @@ public class StringTest {
         String str = "task buildTest()";
         String substring = str.substring(5, str.indexOf("("));
         System.out.println(substring);
+    }
+
+    @Test
+    public void test() {
+        Object o = true;
+        o = "ssss";
+        System.out.println(o);
+    }
+
+    @Test
+    public void test2() {
+        Path path = Paths.get("a", "b", "c");
+        System.out.println(path.toString());
     }
 
 }

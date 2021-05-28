@@ -5,6 +5,7 @@ import com.googlecode.aviator.AviatorEvaluator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
@@ -91,16 +92,36 @@ public class AviatorDemo {
   }
 
   @Test
+  public void testContains() {
+    AviatorEvaluator.addFunction(new ContainsFunction());
+    JSONObject env = new JSONObject();
+    env.put("level", "Error");
+    env.put("level1", "Info");
+    env.put("result", "false");
+
+    System.out.println(
+        AviatorEvaluator.execute("contains(level)", env));
+  }
+
+  @Test
   public void testCustomFunction() {
+
+    IntSummaryStatistics statistics = new IntSummaryStatistics();
+
     AviatorEvaluator.addFunction(new AddFunction());
-    AviatorEvaluator.addFunction(new MCountFunction());
+    AviatorEvaluator.addFunction(new MCountFunction(statistics));
 
     System.out.println(AviatorEvaluator.execute("add(1,2)"));
     System.out.println(AviatorEvaluator.execute("add(add(1,2),100)"));
 
     JSONObject env = new JSONObject();
     env.put("result", "true");
-    System.out.println(AviatorEvaluator.execute("result == 'true' && mcount(result) >= 1", env));
+
+    statistics.accept(1);
+    statistics.accept(2);
+
+    System.out.println(AviatorEvaluator.execute("mcount(result)", env));
+    System.out.println(AviatorEvaluator.execute("result == 'true' && !(mcount(result) >= 1)", env));
 
   }
 

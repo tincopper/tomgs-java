@@ -3,10 +3,12 @@ package com.tomgs.flink.demo.datastreamapi;
 import com.tomgs.flink.demo.datastreamapi.MyStreamingSource.Item;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.RichAggregateFunction;
+import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -65,6 +67,24 @@ public class DataStreamAPIDemo {
   @Test
   public void filter() {
     SingleOutputStreamOperator<Item> filter = items.filter(item -> item.getId() % 2 == 0);
+    filter.printToErr();
+  }
+
+  @Test
+  public void filter1() {
+    SingleOutputStreamOperator<Item> filter = items.filter(new RichFilterFunction<Item>() {
+
+      @Override
+      public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+      }
+
+      @Override
+      public boolean filter(Item value) throws Exception {
+        return false;
+      }
+
+    });
     filter.printToErr();
   }
 
