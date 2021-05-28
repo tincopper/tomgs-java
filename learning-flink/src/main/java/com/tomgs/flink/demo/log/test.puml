@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response
+@enduml
+
+@startuml
+autonumber
+AnnotationFormPlugin -> AnnotationFormPlugin: <init> doScannerAnnotation
+AnnotationFormPlugin -> FormView: setView
+FormView -> FormView: addPlugin
+AnnotationFormPlugin <-- FormView: setView
+AnnotationFormPlugin -> AnnotationRequestHandler: initiallize
+AnnotationFormPlugin -> AnnotationRequestHandler: registerListener
+AnnotationFormPlugin -> AnnotationRequestHandler: afterCreateNewData
+AnnotationFormPlugin -> AnnotationRequestHandler: click
+AnnotationFormPlugin -> AnnotationRequestHandler: itemClick
+AnnotationFormPlugin -> CallbackHandler: confirmCallBack
+AnnotationFormPlugin -> CallbackHandler: closedCallBack
+
+@enduml
