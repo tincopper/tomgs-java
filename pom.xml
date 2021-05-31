@@ -44,6 +44,7 @@
         <module>learning-storage</module>
       <module>learning-flink</module>
       <module>learning-aviator</module>
+      <module>learning-kafka</module>
     </modules>
 
     <parent>

@@ -138,7 +138,8 @@ public class FlowRunner2Test {
 
   private NodeBean createFlowNode3() {
     NodeBean rootNode = buildSubFlowNode("root");
-    NodeBean n1 = buildSubFlowNode("n1", "root");
+    NodeBean rn1 = buildSubFlowNode("n1", "root");
+    NodeBean rn2 = buildSubFlowNode("r-n2", "root");
 
     NodeBean n2 = buildSubFlowNode("n2", "n1");
     NodeBean n3 = buildSubFlowNode("n3", "n1");
@@ -159,7 +160,7 @@ public class FlowRunner2Test {
     NodeBean n14 = buildSubFlowNode("n14", "n11", "n12", "n13");
 
     NodeBean flowNode = buildSubFlowNode("flow");
-    flowNode.setNodes(ImmutableList.of(rootNode, n1, n4, n7, n5, n6, n2, n3, n8, n9, n11, n13, n14, n12, n10));
+    flowNode.setNodes(ImmutableList.of(rootNode, rn1, rn2, n4, n7, n5, n6, n2, n3, n8, n9, n11, n13, n14, n12, n10));
 
     return flowNode;
   }
