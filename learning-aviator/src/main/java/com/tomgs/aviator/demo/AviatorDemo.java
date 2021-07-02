@@ -125,4 +125,17 @@ public class AviatorDemo {
 
   }
 
+  @Test
+  public void test7() {
+    int i = 3 % 2;
+    int i1 = 2 % 3;
+    int i2 = 4 % 2;
+    int i3 = 2 % 4;
+
+    System.out.println(i);
+    System.out.println(i1);
+    System.out.println(i2);
+    System.out.println(i3);
+  }
+
 }
