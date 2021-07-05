@@ -45,6 +45,7 @@
       <module>learning-flink</module>
       <module>learning-aviator</module>
       <module>learning-kafka</module>
+      <module>learning-jraft</module>
     </modules>
 
     <parent>
