@@ -40,12 +40,13 @@
         <module>learning-bigdata</module>
         <module>learning-disruptor</module>
         <module>learning-springwebflux</module>
-      <module>learning-k8s</module>
+        <module>learning-k8s</module>
         <module>learning-storage</module>
-      <module>learning-flink</module>
-      <module>learning-aviator</module>
-      <module>learning-kafka</module>
-      <module>learning-jraft</module>
+        <module>learning-flink</module>
+        <module>learning-aviator</module>
+        <module>learning-kafka</module>
+        <module>learning-jraft</module>
+        <module>learning-metrics</module>
     </modules>
 
     <parent>
@@ -79,6 +80,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.8.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>2.10.0</version>
             </dependency>
 
             <dependency>
