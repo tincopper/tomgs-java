@@ -1,4 +1,4 @@
-package com.tomgs.learning.metrics.meters;
+package com.tomgs.learning.metrics;
 
 import com.codahale.metrics.*;
 import org.junit.After;
@@ -13,18 +13,22 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * meters demo
+ * metrics demo
  *
  * @author tomgs
  * @date 2021/7/23 11:10
  * @since 1.0
  */
-public class MetersDemo {
+public class MetricsDemo {
 
     private static final MetricRegistry metrics = new MetricRegistry();
 
     @Before
     public void before() {
+        startReport(metrics);
+    }
+
+    static void startReport(MetricRegistry metrics) {
         ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
