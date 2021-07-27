@@ -1,5 +1,8 @@
 package com.tomgs.core.benchmark;
 
+import cn.hutool.core.text.StrSpliter;
+import com.google.common.base.Splitter;
+import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -34,7 +37,7 @@ public class BenchMarkSplit {
 
     @Benchmark
     public void strSplit() {
-        str.split("/");
+        str.split("/", 3);
     }
 
     @Benchmark
@@ -53,6 +56,24 @@ public class BenchMarkSplit {
     @Benchmark
     public void customSplit() {
         split(str, "/");
+    }
+
+    @Benchmark
+    public void stringUtils() {
+        StringUtils.split(str, "/");
+    }
+
+    private final Splitter splitter = Splitter.on("/");
+            //.limit(3);
+    @Benchmark
+    public void guavaSplitter() {
+        splitter.split(str);
+        //splitter.splitToList(str); // 这个性能比较低
+    }
+
+    @Benchmark
+    public void hutoolSplit() {
+        StrSpliter.split(str, 3);
     }
 
     // indexOf和subString的性能比较高
