@@ -1,8 +1,10 @@
 package com.tomgs.core.base.string;
 
+import com.google.common.base.Splitter;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.*;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 10) // 进行10轮测试
 public class StringTest {
 
+    private final Splitter splitter = Splitter.on("/").limit(3);
+
     @Test
     public void testReverse() {
         StringBuilder sb = new StringBuilder();
@@ -32,6 +36,10 @@ public class StringTest {
         // split
         // StringTokenizer
         // CustomerSplit
+        // GuavaSplitter
+        // StringUtils.split
+        List<String> strings = splitter.splitToList("/a/b/c/d");
+        System.out.println(strings);
     }
 
 }
