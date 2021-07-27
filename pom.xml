@@ -20,6 +20,7 @@
         <cglib.version>3.2.4</cglib.version>
         <easyexcel.version>2.1.6</easyexcel.version>
         <disruptor.version>3.4.0</disruptor.version>
+        <hutool.version>4.1.12</hutool.version>
     </properties>
 
     <modules>
@@ -47,6 +48,7 @@
         <module>learning-kafka</module>
         <module>learning-jraft</module>
         <module>learning-metrics</module>
+        <module>learning-beetl</module>
     </modules>
 
     <parent>
@@ -89,6 +91,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.8</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>23.0</version>
@@ -128,6 +136,18 @@
                 <groupId>com.lmax</groupId>
                 <artifactId>disruptor</artifactId>
                 <version>${disruptor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ibeetl</groupId>
+                <artifactId>beetl</artifactId>
+                <version>3.4.0.RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
