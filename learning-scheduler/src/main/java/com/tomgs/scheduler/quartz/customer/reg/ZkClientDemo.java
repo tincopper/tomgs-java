@@ -39,4 +39,12 @@ public class ZkClientDemo {
     }
   }
 
+  @Test
+  public void testCreatePersistentSequential() throws Exception {
+    String key = "/test/event";
+    String value = "123";
+    zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(key, value.getBytes(Charsets.UTF_8));
+    zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(key, value.getBytes(Charsets.UTF_8));
+  }
+
 }
