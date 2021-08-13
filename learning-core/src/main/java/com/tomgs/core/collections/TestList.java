@@ -1,4 +1,4 @@
-package com.tomgs.core.list;
+package com.tomgs.core.collections;
 
 import java.util.ArrayList;
 import java.util.List;

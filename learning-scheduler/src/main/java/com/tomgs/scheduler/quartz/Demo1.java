@@ -20,6 +20,7 @@ public class Demo1 {
   public static void main(String[] args) throws SchedulerException {
     //定时器对象
     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+    scheduler.standby();
     //定义一个工作对象 设置工作名称与组名
     JobDataMap dataMap = new JobDataMap();
     dataMap.put("key", "123");
@@ -33,9 +34,12 @@ public class Demo1 {
         CronScheduleBuilder.cronSchedule("0/3 * * * * ?")).build();
     //设置工作 与触发器
     scheduler.scheduleJob(job, trigger);
+    scheduler.scheduleJob(job, trigger);
+    //scheduler.start();
+    //scheduler.standby();
     // and start it off
     //开始定时任务
-    scheduler.start();
+    //scheduler.start();
   }
 
 }
