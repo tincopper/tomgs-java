@@ -49,6 +49,7 @@
         <module>learning-jraft</module>
         <module>learning-metrics</module>
         <module>learning-beetl</module>
+        <module>learning-zk</module>
     </modules>
 
     <parent>
