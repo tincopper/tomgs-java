@@ -15,7 +15,6 @@ public class UserCache {
         @Override
         protected User newObject(Handle<User> handle) {
             return new User(handle);
-
         }
     };
 
