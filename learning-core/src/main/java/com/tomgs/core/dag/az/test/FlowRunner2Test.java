@@ -87,10 +87,10 @@ public class FlowRunner2Test {
     NodeBean flowNode = createFlowNode3();
     final Dag dag = createDag(flowNode);
     Map<Integer, List<Node>> collect = dag.getLayerNodeMap();
-    for (List<Node> nodes : collect.values()) {
-      System.out.println("------------------");
-      CountDownLatch countDownLatch = new CountDownLatch(nodes.size());
-      nodes.forEach(n -> executorService.execute(() -> {
+    for (Map.Entry<Integer, List<Node>> nodeEntry : collect.entrySet()) {
+      System.out.println("------------------ execute layer " + nodeEntry.getKey());
+      CountDownLatch countDownLatch = new CountDownLatch(nodeEntry.getValue().size());
+      nodeEntry.getValue().forEach(n -> executorService.execute(() -> {
         System.out.println(Thread.currentThread().getName() + "执行：" + n);
         countDownLatch.countDown();
         n.setStatus(Status.SUCCESS);
