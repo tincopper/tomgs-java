@@ -21,15 +21,8 @@ package com.tomgs.core.dag.az.test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.tomgs.core.dag.az.Dag;
-import com.tomgs.core.dag.az.DagBuilder;
-import com.tomgs.core.dag.az.DagProcessor;
-import com.tomgs.core.dag.az.DagService;
-import com.tomgs.core.dag.az.ExecutorServiceUtils;
-import com.tomgs.core.dag.az.Node;
-import com.tomgs.core.dag.az.NodeBean;
-import com.tomgs.core.dag.az.NodeProcessor;
-import com.tomgs.core.dag.az.Status;
+import com.tomgs.core.dag.az.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -98,6 +91,31 @@ public class FlowRunner2Test {
       countDownLatch.await();
     }
 
+  }
+
+  @Test
+  public void executeLayerFlow() throws InterruptedException {
+    NodeBean flowNode = createFlowNode3();
+    final Dag dag = createDag(flowNode);
+    int layerIndex = 1;
+    // 获取指定层的任务
+    NodeLayer layer = dag.getLayer(layerIndex);
+    Status status = layer.getStatus();
+    CountDownLatch countDownLatch = new CountDownLatch(layer.getNodes().size());
+    if (status == Status.READY || status == Status.RUNNING) {
+      for (Node node : layer.getNodes()) {
+        if (node.getStatus() == Status.READY) {
+          executorService.execute(() -> {
+            node.setStatus(Status.SUCCESS);
+            System.out.println("节点运行成功:" + node);
+            countDownLatch.countDown();
+          });
+        }
+      }
+    }
+
+    countDownLatch.await();
+    System.out.println("DAG运行结果：" + dag);
   }
 
   private NodeBean createFlowNode() {
