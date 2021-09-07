@@ -25,10 +25,7 @@ import com.tomgs.core.dag.refactor.*;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -86,6 +83,23 @@ public class FlowRunner2Test {
       }));
       countDownLatch.await();
     }
+
+  }
+
+  @Test
+  public void executeFlow2() {
+    NodeBean flowNode = createFlowNode3();
+    Dag dag = createDag(flowNode);
+    Optional<NodeLayer> firstLayer = dag.getFirstLayer();
+    dag.setStatus(Status.RUNNING);
+    firstLayer.ifPresent(nodeLayer -> {
+      List<Node> nodes = nodeLayer.getNodes();
+      nodeLayer.setStatus(Status.RUNNING);
+      nodeLayer.setRunningNodes(nodes.size());
+      for (Node node : nodes) {
+        System.out.println(node);
+      }
+    });
 
   }
 
@@ -200,12 +214,12 @@ public class FlowRunner2Test {
   private static class DagCreator {
 
     private final NodeBean flowNode;
-    private final DagBuilder<JobDesc> dagBuilder;
+    private final DagBuilder dagBuilder;
 
     DagCreator(final NodeBean flowNode) {
       final String flowName = flowNode.getName();
       this.flowNode = flowNode;
-      this.dagBuilder = new DagBuilder<>(flowName);
+      this.dagBuilder = new DagBuilder(flowName);
     }
 
     Dag create() {

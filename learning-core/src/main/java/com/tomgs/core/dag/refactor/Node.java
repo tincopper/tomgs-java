@@ -27,19 +27,19 @@ import static java.util.Objects.requireNonNull;
 /**
  * Node in a DAG: Directed acyclic graph.
  */
-public class Node<T> {
+public class Node {
 
     private final Long id;
 
     private final String name;
 
-    private final T rawData;
+    private final Object rawData;
 
     // The nodes that this node depends on.
-    private final List<Node<T>> parents = new ArrayList<>();
+    private final List<Node> parents = new ArrayList<>();
 
     // The nodes that depend on this node.
-    private final List<Node<T>> children = new ArrayList<>();
+    private final List<Node> children = new ArrayList<>();
 
     private Status status = Status.READY;
 
@@ -47,7 +47,7 @@ public class Node<T> {
 
     private int layer = 0;
 
-    Node(final String name, final T rawData,final Dag dag) {
+    Node(final String name, final Object rawData,final Dag dag) {
         requireNonNull(name, "The name of the node can't be null");
         this.name = name;
         requireNonNull(dag, "The dag of the node can't be null");
@@ -66,7 +66,7 @@ public class Node<T> {
         return this.id;
     }
 
-    public T getRawData() {
+    public Object getRawData() {
         return rawData;
     }
 
@@ -76,12 +76,12 @@ public class Node<T> {
      * <p>It's important NOT to expose this method as public. The design relies on this to ensure
      * correctness. The DAG's structure shouldn't change after it is created.
      */
-    void addParent(final Node<T> node) {
+    void addParent(final Node node) {
         this.parents.add(node);
         node.addChild(this);
     }
 
-    private void addChild(final Node<T> node) {
+    private void addChild(final Node node) {
         this.children.add(node);
     }
 
@@ -99,7 +99,7 @@ public class Node<T> {
             // e.g. if the node is disabled, it is not ready to run.
             return false;
         }
-        for (final Node<T> parent : this.parents) {
+        for (final Node parent : this.parents) {
             if (!parent.status.isSuccessEffectively()) {
                 return false;
             }
@@ -114,7 +114,7 @@ public class Node<T> {
         // It's possible that the dag is killed before this method is called.
         assertRunningOrKilling();
         changeStatus(Status.SUCCESS);
-        for (final Node<T> child : this.children) {
+        for (final Node child : this.children) {
             child.runIfAllowed();
         }
         this.dag.updateDagStatus();
@@ -136,7 +136,7 @@ public class Node<T> {
         // It's possible that the dag is killed before this method is called.
         assertRunningOrKilling();
         changeStatus(Status.FAILURE);
-        for (final Node<T> child : this.children) {
+        for (final Node child : this.children) {
             child.cancel();
         }
         //todo: HappyRay support failure options "Finish Current Running" and "Cancel All"
@@ -149,7 +149,7 @@ public class Node<T> {
         if (this.status != Status.DISABLED) {
             changeStatus(Status.CANCELED);
         }
-        for (final Node<T> node : this.children) {
+        for (final Node node : this.children) {
             node.cancel();
         }
     }
@@ -194,7 +194,7 @@ public class Node<T> {
 
     @Override
     public String toString() {
-        return String.format("Node (%s) status (%s) layer (%s) in %s", this.name, this.status, this.layer, this.dag);
+        return String.format("Node (%s) id (%s) status (%s) layer (%s) in %s", this.name, this.id, this.status, this.layer, this.dag);
     }
 
     public Status getStatus() {
@@ -219,12 +219,12 @@ public class Node<T> {
     }
 
     @VisibleForTesting
-    public List<Node<T>> getChildren() {
+    public List<Node> getChildren() {
         return this.children;
     }
 
     @VisibleForTesting
-    public List<Node<T>> getParents() {
+    public List<Node> getParents() {
         return this.parents;
     }
 }

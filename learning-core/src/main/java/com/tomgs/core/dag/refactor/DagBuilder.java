@@ -27,11 +27,11 @@ import static java.util.Objects.requireNonNull;
  * methods on NodeBuilder to add dependencies among them. Call the {@link DagBuilder#build()} method
  * to build a Dag.
  */
-public class DagBuilder<T> {
+public class DagBuilder {
 
   private final Dag dag;
 
-  private final Map<String, Node<T>> nameToNodeMap = new HashMap<>();
+  private final Map<String, Node> nameToNodeMap = new HashMap<>();
 
   // The builder can only be used to build a DAG once to prevent modifying an existing DAG after it
   // is built.
@@ -54,14 +54,14 @@ public class DagBuilder<T> {
    * @return a new node
    * @throws DagException if the name is not unique in the DAG.
    */
-  public Node<T> createNode(final String name, final T t) {
+  public Node createNode(final String name, final Object rawData) {
     checkIsBuilt();
 
     if (this.nameToNodeMap.get(name) != null) {
       throw new DagException(String.format("Node names in %s need to be unique. The name "
           + "(%s) already exists.", this, name));
     }
-    final Node<T> node = new Node<>(name, t, this.dag);
+    final Node node = new Node(name, rawData, this.dag);
     this.nameToNodeMap.put(name, node);
 
     return node;
@@ -80,7 +80,7 @@ public class DagBuilder<T> {
 
   /**
    * Add a parent node to a child node. All the names should have been registered with this builder
-   * with the {@link DagBuilder#createNode(String)} call.
+   * with the {@link DagBuilder#createNode(String, Object)} call.
    *
    * @param childNodeName name of the child node
    * @param parentNodeName name of the parent node
@@ -88,13 +88,13 @@ public class DagBuilder<T> {
   public void addParentNode(final String childNodeName, final String parentNodeName) {
     checkIsBuilt();
 
-    final Node<T> child = this.nameToNodeMap.get(childNodeName);
+    final Node child = this.nameToNodeMap.get(childNodeName);
     if (child == null) {
       throw new DagException(String.format("Unknown child node (%s). Did you create the node?",
           childNodeName));
     }
 
-    final Node<T> parent = this.nameToNodeMap.get(parentNodeName);
+    final Node parent = this.nameToNodeMap.get(parentNodeName);
     if (parent == null) {
       throw new DagException(
           String.format("Unknown parent node (%s). Did you create the node?", parentNodeName));
@@ -113,8 +113,8 @@ public class DagBuilder<T> {
    *
    * @param child 子节点
    */
-  private void adjustChildNodeLayer(Node<T> child) {
-    for (Node<T> childChild : child.getChildren()) {
+  private void adjustChildNodeLayer(Node child) {
+    for (Node childChild : child.getChildren()) {
       if (child.getLayer() >= childChild.getLayer()) {
         childChild.setLayer(child.getLayer() + 1);
       }
@@ -153,16 +153,16 @@ public class DagBuilder<T> {
     class CircularDependencyChecker {
 
       // The nodes that need to be visited
-      private final Set<Node<T>> toVisit = new HashSet<>(DagBuilder.this.nameToNodeMap.values());
+      private final Set<Node> toVisit = new HashSet<>(DagBuilder.this.nameToNodeMap.values());
 
       // The nodes that have finished traversing all their parent nodes
-      private final Set<Node<T>> finished = new HashSet<>();
+      private final Set<Node> finished = new HashSet<>();
 
       // The nodes that are waiting for their parent nodes to finish visit.
-      private final Set<Node<T>> ongoing = new HashSet<>();
+      private final Set<Node> ongoing = new HashSet<>();
 
       // One sample of nodes that form a circular dependency
-      private final List<Node<T>> sampleCircularNodes = new ArrayList<>();
+      private final List<Node> sampleCircularNodes = new ArrayList<>();
 
       /**
        * Checks if the builder contains nodes that form a circular dependency ring.
@@ -171,7 +171,7 @@ public class DagBuilder<T> {
        */
       private void check() {
         while (!this.toVisit.isEmpty()) {
-          final Node<T> node = removeOneNodeFromToVisitSet();
+          final Node node = removeOneNodeFromToVisitSet();
           if (checkNode(node)) {
             final String msg = String.format("Circular dependency detected. Sample: %s",
                 this.sampleCircularNodes);
@@ -185,9 +185,9 @@ public class DagBuilder<T> {
        *
        * @return a node
        */
-      private Node<T> removeOneNodeFromToVisitSet() {
-        final Iterator<Node<T>> iterator = this.toVisit.iterator();
-        final Node<T> node = iterator.next();
+      private Node removeOneNodeFromToVisitSet() {
+        final Iterator<Node> iterator = this.toVisit.iterator();
+        final Node node = iterator.next();
         iterator.remove();
         return node;
       }
@@ -200,7 +200,7 @@ public class DagBuilder<T> {
        * @param node node to check
        * @return true if it is
        */
-      private boolean checkNode(final Node<T> node) {
+      private boolean checkNode(final Node node) {
         if (this.finished.contains(node)) {
           return false;
         }
@@ -210,7 +210,7 @@ public class DagBuilder<T> {
         }
         this.toVisit.remove(node);
         this.ongoing.add(node);
-        for (final Node<T> parent : node.getParents()) {
+        for (final Node parent : node.getParents()) {
           if (checkNode(parent)) {
             this.sampleCircularNodes.add(node);
             return true;
