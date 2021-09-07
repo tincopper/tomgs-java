@@ -18,10 +18,7 @@ package com.tomgs.core.dag.refactor;
 
 import cn.hutool.core.lang.UUID;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -37,6 +34,7 @@ public class Dag {
     private final String name;
     private final List<Node> nodes = new ArrayList<>();
     private final List<NodeLayer> nodeLayers = new ArrayList<>();
+    private int layerSize;
     private Status status = Status.READY;
 
     Dag(final String name) {
@@ -144,7 +142,7 @@ public class Dag {
 
     @Override
     public String toString() {
-        return String.format("dag (%s), status (%s)", this.name, this.status);
+        return String.format("dag (%s), id(%s), status (%s)", this.name, this.id, this.status);
     }
 
     String getName() {
@@ -155,7 +153,7 @@ public class Dag {
         return this.status;
     }
 
-    void setStatus(final Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
@@ -176,6 +174,7 @@ public class Dag {
             nodeLayer.setNodes(nodes);
             this.nodeLayers.add(nodeLayer);
         });
+        this.layerSize = nodeLayers.size();
     }
 
     public List<NodeLayer> getNodeLayers() {
@@ -196,12 +195,27 @@ public class Dag {
         return nodeLayers.get(layer);
     }
 
-  /**
-   * 用于持久化
-   * @return map
-   */
-  public Map<String, Object> toObject() {
-      return null;
-  }
+    /**
+     * 获取首层节点
+     *
+     * @return 首层信息
+     */
+    public Optional<NodeLayer> getFirstLayer() {
+        List<NodeLayer> nodeLayers = this.getNodeLayers();
+        return nodeLayers.stream().findFirst();
+    }
+
+    public boolean isLastLayer(int layer) {
+        return this.layerSize == layer + 1;
+    }
+
+    /**
+     * 用于持久化
+     *
+     * @return map
+     */
+    public Map<String, Object> toObject() {
+        return null;
+    }
 
 }
