@@ -22,13 +22,20 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>4.0.3</version>
+      <version>3.4.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.6</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils -->

@@ -1,6 +1,6 @@
 package com.tomgs.core.benchmark;
 
-import cn.hutool.core.text.StrSpliter;
+import cn.hutool.core.text.StrSplitter;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 import org.openjdk.jmh.annotations.*;
@@ -73,7 +73,7 @@ public class BenchMarkSplit {
 
     @Benchmark
     public void hutoolSplit() {
-        StrSpliter.split(str, 3);
+        StrSplitter.split(str, 3);
     }
 
     // indexOf和subString的性能比较高

@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tomgs.core.dag.az.*;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,14 @@ public class FlowRunner2Test {
 
   // The recorded event sequence.
   private final List<String> eventSequence = new ArrayList<>();
+
+  @Test
+  public void testLoadFlow() throws Exception {
+    File file = loadFlowFileFromResource();
+    NodeBeanLoader loader = new NodeBeanLoader();
+    NodeBean nodeBean = loader.load(file);
+    System.out.println(nodeBean);
+  }
 
   @Test
   public void runSimpleV2Flow() throws Exception {
@@ -249,8 +258,10 @@ public class FlowRunner2Test {
   }
 
   private File loadFlowFileFromResource() {
-    final ClassLoader loader = getClass().getClassLoader();
-    return new File(loader.getResource("hello_world_flow.flow").getFile());
+    //final ClassLoader loader = getClass().getClassLoader();
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    URL resource = loader.getResource("hello_world_flow.flow");
+    return new File(resource.getFile());
   }
 
   class SimpleDagProcessor implements DagProcessor {

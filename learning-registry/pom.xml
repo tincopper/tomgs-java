@@ -9,13 +9,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>learning-loadbalance</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-    </dependencies>
+    <artifactId>learning-registry</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>learning-registry-etcd</module>
+        <module>learning-registry-nacos</module>
+        <module>learning-registry-jraft</module>
+    </modules>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
 
 </project>

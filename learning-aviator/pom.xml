@@ -11,10 +11,6 @@
 
   <artifactId>learning-aviator</artifactId>
 
-  <properties>
-    <hutool.version>4.1.12</hutool.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.googlecode.aviator</groupId>
@@ -34,7 +30,6 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-all</artifactId>
-      <version>${hutool.version}</version>
     </dependency>
   </dependencies>
 </project>

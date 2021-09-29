@@ -10,6 +10,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>learning-limiter</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>

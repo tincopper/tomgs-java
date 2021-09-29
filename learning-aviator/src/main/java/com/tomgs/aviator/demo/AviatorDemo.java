@@ -80,9 +80,9 @@ public class AviatorDemo {
   public void test6() {
     JSONObject env = new JSONObject();
 //    Map<String, Object> env = new HashMap<>();
-    env.put("level", "Error");
-    env.put("level1", "Info");
-    env.put("result", "false");
+    env.set("level", "Error");
+    env.set("level1", "Info");
+    env.set("result", "false");
     System.out.println(
         AviatorEvaluator.execute("level == 'Error' || level1 == 'Info'", env));
 
@@ -95,9 +95,9 @@ public class AviatorDemo {
   public void testContains() {
     AviatorEvaluator.addFunction(new ContainsFunction());
     JSONObject env = new JSONObject();
-    env.put("level", "Error");
-    env.put("level1", "Info");
-    env.put("result", "false");
+    env.set("level", "Error");
+    env.set("level1", "Info");
+    env.set("result", "false");
 
     System.out.println(
         AviatorEvaluator.execute("contains(level)", env));

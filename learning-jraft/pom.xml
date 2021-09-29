@@ -12,7 +12,9 @@
   <artifactId>learning-jraft</artifactId>
 
   <properties>
-    <jraft.core.version>1.3.7</jraft.core.version>
+    <jraft.core.version>1.3.8</jraft.core.version>
+    <jraft-rheakv.core.version>1.3.8</jraft-rheakv.core.version>
+    <log4j.version>2.13.2</log4j.version>
   </properties>
 
   <dependencies>
@@ -22,14 +24,24 @@
       <artifactId>jraft-core</artifactId>
       <version>${jraft.core.version}</version>
     </dependency>
-    <!-- jsr305 -->
     <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>jraft-rheakv-core</artifactId>
+      <version>${jraft-rheakv.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>jraft-rheakv-pd</artifactId>
+      <version>${jraft-rheakv.core.version}</version>
+    </dependency>
+    <!-- jsr305 -->
+    <!--<dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>3.0.2</version>
-    </dependency>
+    </dependency>-->
     <!-- bolt -->
-    <dependency>
+    <!--<dependency>
       <groupId>com.alipay.sofa</groupId>
       <artifactId>bolt</artifactId>
       <version>1.5.3</version>
@@ -38,14 +50,14 @@
       <groupId>com.alipay.sofa</groupId>
       <artifactId>hessian</artifactId>
       <version>3.3.6</version>
-    </dependency>
+    </dependency>-->
     <!-- log -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.21</version>
     </dependency>
-    <!-- disruptor -->
+    <!--&lt;!&ndash; disruptor &ndash;&gt;
     <dependency>
       <groupId>com.lmax</groupId>
       <artifactId>disruptor</artifactId>
@@ -61,13 +73,13 @@
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
     </dependency>
-    <!-- protobuf -->
+    &lt;!&ndash; protobuf &ndash;&gt;
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>3.5.1</version>
     </dependency>
-    <!-- protostuff -->
+    &lt;!&ndash; protostuff &ndash;&gt;
     <dependency>
       <groupId>io.protostuff</groupId>
       <artifactId>protostuff-core</artifactId>
@@ -78,23 +90,49 @@
       <artifactId>protostuff-runtime</artifactId>
       <version>1.6.0</version>
     </dependency>
-    <!-- rocksdb -->
+    &lt;!&ndash; rocksdb &ndash;&gt;
     <dependency>
       <groupId>org.rocksdb</groupId>
       <artifactId>rocksdbjni</artifactId>
       <version>5.14.2</version>
     </dependency>
-    <!-- java thread affinity -->
+    &lt;!&ndash; java thread affinity &ndash;&gt;
     <dependency>
       <groupId>net.openhft</groupId>
       <artifactId>affinity</artifactId>
       <version>3.1.7</version>
+    </dependency>-->
+    <!-- 要加下面的日志，不然输出不了日志 -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-jcl</artifactId>
+      <version>${log4j.version}</version>
     </dependency>
     <!-- metrics -->
     <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-core</artifactId>
       <version>4.0.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
     </dependency>
   </dependencies>
 </project>

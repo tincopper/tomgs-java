@@ -20,7 +20,7 @@
         <cglib.version>3.2.4</cglib.version>
         <easyexcel.version>2.1.6</easyexcel.version>
         <disruptor.version>3.4.0</disruptor.version>
-        <hutool.version>4.1.12</hutool.version>
+        <hutool.version>5.7.4</hutool.version>
     </properties>
 
     <modules>
@@ -50,6 +50,7 @@
         <module>learning-metrics</module>
         <module>learning-beetl</module>
         <module>learning-zk</module>
+        <module>learning-registry</module>
     </modules>
 
     <parent>
