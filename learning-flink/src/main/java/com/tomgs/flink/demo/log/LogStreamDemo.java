@@ -23,10 +23,10 @@ public class LogStreamDemo {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
     Properties prop = new Properties();
-    prop.setProperty("bootstrap.servers","172.20.182.13:9092,172.20.182.14:9092");
-    prop.setProperty("group.id","logstash");
+    prop.setProperty("bootstrap.servers", System.getProperty("kafka.servers"));
+    prop.setProperty("group.id", System.getProperty("kafka.group.id"));
 
-    FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<>("topic-jdyapp-log", new SimpleStringSchema(), prop);
+    FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<>(System.getProperty("kafka.topic"), new SimpleStringSchema(), prop);
     //env.getConfig().disableSysoutLogging();
     env.getConfig().setRestartStrategy(RestartStrategies.fixedDelayRestart(5,5000));
     env.enableCheckpointing(2000);
