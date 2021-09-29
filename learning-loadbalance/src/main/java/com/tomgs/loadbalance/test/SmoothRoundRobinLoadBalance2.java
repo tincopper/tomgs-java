@@ -46,10 +46,13 @@ public class SmoothRoundRobinLoadBalance2 {
 
         List<ServerInfo> servers = Lists.newArrayList(serverInfo1, serverInfo2, serverInfo3, serverInfo4);
 
-        for (int i = 1; i <= 20; i++) {
+        long start = System.currentTimeMillis();
+        for (int i = 1; i <= 2000000; i++) {
             ServerInfo serverInfo = loadBalance.doSelect(servers);
-            System.out.println(i + " select server is " + serverInfo.getHost());
+            //System.out.println(i + " select server is " + serverInfo.getHost());
         }
+        long elapsed = System.currentTimeMillis() - start;
+        System.out.println(elapsed); // 86ms
     }
 
 }
