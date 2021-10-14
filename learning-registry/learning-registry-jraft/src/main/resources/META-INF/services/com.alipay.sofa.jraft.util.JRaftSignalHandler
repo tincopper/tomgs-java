@@ -1,2 +1,2 @@
-com.alipay.sofa.jraft.rhea.RheaKVDescribeSignalHandler
-com.alipay.sofa.jraft.rhea.RheaKVMetricsSignalHandler
+com.tomgs.registry.jraft.rhea.RheaKVDescribeSignalHandler
+com.tomgs.registry.jraft.rhea.RheaKVMetricsSignalHandler
