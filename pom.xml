@@ -51,6 +51,7 @@
         <module>learning-beetl</module>
         <module>learning-zk</module>
         <module>learning-registry</module>
+        <module>learning-dubbo</module>
     </modules>
 
     <parent>
