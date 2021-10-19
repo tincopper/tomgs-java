@@ -31,4 +31,10 @@ public class IGreeter1Impl implements IGreeter {
                 .setId("12345").build();
         return usr;
     }
+
+    @Override
+    public String sayHello2(String name) {
+        System.out.println("receiv: " + name);
+        return "hello: " + name;
+    }
 }

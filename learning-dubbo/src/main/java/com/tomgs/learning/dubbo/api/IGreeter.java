@@ -26,4 +26,6 @@ public interface IGreeter {
      */
     Helloworld.User sayHello(Helloworld.HelloRequest request);
 
+    String sayHello2(String name);
+
 }
