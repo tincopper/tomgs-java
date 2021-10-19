@@ -22,6 +22,7 @@
         <spring-boot.version>1.5.13.RELEASE</spring-boot.version>
         <grpc.version>1.19.0</grpc.version>
         <protoc.version>3.7.1</protoc.version>
+        <dubbo.compiler.version>0.0.2</dubbo.compiler.version>
     </properties>
 
     <dependencies>
@@ -113,8 +114,17 @@
                 <configuration>
                     <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
                     <protocArtifact>com.google.protobuf:protoc:3.17.3:exe:${os.detected.classifier}</protocArtifact>
-                    <pluginId>triple-java</pluginId>
                     <outputDirectory>build/generated/source/proto/main/java</outputDirectory>
+                    <pluginId>triple-java</pluginId>
+                    <!--<protocPlugins>
+                        <protocPlugin>
+                            <id>dubbo</id>
+                            <groupId>org.apache.dubbo</groupId>
+                            <artifactId>dubbo-compiler</artifactId>
+                            <version>${dubbo.compiler.version}</version>
+                            <mainClass>org.apache.dubbo.gen.dubbo.Dubbo3Generator</mainClass>
+                        </protocPlugin>
+                    </protocPlugins>-->
                 </configuration>
                 <executions>
                     <execution>
