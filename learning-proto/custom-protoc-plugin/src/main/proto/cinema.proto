@@ -1,0 +1,34 @@
+syntax = "proto3";
+option java_package="com.tomgs.learning.cinema";
+
+enum MovieType{
+  CHILDREN=0;
+  ADULT=1;
+  NORMAL=2;
+  OHTER=3;
+}
+enum Gender{
+  MAN=0;
+  WOMAN=1;
+  OTHER=2;
+}
+
+message Movie{
+  string name=1;
+  MovieType type=2;
+  int32 releaseTimeStamp=3;
+  string description=4;
+  string address=5;
+}
+
+message Customer{
+  string name=1;
+  Gender gender=2;
+  int32 birthdayTimeStamp=3;
+}
+
+message Ticket{
+  int32 id=1;
+  repeated Movie movie=2;
+  Customer customer=3;
+}

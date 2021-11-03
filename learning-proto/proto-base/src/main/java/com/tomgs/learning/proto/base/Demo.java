@@ -3,6 +3,8 @@ package com.tomgs.learning.proto.base;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import com.tomgs.learning.dubbo.api.HelloRequest;
+import com.tomgs.learning.proto.api.HelloOptionProto;
+import com.tomgs.learning.proto.api.MyMessage;
 
 /**
  * Demo
@@ -20,6 +22,12 @@ public class Demo {
         HelloRequest.Builder builder = HelloRequest.newBuilder();
         JsonFormat.parser().merge(print, builder);
         System.out.println(builder);
+
+        System.out.println(HelloOptionProto.myOption);
+
+        String value = MyMessage.getDescriptor().getOptions()
+                .getExtension(HelloOptionProto.myOption);
+        System.out.println(value);
     }
 
 }

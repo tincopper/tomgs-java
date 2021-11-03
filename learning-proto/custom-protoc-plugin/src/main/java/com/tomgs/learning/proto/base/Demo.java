@@ -45,8 +45,8 @@ public class Demo {
         FileDescriptorSet descriptorSet = FileDescriptorSet.parseFrom(fin);
 
         for (FileDescriptorProto fdp : descriptorSet.getFileList()) {
-            FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{});
 
+            FileDescriptor fd = FileDescriptor.buildFrom(fdp, new FileDescriptor[]{});
             for (Descriptor descriptor : fd.getMessageTypes()) {
                 String className = fdp.getOptions().getJavaPackage() + "."
                         + fdp.getOptions().getJavaOuterClassname() + "$"
@@ -63,7 +63,6 @@ public class Demo {
 //		Descriptor md = fd.getDescriptorForType();
 //		byte[] data = null ;
 //		DynamicMessage m = DynamicMessage.parseFrom(md, data);
-
 
     }
 

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package="com.tomgs.learning.selfmd";
+
+import "google/protobuf/descriptor.proto";
+
+message SelfDescribingMessage {
+  // Set of FileDescriptorProtos which describe the type and its dependencies.
+  google.protobuf.FileDescriptorSet descriptor_set = 1;
+
+  string msg_name=2;
+
+  // The message and its type, encoded as an Any message.
+  bytes message = 3;
+}
