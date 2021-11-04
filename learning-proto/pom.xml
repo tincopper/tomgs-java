@@ -21,22 +21,43 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <grpc.version>1.41.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
         <protobuf.version>3.18.1</protobuf.version>
-        <protoc.version>3.18.1</protoc.version>
+        <!--<protoc.version>3.18.1</protoc.version>-->
+        <protoc.version>3.15.8</protoc.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.tomgs.learning</groupId>
+                <artifactId>proto-compiler</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.salesforce.servicelibs</groupId>
+                <artifactId>jprotoc</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.salesforce.servicelibs</groupId>
+                <artifactId>grpc-contrib</artifactId>
+                <version>0.8.1</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>protobuf-java-util</artifactId>
+                        <groupId>com.google.protobuf</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>protobuf-java</artifactId>
+                        <groupId>com.google.protobuf</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <dependency>
-            <groupId>com.salesforce.servicelibs</groupId>
-            <artifactId>jprotoc</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.salesforce.servicelibs</groupId>
-            <artifactId>grpc-contrib</artifactId>
-            <version>0.8.1</version>
-        </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
@@ -74,12 +95,12 @@
         </extensions>
         <pluginManagement>
             <plugins>
-                <plugin>
+                <!--<plugin>
                     <groupId>org.xolstice.maven.plugins</groupId>
                     <artifactId>protobuf-maven-plugin</artifactId>
                     <version>0.6.1</version>
                     <extensions>true</extensions>
-                    <!--<configuration>
+                    &lt;!&ndash;<configuration>
                         <pluginId>java</pluginId>
                         <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
                         &lt;!&ndash; <pluginId>grpc-java</pluginId>
@@ -93,7 +114,7 @@
                                 <mainClass>com.tomgs.learning.proto.demo.MyProtocPlugin</mainClass>
                             </protocPlugin>
                         </protocPlugins>&ndash;&gt;
-                    </configuration>-->
+                    </configuration>&ndash;&gt;
                     <executions>
                         <execution>
                             <goals>
@@ -102,7 +123,7 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
+                </plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>

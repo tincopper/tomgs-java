@@ -1,6 +1,7 @@
 package com.tomgs.learning.proto.base;
 
 import com.google.protobuf.*;
+import com.google.protobuf.util.JsonFormat;
 import com.tomgs.learning.cinema.Cinema;
 
 import java.io.FileInputStream;
@@ -76,6 +77,9 @@ public class DynamicMessageTest1 {
         //DynamicMessage parseFrom = DynamicMessage.parseFrom(pbDescritpor, byteArray);
 
         System.out.println(pbMessage);
+
+        String jsonMessage = JsonFormat.printer().print(pbMessage);
+        System.out.println(jsonMessage);
     }
 
     public static byte[] initMsg() {
