@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.util.JsonFormat;
 import com.tomgs.learning.cinema.Cinema;
 import com.tomgs.learning.selfmd.Selfmd;
 
@@ -65,6 +66,12 @@ public class DynamicMessageTest2 {
         DynamicMessage dmsg = DynamicMessage.parseFrom(pbDescritpor, message);
 
         System.out.println(dmsg);
+
+        Cinema.Ticket ticket = Cinema.Ticket.parseFrom(dmsg.toByteArray());
+        System.out.println(ticket);
+
+        String jsonMessage = JsonFormat.printer().print(dmsg);
+        System.out.println(jsonMessage);
     }
 
     public static Cinema.Ticket initMsg() {
