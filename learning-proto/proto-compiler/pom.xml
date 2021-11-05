@@ -76,6 +76,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -115,7 +131,7 @@
                                     <additionalDependencies>
                                         <additionalDependency>
                                             <groupId>org.apache.logging.log4j</groupId>
-                                            <artifactId>log4j-api</artifactId>
+                                            <artifactId>log4j-tomgs</artifactId>
                                             <version>${log4j2_version}</version>
                                         </additionalDependency>
                                         <additionalDependency>
@@ -133,7 +149,7 @@
                             <encoding>UTF-8</encoding>
                             <docencoding>UTF-8</docencoding>
                             <links>
-                                <link>http://docs.oracle.com/javase/8/docs/api</link>
+                                <link>http://docs.oracle.com/javase/8/docs/tomgs</link>
                             </links>
                             <doclint>none</doclint>
                             <excludePackageNames>
