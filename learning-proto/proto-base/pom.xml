@@ -34,6 +34,10 @@
                 <configuration>
                     <!--<pluginId>java</pluginId>-->
                     <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <!--<includes>
+                        <include>${project.basedir}/src/main/proto/*.proto</include>
+                        <include>${project.basedir}/src/main/proto/**/*.proto</include>
+                    </includes>-->
                     <!-- <pluginId>grpc-java</pluginId>
                      <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>-->
                     <!--<protocPlugins>
@@ -65,36 +69,44 @@
                                     <groupId>com.tomgs.learning</groupId>
                                     <artifactId>proto-compiler</artifactId>
                                     <version>${project.version}</version>
-                                    <mainClass>com.tomgs.proto.gen.dubbo.DubboGenerator</mainClass>
+                                    <!--<mainClass>com.tomgs.proto.gen.dubbo.DubboGenerator</mainClass>-->
+                                    <mainClass>com.tomgs.proto.gen.demo.DubboExtensionGenerator</mainClass>
                                 </protocPlugin>
                             </protocPlugins>
                         </configuration>
                     </execution>
-                    <execution>
+                    <!--<execution>
                         <id>protoc-dump</id>
                         <goals>
                             <goal>compile</goal>
                         </goals>
                         <configuration>
                             <protocPlugins>
-                                <protocPlugin>
+                                &lt;!&ndash;<protocPlugin>
                                     <id>dump</id>
                                     <groupId>com.salesforce.servicelibs</groupId>
                                     <artifactId>jprotoc</artifactId>
                                     <version>${jprotoc.version}</version>
                                     <mainClass>com.salesforce.jprotoc.dump.DumpGenerator</mainClass>
+                                </protocPlugin>&ndash;&gt;
+                                <protocPlugin>
+                                    <id>dump</id>
+                                    <groupId>com.tomgs.learning</groupId>
+                                    <artifactId>proto-compiler</artifactId>
+                                    <version>${project.version}</version>
+                                    <mainClass>com.tomgs.proto.gen.demo.DumpExtensionGenerator</mainClass>
                                 </protocPlugin>
                             </protocPlugins>
                         </configuration>
-                        <!-- OR -->
-                        <!--<goals>
+                        &lt;!&ndash; OR &ndash;&gt;
+                        &lt;!&ndash;<goals>
                             <goal>compile-custom</goal>
                         </goals>
                         <configuration>
                             <pluginId>dump</pluginId>
                             <pluginArtifact>com.salesforce.servicelibs:jprotoc:${jprotoc.version}:exe:${os.detected.classifier}</pluginArtifact>
-                        </configuration>-->
-                    </execution>
+                        </configuration>&ndash;&gt;
+                    </execution>-->
                 </executions>
             </plugin>
             <plugin>
