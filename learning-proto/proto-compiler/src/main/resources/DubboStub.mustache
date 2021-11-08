@@ -42,9 +42,8 @@ static Class<?> clazz = init();
     {{outputType}} {{methodName}}({{inputType}} request);
 
     CompletableFuture<{{outputType}}> {{methodName}}Async({{inputType}} request);
-
     {{#dubboRule}}
-        String {{methodName}} = "{{appId}}.{{serviceFactory}}.{{serviceName}}.{{methodName}}";
+    String {{methodName}} = "{{dubboRule.appId}}.{{dubboRule.serviceFactory}}.{{dubboRule.serviceName}}.{{dubboRule.methodName}}";
     {{/dubboRule}}
 {{/methods}}
 

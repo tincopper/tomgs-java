@@ -1,0 +1,56 @@
+{{#packageName}}
+package {{packageName}};
+{{/packageName}}
+
+import com.camel.bos.adapter.dubbo.component.ExceptionProcessor;
+import com.google.protobuf.util.JsonFormat;
+import org.apache.camel.builder.RouteBuilder;
+
+/**
+ * {{className}}
+ *
+ * @author tomgs
+ * @since 2021/11/5
+ */
+@javax.annotation.Generated(
+    value = "by XESB generator",
+    comments = "Source: {{protoName}}")
+public class {{className}} extends RouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        String grpServerEndpoint = System.getProperty("grpc.server.endpoint");
+        errorHandler(defaultErrorHandler().onExceptionOccurred(new ExceptionProcessor()));
+
+{{#methods}}
+        from(String.format("grpc://%s/%s?method=%s&synchronous=true",
+            grpServerEndpoint,
+            {{serviceName}}Grpc.SERVICE_NAME,
+            "{{methodName}}"))
+        .log("Request received: ${body}")
+        .process(exchange -> {
+            // 将grpc请求信息转换为dubbo请求信息
+            {{inputType}} body = exchange.getMessage().getBody({{inputType}}.class);
+            String jsonArg = JsonFormat.printer().print(body);
+            exchange.getIn().setBody(jsonArg);
+        })
+        {{#dubboRule}}
+        .to(String.format("dubbo://kd.bos.service.DispatchService?appId=%s&serviceFactory=%s&serviceName=%s&methodName=%s",
+            "{{dubboRule.appId}}",
+            "{{dubboRule.serviceFactory}}",
+            "{{dubboRule.serviceName}}",
+            "{{dubboRule.methodName}}"
+        ))
+        .process(exchange -> {
+            // 将dubbo响应信息转换为grpc响应信息
+            String body = exchange.getIn().getBody(String.class);
+            {{outputType}}.Builder builder = {{outputType}}.newBuilder();
+            JsonFormat.parser().merge(body, builder);
+            exchange.getMessage().setBody(builder.build(), {{outputType}}.class);
+        })
+        {{/dubboRule}}
+        .log("Dubbo Response received: ${body}");
+{{/methods}}
+    }
+
+}

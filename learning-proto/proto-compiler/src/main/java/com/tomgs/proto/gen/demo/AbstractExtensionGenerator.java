@@ -150,7 +150,10 @@ public abstract class AbstractExtensionGenerator extends Generator {
         methodContext.javaDoc = getJavaDoc(getComments(methodLocation), getMethodJavaDocPrefix());
 
         DubboRule dubboRule = methodProto.getOptions().getExtension(DubboProto.dubbo);
-        if (dubboRule != null) {
+        if (!Strings.isNullOrEmpty(dubboRule.getAppId())
+                && !Strings.isNullOrEmpty(dubboRule.getServiceFactory())
+                && !Strings.isNullOrEmpty(dubboRule.getMethodName())
+                && !Strings.isNullOrEmpty(dubboRule.getServiceName())) {
             DubboRuleContext dubboRuleContext = new DubboRuleContext();
             dubboRuleContext.appId = dubboRule.getAppId();
             dubboRuleContext.serviceFactory = dubboRule.getServiceFactory();
@@ -300,10 +303,13 @@ public abstract class AbstractExtensionGenerator extends Generator {
     }
 
     private class DubboRuleContext {
-        private String serviceFactory;
-        private String serviceName;
-        private String methodName;
-        private String appId;
+        public String serviceFactory;
+
+        public String serviceName;
+
+        public String methodName;
+
+        public String appId;
     }
 
 

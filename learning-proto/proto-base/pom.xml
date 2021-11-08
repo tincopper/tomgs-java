@@ -51,12 +51,12 @@
                     </protocPlugins>-->
                 </configuration>
                 <executions>
-                    <!--<execution>
+                    <execution>
                         <goals>
                             <goal>compile</goal>
-                            <goal>compile-custom</goal>
+                            <!--<goal>compile-custom</goal>-->
                         </goals>
-                    </execution>-->
+                    </execution>
                     <execution>
                         <id>protoc-dubbo</id>
                         <goals>
@@ -71,6 +71,24 @@
                                     <version>${project.version}</version>
                                     <!--<mainClass>com.tomgs.proto.gen.dubbo.DubboGenerator</mainClass>-->
                                     <mainClass>com.tomgs.proto.gen.demo.DubboExtensionGenerator</mainClass>
+                                </protocPlugin>
+                            </protocPlugins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>protoc-rule</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <protocPlugins>
+                                <protocPlugin>
+                                    <id>rule</id>
+                                    <groupId>com.tomgs.learning</groupId>
+                                    <artifactId>proto-compiler</artifactId>
+                                    <version>${project.version}</version>
+                                    <!--<mainClass>com.tomgs.proto.gen.dubbo.DubboGenerator</mainClass>-->
+                                    <mainClass>com.tomgs.proto.gen.demo.RuleGenerator</mainClass>
                                 </protocPlugin>
                             </protocPlugins>
                         </configuration>
