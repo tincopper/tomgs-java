@@ -1,0 +1,12 @@
+
+�
+ext_demo.proto	tomgs.apigoogle/tomgs/annotations.prototomgs/tomgs/dubbo.proto""
+HelloRequest
+name (	Rname"<
+User
+name (	Rname
+id (	Rid
+age (Rage2�
+Greeter�
+SayHello.tomgs.tomgs.HelloRequest.tomgs.tomgs.User"g���"/v1/example/echo:*���F
+kd.bos.service.ServiceFactoryFormServicegetCustomCtlVersion"bosbproto3
