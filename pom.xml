@@ -54,6 +54,7 @@
         <module>learning-dubbo</module>
         <module>learning-camel</module>
         <module>learning-proto</module>
+        <module>learning-grpc</module>
     </modules>
 
     <parent>
