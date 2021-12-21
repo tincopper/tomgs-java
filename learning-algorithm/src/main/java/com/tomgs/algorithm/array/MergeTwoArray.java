@@ -4,20 +4,28 @@ import java.util.Arrays;
 
 /**
  *  合并有序数组：
- *  给定两个有序整数数组nums1和nums2，讲nums2合并到nums1中，使得nums1成为一个有序的数组。
+ *  给定两个有序整数数组nums1和nums2，将nums2合并到nums1中，使得nums1成为一个有序的数组。
  *  <p>
  *      示例：输入 nums1 = [1, 2, 3, 0, 0, 0], m = 3;
  *                nums2 = [2, 5, 6], n = 3;
  *            输出: [1, 2, 2, 3, 5, 6]
  *  <p/>
+ *  要求：时间复杂度O(n)，空间复杂度O(1)
+ *
  * @author tomgs
  * @version 2019/11/18 1.0 
  */
 public class MergeTwoArray {
 
     public static void main(String[] args) {
+        int[] nums1 = {1, 2, 3, 0, 0, 0, 0};
+        int[] nums2 = {1, 2, 5, 6};
 
+        //method1(nums1, 3, nums2, 3);
+//        method2(nums1, 3, nums2, 3);
+        method3(nums1, 3, nums2, 4);
 
+        System.out.println(Arrays.toString(nums1));
     }
 
     /**
@@ -75,6 +83,6 @@ public class MergeTwoArray {
             nums1[p--] = (nums1[p1] < nums2[p2]) ? nums2[p2--] : nums1[p1--];
 
         // add missing elements from nums2
-        System.arraycopy(nums2, 0, nums1, 0, p2 + p1);
+        //System.arraycopy(nums2, 0, nums1, 0, p2 + p1);
     }
 }
