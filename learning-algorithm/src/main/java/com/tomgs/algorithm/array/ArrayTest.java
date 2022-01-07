@@ -2,10 +2,13 @@ package com.tomgs.algorithm.array;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 数组相关算法题
+ *
  * @author tangzhongyuan
  * @since 2019-07-18 10:34
  **/
@@ -29,11 +32,97 @@ public class ArrayTest {
     }
 
     /**
-     * 将元素均为0、1、2的数组排序，时间复杂度O（n）。
+     * 将元素均为0、1、2的数组排序，时间复杂度O(n)，空间复杂度O(1)。
      */
     @Test
     public void test2() {
+        // 1、最简单方式开辟3个数组来存放0，1，2的数据
+        // 2、3个指针原地排序，0往前面扔，2往后面扔，1不动
+        // 3、快排
+        int[] nums = {0, 2, 1, 2, 2, 2, 1, 0};
 
+        int p0 = 0, p1 = 0, p2 = nums.length - 1;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                p0++;
+            } else if (nums[i] == 1) {
+                p1++;
+            } else {
+
+            }
+        }
+
+        //sort012(nums);
+        System.out.println(Arrays.toString(nums));
+    }
+
+    /**
+     * 给你一个有序数组nums，请你原地删除重复出现的元素，使每个元素只出现一次，返回删除后数组的新长度。
+     * 不要使用额外的数组空间，你必须在原地修改输入数组并在使用 O(1) 额外空间的条件下完成。
+     * eg: nums = [1, 1, 2] output: 2, nums = [1, 2]
+     */
+    @Test
+    public void test3() {
+        // 1、有序数组，一个数字可能有多次重复
+        int[] nums = {1, 1, 1, 2, 2, 2, 3, 4};
+
+        int length = solution(nums);
+        System.out.println("length: " + length);
+        System.out.println("nums: " + Arrays.toString(nums));
+    }
+
+    private int solution(int[] nums) {
+        if (nums == null || nums.length <= 0) {
+            return 0;
+        }
+        int currIndex = 0, nextIndex = 1, length = 1;
+        while (nextIndex < nums.length) {
+            if (nums[currIndex] == nums[nextIndex]) {
+                nums[nextIndex] = -1;
+                nextIndex++;
+            } else {
+                currIndex++;
+                nums[currIndex] = nums[nextIndex];
+                length++;
+            }
+        }
+        return length;
+    }
+
+    void sort012(int[] array) {
+        int p0 = 0;
+        int p2 = array.length - 1;
+        int p1;
+        //p0指向第一个不是0的值
+        while (array[p0] == 0 && p0 < array.length) {
+            p0++;
+        }
+        //p2指向第一个不是2的值
+        while (array[p2] == 2 && p2 >= 0) {
+            p2--;
+        }
+        p1 = p0;//p1从p0的位置开始遍历
+        while (p1 <= p2) {
+            if (array[p1] == 1)
+                p1++;
+            else if (array[p1] == 0) {
+                swap(array, p0, p1);
+                while (array[p0] == 0 && p0 < array.length) {
+                    p0++;
+                }
+            } else {
+                swap(array, p2, p1);
+                while (array[p2] == 2 && p2 >= 0) {
+                    p2--;
+                }
+            }
+        }
+    }
+
+    private void swap(int[] array, int i, int i1) {
+        int tmp = array[i];
+        array[i] = array[i1];
+        array[i1] = tmp;
     }
 
     /**
@@ -58,7 +147,7 @@ public class ArrayTest {
      * 把数值作为 key，它的下标作为 value
      * 遍历数组，判断 map 是否含有这个目标值-当前数值，
      * 有直接返回，没有的话放到map里面
-     *
+     * <p>
      * 所以以后写代码，如果有双层 for 循环，首先考虑一下能否用 map 替换一层
      */
     private int[] findTowSum2(int[] nums, int target) {
