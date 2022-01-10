@@ -2,9 +2,7 @@ package com.tomgs.algorithm.array;
 
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数组相关算法题
@@ -69,6 +67,61 @@ public class ArrayTest {
         int length = solution(nums);
         System.out.println("length: " + length);
         System.out.println("nums: " + Arrays.toString(nums));
+    }
+
+    /**
+     * 217. 给定一个整数数组，判断是否存在重复元素。
+     * 如果存在一值在数组中出现至少两次，函数返回 true 。如果数组中每个元素都不相同，则返回 false 。
+     *
+     * 输入: [1,2,3,1]
+     * 输出: true
+     *
+     * 输入: [1,2,3,4]
+     * 输出: false
+     *
+     * 输入: [1,1,1,3,3,4,3,2,4,2]
+     * 输出: true
+     */
+    @Test
+    public void test4() {
+        int[] nums = {1, 2, 3, 1};
+        //1、先排序再判断相邻元素，Arrays.sort
+        //2、使用hash表，HashSet，存在相同元素时add返回false
+        boolean result = containsDuplicate(nums);
+        System.out.println("result: " + result);
+    }
+
+    /**
+     * 53. 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+     * 子数组 是数组中的一个连续部分。
+     *
+     * 输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+     * 输出：6
+     * 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+     *
+     * 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的 分治法 求解。
+     */
+    @Test
+    public void test5() {
+        int[] nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+        // 1、贪心算法
+        // 2、动态规划
+        int result = maxSubArray(nums);
+        System.out.println(result);
+    }
+
+    public int maxSubArray(int[] nums) {
+        return 0;
+    }
+
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            if (!set.add(num)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int solution(int[] nums) {
