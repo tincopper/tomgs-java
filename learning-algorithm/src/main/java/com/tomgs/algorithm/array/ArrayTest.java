@@ -103,15 +103,54 @@ public class ArrayTest {
      */
     @Test
     public void test5() {
-        int[] nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+        int[] nums1 = {-2};
+        int[] nums2 = {-2, -5};
+        int[] nums3 = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
         // 1、贪心算法
+        System.out.println(maxSubArray(nums1));
+        System.out.println(maxSubArray(nums2));
+        System.out.println(maxSubArray(nums3));
         // 2、动态规划
-        int result = maxSubArray(nums);
-        System.out.println(result);
+        System.out.println(maxSubArray1(nums1));
+        System.out.println(maxSubArray1(nums2));
+        System.out.println(maxSubArray1(nums3));
     }
 
+    /**
+     * 贪心算法实现
+     * 若当前指针所指的元素之前的和小于0，则丢弃当前元素的之前的数列
+     */
     public int maxSubArray(int[] nums) {
-        return 0;
+        if (nums == null || nums.length == 0) {
+            return Integer.MIN_VALUE;
+        }
+        int maxSum = nums[0], curSum = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            curSum += nums[i];
+            if (curSum < nums[i]) {
+                curSum = nums[i];
+            }
+            if (curSum > maxSum) {
+                maxSum = curSum;
+            }
+        }
+        return maxSum;
+    }
+
+    /**
+     * 动态规划实现
+     * 若前一个元素大于0，则将其加到当前元素上面
+     */
+    public int maxSubArray1(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return Integer.MIN_VALUE;
+        }
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i -1] >0) {
+                nums[i] += nums[i - 1];
+            }
+        }
+        return Arrays.stream(nums).max().getAsInt();
     }
 
     public boolean containsDuplicate(int[] nums) {
