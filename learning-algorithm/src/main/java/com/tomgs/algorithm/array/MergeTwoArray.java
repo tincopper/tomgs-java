@@ -18,12 +18,12 @@ import java.util.Arrays;
 public class MergeTwoArray {
 
     public static void main(String[] args) {
-        int[] nums1 = {1, 2, 3, 0, 0, 0, 0};
-        int[] nums2 = {1, 2, 5, 6};
+        int[] nums1 = {3, 4, 6, 0, 0, 0};
+        int[] nums2 = {1, 2, 3};
 
         //method1(nums1, 3, nums2, 3);
 //        method2(nums1, 3, nums2, 3);
-        method3(nums1, 3, nums2, 4);
+        method3(nums1, 3, nums2, 3);
 
         System.out.println(Arrays.toString(nums1));
     }
@@ -81,8 +81,10 @@ public class MergeTwoArray {
         //compare elements from nums1 and nums2 and add the largest one into nums1;
         while ((p1 >= 0) && (p2 >= 0))
             nums1[p--] = (nums1[p1] < nums2[p2]) ? nums2[p2--] : nums1[p1--];
-
         // add missing elements from nums2
-        //System.arraycopy(nums2, 0, nums1, 0, p2 + p1);
+        // 此时有可能p2不为0
+        while (p2 >=0) {
+            nums1[p--] = nums2[p2--];
+        }
     }
 }
