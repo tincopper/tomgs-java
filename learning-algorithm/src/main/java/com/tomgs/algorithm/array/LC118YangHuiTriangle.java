@@ -2,6 +2,7 @@ package com.tomgs.algorithm.array;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,48 @@ import java.util.List;
 public class LC118YangHuiTriangle {
 
     public List<List<Integer>> generate(int numRows) {
-        return null;
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 1; i <= numRows; i++) {
+            if (i == 1) {
+                List<Integer> tmp = new ArrayList<>();
+                tmp.add(1);
+                result.add(tmp);
+                continue;
+            }
+            if (i == 2) {
+                List<Integer> tmp = new ArrayList<>();
+                tmp.add(1);
+                tmp.add(1);
+                result.add(tmp);
+                continue;
+            }
+            List<Integer> tmp = new ArrayList<>();
+            List<Integer> preLayer = result.get(i - 2);
+            tmp.add(1);
+            for (int j = 1; j < i - 1; j++) {
+                tmp.add(preLayer.get(j - 1) + preLayer.get(j));
+            }
+            tmp.add(1);
+            result.add(tmp);
+        }
+
+        return result;
+    }
+
+    public List<List<Integer>> generate2(int numRows) {
+        List<List<Integer>> ret = new ArrayList<List<Integer>>();
+        for (int i = 0; i < numRows; ++i) {
+            List<Integer> row = new ArrayList<Integer>();
+            for (int j = 0; j <= i; ++j) {
+                if (j == 0 || j == i) {
+                    row.add(1);
+                } else {
+                    row.add(ret.get(i - 1).get(j - 1) + ret.get(i - 1).get(j));
+                }
+            }
+            ret.add(row);
+        }
+        return ret;
     }
 
     @Test
@@ -32,10 +74,21 @@ public class LC118YangHuiTriangle {
         System.out.println(generate);
     }
 
-
     @Test
     public void test1() {
-        List<List<Integer>> generate = generate(1);
+        List<List<Integer>> generate = generate(2);
+        System.out.println(generate);
+    }
+
+    @Test
+    public void test2() {
+        List<List<Integer>> generate = generate2(5);
+        System.out.println(generate);
+    }
+
+    @Test
+    public void test3() {
+        List<List<Integer>> generate = generate2(1);
         System.out.println(generate);
     }
 
