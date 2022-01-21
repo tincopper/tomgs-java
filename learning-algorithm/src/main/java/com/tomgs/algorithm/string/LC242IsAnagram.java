@@ -2,10 +2,14 @@ package com.tomgs.algorithm.string;
 
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 242. 有效的字母异位词
  *
  * 给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的字母异位词。
+ * 字母异位词指字母相同，但排列不同的字符串。
  *
  * 注意：若s 和 t中每个字符出现的次数都相同，则称s 和 t互为字母异位词。
  *
@@ -27,7 +31,21 @@ import org.junit.Test;
 public class LC242IsAnagram {
 
     public boolean isAnagram(String s, String t) {
-        return false;
+        if (s.equals(t)) {
+            return false;
+        }
+        Set<Character> set = new HashSet<>();
+        char[] m = s.toCharArray();
+        for (char c : m) {
+            set.add(c);
+        }
+        char[] n = t.toCharArray();
+        for (char c : n) {
+            if (!set.contains(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Test
@@ -40,6 +58,13 @@ public class LC242IsAnagram {
     @Test
     public void test1() {
         String s = "rat", t = "car";
+        boolean result = isAnagram(s, t);
+        System.out.println(result);
+    }
+
+    @Test
+    public void test2() {
+        String s = "acsrsfs", t = "carsssf";
         boolean result = isAnagram(s, t);
         System.out.println(result);
     }

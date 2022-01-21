@@ -31,8 +31,22 @@ import org.junit.Test;
  */
 public class LC383CanConstruct {
 
+    // 对应 magazine 包含 ransomNote
     public boolean canConstruct(String ransomNote, String magazine) {
-        return false;
+        int[] arr = new int[26];
+        for (int i = 0; i < magazine.length(); i++) {
+            // 对应字母下标设置值
+            arr[magazine.charAt(i) - 'a']++;
+        }
+        // 然后判断ransomNote是否在arr中存在对应的值以及存在的次数
+        for (int i = 0; i < ransomNote.length(); i++) {
+            int index = ransomNote.charAt(i) - 'a';
+            arr[index]--;
+            if (arr[index] < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Test
