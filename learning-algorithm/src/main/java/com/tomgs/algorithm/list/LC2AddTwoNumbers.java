@@ -29,12 +29,13 @@ public class LC2AddTwoNumbers {
         ListNode tailNode = null;
         // 进位
         int carry = 0;
-        while (l1.next != null || l2.next != null) {
-            int v1 = l1.next == null ? 0 : l1.value;
-            int v2 = l2.next == null ? 0 : l2.value;
+        while (l1 != null || l2 != null || carry != 0) {
+            int v1 = l1 == null ? 0 : l1.value;
+            int v2 = l2 == null ? 0 : l2.value;
 
-            int quotient = (v1 + v2 + carry) / 10;
-            int mod = (v1 + v2 + carry) % 10;
+            int v = v1 + v2 + carry;
+            int quotient = v / 10;
+            int mod = v % 10;
 
             carry = quotient;
             if (headNode == null) {
@@ -48,29 +49,48 @@ public class LC2AddTwoNumbers {
                 }
                 tailNode = node;
             }
-            if (l1.next != null) {
+            if (l1 != null) {
                 l1 = l1.next;
-            } else {
-                l1.value = 0;
             }
-            if (l2.next != null) {
+            if (l2 != null) {
                 l2 = l2.next;
-            } else {
-                l2.value = 0;
             }
-        }
-        int end = l1.value + l2.value + carry;
-        if (tailNode != null) {
-            ListNode node1 = new ListNode(end / 10);
-            ListNode node2 = new ListNode(end % 10);
-            tailNode.setNext(node1);
-            node1.setNext(node2);
-        } else {
-            headNode = new ListNode(end / 10);
-            ListNode node = new ListNode(end % 10);
-            headNode.setNext(node);
         }
         return headNode;
+    }
+
+    /**
+     * 官方解法
+     */
+    public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
+        ListNode head = null, tail = null;
+        // 进位值
+        int carry = 0;
+
+        while (l1 != null || l2 != null) {
+            int v1 = l1 == null ? 0 : l1.value;
+            int v2 = l2 == null ? 0 : l2.value;
+            int sumVal = v1 + v2 + carry;
+            carry = sumVal / 10;
+            if (head == null) { // first node
+                head = tail = new ListNode(sumVal % 10);
+            } else {
+                tail.next = new ListNode(sumVal % 10);
+                tail = tail.next;
+            }
+            if (l1 != null) {
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                l2 = l2.next;
+            }
+        }
+        // 遍历完之后看一下有没有进位
+        if (carry > 0) {
+            tail.setNext(new ListNode(carry));
+        }
+
+        return head;
     }
 
     @Test
@@ -81,8 +101,7 @@ public class LC2AddTwoNumbers {
         ListNode l2 = ListNode.createListNode(5, 6, 4);
         System.out.println(l2.toPrettyString());
 
-        ListNode result = addTwoNumbers(l1, l2);
-        System.out.println(result.toPrettyString());
+        printResult(l1, l2);
     }
 
     @Test
@@ -93,8 +112,7 @@ public class LC2AddTwoNumbers {
         ListNode l2 = ListNode.createListNode(0);
         System.out.println(l2.toPrettyString());
 
-        ListNode result = addTwoNumbers(l1, l2);
-        System.out.println(result.toPrettyString());
+        printResult(l1, l2);
     }
 
     @Test
@@ -105,9 +123,14 @@ public class LC2AddTwoNumbers {
         ListNode l2 = ListNode.createListNode(9, 9, 9, 9);
         System.out.println(l2.toPrettyString());
 
-        ListNode result = addTwoNumbers(l1, l2);
-        System.out.println(result.toPrettyString());
+        printResult(l1, l2);
     }
 
+    private void printResult(ListNode l1, ListNode l2) {
+        ListNode result = addTwoNumbers(l1, l2);
+        ListNode result2 = addTwoNumbers2(l1, l2);
+        System.out.println(result.toPrettyString());
+        System.out.println(result2.toPrettyString());
+    }
 
 }
