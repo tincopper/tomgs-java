@@ -73,20 +73,19 @@ public class LC11MaxArea {
     public int maxArea2(int[] height) {
         int maxArea = 0;
         // 左右指针
-        int left = 0, right = 1;
         int len = height.length;
-        while (left < len - 1) {
+        int left = 0, right = len - 1;
+        while (left < right) {
             int w = right - left;
             int h = Math.min(height[left], height[right]);
             int size = w * h;
             if (size > maxArea) {
                 maxArea = size;
             }
-            if (right < len - 1) {
-                right++;
-            } else {
+            if (height[left] < height[right]) {
                 left++;
-                right = left + 1;
+            } else {
+                right--;
             }
         }
 
@@ -97,27 +96,35 @@ public class LC11MaxArea {
     public void test() {
         int[] height = {1, 8, 6, 2, 5, 4, 8, 3, 7};
         int result = maxArea(height);
+        int result2 = maxArea2(height);
         System.out.println(result);
+        System.out.println(result2);
     }
 
     @Test
     public void test1() {
         int[] height = {4, 3, 2, 1, 4};
         int result = maxArea(height);
+        int result2 = maxArea2(height);
         System.out.println(result);
+        System.out.println(result2);
     }
 
     @Test
     public void test2() {
         int[] height = {1, 1};
         int result = maxArea(height);
+        int result2 = maxArea2(height);
         System.out.println(result);
+        System.out.println(result2);
     }
 
     @Test
     public void test3() {
         int[] height = {1, 2, 1};
         int result = maxArea(height);
+        int result2 = maxArea2(height);
         System.out.println(result);
+        System.out.println(result2);
     }
 }
