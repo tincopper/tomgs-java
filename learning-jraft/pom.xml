@@ -34,7 +34,50 @@
       <artifactId>jraft-rheakv-pd</artifactId>
       <version>${jraft-rheakv.core.version}</version>
     </dependency>
-    <!-- jsr305 -->
+
+    <!-- https://mvnrepository.com/artifact/org.apache.ratis/ratis-server -->
+    <dependency>
+      <groupId>org.apache.ratis</groupId>
+      <artifactId>ratis-server</artifactId>
+      <version>2.2.0</version>
+      <!--<scope>provided</scope>-->
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.ratis/ratis-netty -->
+    <dependency>
+      <groupId>org.apache.ratis</groupId>
+      <artifactId>ratis-netty</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.ratis/ratis-grpc -->
+    <dependency>
+      <groupId>org.apache.ratis</groupId>
+      <artifactId>ratis-grpc</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.ratis</groupId>
+      <artifactId>ratis-tools</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+      <version>1.72</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.2.1</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+
+      <!-- jsr305 -->
     <!--<dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
@@ -127,7 +170,6 @@
     <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-core</artifactId>
-      <version>4.0.2</version>
     </dependency>
 
     <dependency>
