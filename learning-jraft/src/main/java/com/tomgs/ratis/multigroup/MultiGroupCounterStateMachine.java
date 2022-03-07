@@ -18,15 +18,12 @@
 
 package com.tomgs.ratis.multigroup;
 
-import com.tomgs.ratis.common.Constants;
-import org.apache.ratis.client.RaftClient;
-import org.apache.ratis.client.api.GroupManagementApi;
+import org.apache.ratis.proto.RaftProtos;
 import org.apache.ratis.protocol.*;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.protocol.TermIndex;
 import org.apache.ratis.server.raftlog.RaftLog;
 import org.apache.ratis.server.storage.RaftStorage;
-import org.apache.ratis.statemachine.StateMachine;
 import org.apache.ratis.statemachine.TransactionContext;
 import org.apache.ratis.statemachine.impl.BaseStateMachine;
 import org.apache.ratis.statemachine.impl.SimpleStateMachineStorage;
@@ -34,9 +31,9 @@ import org.apache.ratis.statemachine.impl.SingleFileSnapshotInfo;
 import org.apache.ratis.util.JavaUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,7 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * {@code query} method however INCREMENT is a transactional command which
  * will be handled by {@code applyTransaction}.
  */
-public class MultiGroupStateMachine extends BaseStateMachine {
+public class MultiGroupCounterStateMachine extends BaseStateMachine {
     private final SimpleStateMachineStorage storage =
             new SimpleStateMachineStorage();
 
@@ -56,16 +53,12 @@ public class MultiGroupStateMachine extends BaseStateMachine {
 
     private AtomicLong leaderTerm = new AtomicLong(-1L);
 
+    private AtomicLong transactions = new AtomicLong(0);
+
     private AtomicBoolean isLeader = new AtomicBoolean(false);
 
-    private final Map<RaftGroupId, StateMachine> registry = new ConcurrentHashMap<>();
-
-    public MultiGroupStateMachine(String groupId) {
+    public MultiGroupCounterStateMachine(String groupId) {
         this.groupId = groupId;
-        registry.put(Constants.RAFT_GROUP1.getGroupId(),
-                new MultiGroupCounterStateMachine("test-counter-1"));
-        registry.put(Constants.RAFT_GROUP2.getGroupId(),
-                new MultiGroupCounterStateMachine("test-counter-2"));
     }
 
     /**
@@ -168,6 +161,61 @@ public class MultiGroupStateMachine extends BaseStateMachine {
         return last.getIndex();
     }
 
+    /**
+     * Handle GET command, which used by clients to get the counter value.
+     *
+     * @param request the GET message
+     * @return the Message containing the current counter value
+     */
+    @Override
+    public CompletableFuture<Message> query(Message request) {
+        LOG.info("----------------> " + groupId);
+        String msg = request.getContent().toString(Charset.defaultCharset());
+        if (!msg.equals("GET")) {
+            return CompletableFuture.completedFuture(
+                    Message.valueOf("Invalid Command"));
+        }
+        return CompletableFuture.completedFuture(
+                Message.valueOf(leaderTerm.toString()));
+    }
+
+    /**
+     * Apply the INCREMENT command by incrementing the counter object.
+     *
+     * @param trx the transaction context
+     * @return the message containing the updated counter value
+     */
+    @Override
+    public CompletableFuture<Message> applyTransaction(TransactionContext trx) {
+        LOG.info("----------------> " + groupId);
+        final RaftProtos.LogEntryProto entry = trx.getLogEntry();
+
+        //check if the command is valid
+        String logData = entry.getStateMachineLogEntry().getLogData()
+                .toString(Charset.defaultCharset());
+        if (!logData.equals("INCREMENT")) {
+            return CompletableFuture.completedFuture(
+                    Message.valueOf("Invalid Command"));
+        }
+        //update the last applied term and index
+        final long index = entry.getIndex();
+        updateLastAppliedTermIndex(entry.getTerm(), index);
+
+        //actual execution of the command: increment the counter
+        leaderTerm.incrementAndGet();
+
+        //return the new value of the counter to the client
+        final CompletableFuture<Message> f =
+                CompletableFuture.completedFuture(Message.valueOf(leaderTerm.toString()));
+
+        //if leader, log the incremented value and it's log index
+        if (trx.getServerRole() == RaftProtos.RaftPeerRole.LEADER) {
+            LOG.info("{}: Increment to {}", index, leaderTerm.toString());
+        }
+
+        return f;
+    }
+
     @Override
     public void notifyLeaderChanged(RaftGroupMemberId groupMemberId, RaftPeerId newLeaderId) {
         LOG.info("----------------> " + groupId);
@@ -176,19 +224,6 @@ public class MultiGroupStateMachine extends BaseStateMachine {
         if (currentPeerId.equals(newLeaderId)) {
             isLeader.set(true);
             System.out.println("LEADER");
-
-            for(RaftGroupId gid : registry.keySet()) {
-                final RaftGroup newGroup = RaftGroup.valueOf(gid, Constants.PEERS);
-                LOG.info("add new group: " + newGroup);
-                try (final RaftClient client = MultiRaftCounterClient.buildClient(newGroup)) {
-                    for (RaftPeer p : newGroup.getPeers()) {
-                        GroupManagementApi groupManagementApi = client.getGroupManagementApi(p.getId());
-                        groupManagementApi.add(newGroup);
-                    }
-                } catch (IOException e) {
-                    LOG.error("add group fail: {}", e.getMessage(), e);
-                }
-            }
         } else {
             isLeader.set(false);
             System.out.println("FOLLOWER");
@@ -200,6 +235,20 @@ public class MultiGroupStateMachine extends BaseStateMachine {
         LOG.info("----------------> " + groupId);
         // 不是主节点时回调
         System.out.println("notifyNotLeader ================================ " + pendingEntries);
+    }
+
+    @Override
+    public TransactionContext startTransaction(RaftClientRequest request) throws IOException {
+        LOG.info("----------------> " + groupId);
+        System.out.println("startTransaction ================================ " + request);
+        // 只有leader 才会调用此方法，所以进入此方法的即为leader
+        isLeader.set(true);
+        // send the next transaction id as the "context" from SM
+        return TransactionContext.newBuilder()
+                .setStateMachine(this)
+                .setClientRequest(request)
+                .setStateMachineContext(transactions.incrementAndGet())
+                .build();
     }
 
     public boolean isLeader() {

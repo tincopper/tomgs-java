@@ -26,6 +26,7 @@ import org.apache.ratis.grpc.GrpcFactory;
 import org.apache.ratis.protocol.ClientId;
 import org.apache.ratis.protocol.Message;
 import org.apache.ratis.protocol.RaftClientReply;
+import org.apache.ratis.protocol.RaftGroup;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,9 +42,9 @@ import java.util.concurrent.TimeUnit;
  * Parameter to this application indicate the number of INCREMENT command, if no
  * parameter found, application use default value which is 10
  */
-public final class MultiRaftClient {
+public final class MultiRaftCounterClient {
 
-  private MultiRaftClient(){
+  private MultiRaftCounterClient(){
   }
 
   //@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
@@ -53,7 +54,7 @@ public final class MultiRaftClient {
     int increment = args.length > 0 ? Integer.parseInt(args[0]) : 10;
 
     //build the counter cluster client
-    RaftClient raftClient = buildClient();
+    RaftClient raftClient = buildClient(Constants.RAFT_GROUP);
 
     //use a executor service with 10 thread to send INCREMENT commands
     // concurrently
@@ -81,12 +82,13 @@ public final class MultiRaftClient {
    * Counter cluster
    *
    * @return the created client of Counter cluster
+   * @param newGroup
    */
-  public static RaftClient buildClient() {
+  public static RaftClient buildClient(RaftGroup newGroup) {
     RaftProperties raftProperties = new RaftProperties();
     RaftClient.Builder builder = RaftClient.newBuilder()
         .setProperties(raftProperties)
-        .setRaftGroup(Constants.RAFT_GROUP)
+        .setRaftGroup(newGroup)
         .setClientRpc(
             new GrpcFactory(new Parameters())
                 .newRaftClientRpc(ClientId.randomId(), raftProperties));

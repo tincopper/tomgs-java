@@ -62,9 +62,17 @@ public final class Constants {
   }
 
   private static final UUID CLUSTER_GROUP_ID = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c1");
+  private static final UUID CLUSTER_GROUP_ID1 = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c2");
+  private static final UUID CLUSTER_GROUP_ID2 = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c3");
 
   public static final RaftGroup RAFT_GROUP = RaftGroup.valueOf(
       RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID), PEERS);
+
+  public static final RaftGroup RAFT_GROUP1 = RaftGroup.valueOf(
+          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID1), PEERS);
+
+  public static final RaftGroup RAFT_GROUP2 = RaftGroup.valueOf(
+          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID2), PEERS);
 
   private Constants() {
   }
