@@ -31,6 +31,9 @@ import java.util.*;
  */
 public final class Constants {
   public static final List<RaftPeer> PEERS;
+  public static final List<RaftPeer> SUB_PEERS1;
+
+  public static final List<RaftPeer> SUB_PEERS2;
   public static final String PATH;
 
   static {
@@ -59,6 +62,19 @@ public final class Constants {
       peers.add(RaftPeer.newBuilder().setId("n" + i).setAddress(addresses[i]).build());
     }
     PEERS = Collections.unmodifiableList(peers);
+
+    final List<RaftPeer> subPeers1 = new ArrayList<>(addresses.length);
+    for (int i = 0; i < addresses.length; i++) {
+      subPeers1.add(RaftPeer.newBuilder().setId("n" + i).setAddress(addresses[i]).setPriority(i == 1 ? 1 : 0).build());
+    }
+
+    SUB_PEERS1 = Collections.unmodifiableList(subPeers1);
+
+    final List<RaftPeer> subPeers2 = new ArrayList<>(addresses.length);
+    for (int i = 0; i < addresses.length; i++) {
+      subPeers2.add(RaftPeer.newBuilder().setId("n" + i).setAddress(addresses[i]).setPriority(i == 2 ? 1 : 0).build());
+    }
+    SUB_PEERS2 = Collections.unmodifiableList(subPeers2);
   }
 
   private static final UUID CLUSTER_GROUP_ID = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c1");
@@ -69,10 +85,10 @@ public final class Constants {
       RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID), PEERS);
 
   public static final RaftGroup RAFT_GROUP1 = RaftGroup.valueOf(
-          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID1), PEERS);
+          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID1), SUB_PEERS1);
 
   public static final RaftGroup RAFT_GROUP2 = RaftGroup.valueOf(
-          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID2), PEERS);
+          RaftGroupId.valueOf(Constants.CLUSTER_GROUP_ID2), SUB_PEERS2);
 
   private Constants() {
   }

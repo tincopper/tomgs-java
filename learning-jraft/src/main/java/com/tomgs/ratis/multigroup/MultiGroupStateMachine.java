@@ -22,6 +22,7 @@ import com.tomgs.ratis.common.Constants;
 import org.apache.ratis.client.RaftClient;
 import org.apache.ratis.client.api.GroupManagementApi;
 import org.apache.ratis.protocol.*;
+import org.apache.ratis.protocol.exceptions.AlreadyExistsException;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.protocol.TermIndex;
 import org.apache.ratis.server.raftlog.RaftLog;
@@ -79,13 +80,13 @@ public class MultiGroupStateMachine extends BaseStateMachine {
      *                    stuff
      * @throws IOException if any error happens during load state
      */
-    @Override
+    /*@Override
     public void initialize(RaftServer server, RaftGroupId groupId,
                            RaftStorage raftStorage) throws IOException {
         super.initialize(server, groupId, raftStorage);
         this.storage.init(raftStorage);
         load(storage.getLatestSnapshot());
-    }
+    }*/
 
     /**
      * very similar to initialize method, but doesn't initialize the storage
@@ -94,17 +95,17 @@ public class MultiGroupStateMachine extends BaseStateMachine {
      *
      * @throws IOException if any error happens during load state
      */
-    @Override
+    /*@Override
     public void reinitialize() throws IOException {
         load(storage.getLatestSnapshot());
-    }
+    }*/
 
     /**
      * Store the current state as an snapshot file in the stateMachineStorage.
      *
      * @return the index of the snapshot
      */
-    @Override
+    /*@Override
     public long takeSnapshot() {
         //get the last applied index
         final TermIndex last = getLastAppliedTermIndex();
@@ -124,7 +125,7 @@ public class MultiGroupStateMachine extends BaseStateMachine {
 
         //return the index of the stored snapshot (which is the last applied one)
         return last.getIndex();
-    }
+    }*/
 
     /**
      * Load the state of the state machine from the storage.
@@ -133,7 +134,7 @@ public class MultiGroupStateMachine extends BaseStateMachine {
      * @return the index of the snapshot or -1 if snapshot is invalid
      * @throws IOException if any error happens during read from storage
      */
-    private long load(SingleFileSnapshotInfo snapshot) throws IOException {
+    /*private long load(SingleFileSnapshotInfo snapshot) throws IOException {
         //check the snapshot nullity
         if (snapshot == null) {
             LOG.warn("The snapshot info is null.");
@@ -167,7 +168,7 @@ public class MultiGroupStateMachine extends BaseStateMachine {
 
         return last.getIndex();
     }
-
+*/
     @Override
     public void notifyLeaderChanged(RaftGroupMemberId groupMemberId, RaftPeerId newLeaderId) {
         LOG.info("----------------> " + groupId);
@@ -185,6 +186,8 @@ public class MultiGroupStateMachine extends BaseStateMachine {
                         GroupManagementApi groupManagementApi = client.getGroupManagementApi(p.getId());
                         groupManagementApi.add(newGroup);
                     }
+                } catch (AlreadyExistsException e) {
+                    // do not log
                 } catch (IOException e) {
                     LOG.error("add group fail: {}", e.getMessage(), e);
                 }

@@ -20,12 +20,16 @@ package com.tomgs.ratis.multigroup;
 
 import com.tomgs.ratis.common.Constants;
 import com.tomgs.ratis.counter.server.CounterStateMachine;
+import org.apache.ratis.client.RaftClient;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcConfigKeys;
+import org.apache.ratis.protocol.RaftGroup;
 import org.apache.ratis.protocol.RaftGroupId;
 import org.apache.ratis.protocol.RaftPeer;
+import org.apache.ratis.protocol.exceptions.AlreadyExistsException;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.RaftServerConfigKeys;
+import org.apache.ratis.server.impl.ServerImplUtils;
 import org.apache.ratis.statemachine.StateMachine;
 import org.apache.ratis.util.NetUtils;
 import org.slf4j.Logger;
@@ -49,43 +53,54 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <p>
  * Run this application three times with three different parameter set-up a
  * ratis cluster which maintain a counter value replicated in each server memory
- *
- *     public void testStateMachineRegistry() throws Throwable {
- *         final Map<RaftGroupId, StateMachine> registry = new ConcurrentHashMap<>();
- *         registry.put(RaftGroupId.randomId(), new SimpleStateMachine4Testing());
- *         registry.put(RaftGroupId.randomId(), new SMTransactionContext());
- *
- *         try (MiniRaftClusterWithSimulatedRpc cluster = newCluster(0)) {
- *             cluster.setStateMachineRegistry(registry::get);
- *
- *             final RaftPeerId id = RaftPeerId.valueOf("s0");
- *             cluster.putNewServer(id, null, true);
- *             cluster.start();
- *
- *             for (RaftGroupId gid : registry.keySet()) {
- *                 final RaftGroup newGroup = RaftGroup.valueOf(gid, cluster.getPeers());
- *                 LOG.info("add new group: " + newGroup);
- *                 try (final RaftClient client = cluster.createClient(newGroup)) {
- *                     for (RaftPeer p : newGroup.getPeers()) {
- *                         client.getGroupManagementApi(p.getId()).add(newGroup);
- *                     }
- *                 }
- *             }
- *
- *             final RaftServer server = cluster.getServer(id);
- *             for (Map.Entry<RaftGroupId, StateMachine> e : registry.entrySet()) {
- *                 Assert.assertSame(e.getValue(), server.getDivision(e.getKey()).getStateMachine());
- *             }
- *         }
- *     }
+ * <p>
+ * public void testStateMachineRegistry() throws Throwable {
+ * final Map<RaftGroupId, StateMachine> registry = new ConcurrentHashMap<>();
+ * registry.put(RaftGroupId.randomId(), new SimpleStateMachine4Testing());
+ * registry.put(RaftGroupId.randomId(), new SMTransactionContext());
+ * <p>
+ * try (MiniRaftClusterWithSimulatedRpc cluster = newCluster(0)) {
+ * cluster.setStateMachineRegistry(registry::get);
+ * <p>
+ * final RaftPeerId id = RaftPeerId.valueOf("s0");
+ * cluster.putNewServer(id, null, true);
+ * cluster.start();
+ * <p>
+ * for (RaftGroupId gid : registry.keySet()) {
+ * final RaftGroup newGroup = RaftGroup.valueOf(gid, cluster.getPeers());
+ * LOG.info("add new group: " + newGroup);
+ * try (final RaftClient client = cluster.createClient(newGroup)) {
+ * for (RaftPeer p : newGroup.getPeers()) {
+ * client.getGroupManagementApi(p.getId()).add(newGroup);
+ * }
+ * }
+ * }
+ * <p>
+ * final RaftServer server = cluster.getServer(id);
+ * for (Map.Entry<RaftGroupId, StateMachine> e : registry.entrySet()) {
+ * Assert.assertSame(e.getValue(), server.getDivision(e.getKey()).getStateMachine());
+ * }
+ * }
+ * }
  */
 public final class MultiRaftCounterServer implements Closeable {
     public static final Logger LOG = LoggerFactory.getLogger(MultiRaftCounterServer.class);
 
     private final RaftServer server;
 
+    private static final Map<RaftGroupId, StateMachine> registry = new ConcurrentHashMap<>();
+
+    private static final Map<RaftGroupId, RaftGroup> groups = new ConcurrentHashMap<>();
 
     public MultiRaftCounterServer(RaftPeer peer, File storageDir) throws IOException {
+        registry.put(Constants.RAFT_GROUP1.getGroupId(),
+                new MultiGroupCounterStateMachine("test-counter-1"));
+        registry.put(Constants.RAFT_GROUP2.getGroupId(),
+                new MultiGroupCounterStateMachine("test-counter-2"));
+
+        groups.put(Constants.RAFT_GROUP1.getGroupId(), Constants.RAFT_GROUP1);
+        groups.put(Constants.RAFT_GROUP2.getGroupId(), Constants.RAFT_GROUP2);
+
         //create a property object
         RaftProperties properties = new RaftProperties();
 
@@ -97,15 +112,8 @@ public final class MultiRaftCounterServer implements Closeable {
         GrpcConfigKeys.Server.setPort(properties, port);
 
         //create and start the Raft server
-        //final RaftPeerId id = RaftPeerId.valueOf("s0");
-        //this.server = ServerImplUtils.newRaftServer(peer.getId(), null, registry::get, properties, null);
-
-        this.server = RaftServer.newBuilder()
-                .setGroup(Constants.RAFT_GROUP)
-                .setProperties(properties)
-                .setServerId(peer.getId())
-                .setStateMachine(new MultiGroupStateMachine("multi-master"))
-                .build();
+        // 多分组raft一定需要使用RaftServerProxy
+        this.server = ServerImplUtils.newRaftServer(peer.getId(), null, registry::get, properties, null);
     }
 
     public void start() throws IOException {
@@ -131,6 +139,24 @@ public final class MultiRaftCounterServer implements Closeable {
         final File storageDir = new File("./" + currentPeer.getId());
         final MultiRaftCounterServer multiRaftCounterServer = new MultiRaftCounterServer(currentPeer, storageDir);
         multiRaftCounterServer.start();
+
+        // 创建多个分组，这个可以在运行时创建，非常方便
+        for (RaftGroupId gid : registry.keySet()) {
+            // 这里在Group添加Peers时可以设置节点优先级，这样可以使leader分布在不同的节点
+            final RaftGroup newGroup = RaftGroup.valueOf(gid, groups.get(gid).getPeers());
+            LOG.info("add new group: " + newGroup);
+            try (final RaftClient client = MultiRaftCounterClient.buildClient(newGroup)) {
+                for (RaftPeer p : newGroup.getPeers()) {
+                    try {
+                        client.getGroupManagementApi(p.getId()).add(newGroup);
+                    } catch (AlreadyExistsException e) {
+                        // do not log
+                    } catch (IOException ioe) {
+                        LOG.warn("Add group failed for {}", p, ioe);
+                    }
+                }
+            }
+        }
 
         //exit when any input entered
         Scanner scanner = new Scanner(System.in, UTF_8.name());
