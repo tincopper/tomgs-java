@@ -19,8 +19,8 @@ public class RHeaKVServerTest {
         Map<String, Object> rawConfigMap = new HashMap<>();
         rawConfigMap.put("ALL_NODE_ADDRESSES", "127.0.0.1:8181");
         rawConfigMap.put("CLUSTER_NAME", "test_cluster");
-        rawConfigMap.put("RAFT_DATA_PATH", "raftDataPath/");
-        rawConfigMap.put("DB_PATH", "raftDbPath/");
+        rawConfigMap.put("RAFT_DATA_PATH", "./target/raftDataPath/");
+        rawConfigMap.put("DB_PATH", "./target/raftDbPath/");
 
         CacheSourceConfig config = new CacheSourceConfig();
         config.setCacheRawConfig(rawConfigMap);

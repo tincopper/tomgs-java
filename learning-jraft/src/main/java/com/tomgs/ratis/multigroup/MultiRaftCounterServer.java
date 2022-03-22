@@ -137,7 +137,7 @@ public final class MultiRaftCounterServer implements Closeable {
         final RaftPeer currentPeer = Constants.PEERS.get(Integer.parseInt(args[0]) - 1);
 
         //start a counter server
-        final File storageDir = new File("./" + currentPeer.getId());
+        final File storageDir = new File("./target/" + currentPeer.getId());
         final MultiRaftCounterServer multiRaftCounterServer = new MultiRaftCounterServer(currentPeer, storageDir);
         multiRaftCounterServer.start();
 
