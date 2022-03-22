@@ -1,4 +1,4 @@
-package com.tomgs.ratis.kv;
+package com.tomgs.ratis.kv.core;
 
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.HodorCacheSource;

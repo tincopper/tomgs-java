@@ -27,7 +27,7 @@ public class RHeaKVServerTest {
         config.setCacheRawConfig(rawConfigMap);
         RHeaKVServer server = new RHeaKVServer(config);
         server.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
+        Runtime.getRuntime().addShutdownHook(new Thread(server::close));
     }
 
 }

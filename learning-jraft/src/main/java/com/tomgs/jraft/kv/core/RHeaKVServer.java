@@ -9,6 +9,7 @@ import com.alipay.sofa.jraft.rhea.options.configured.RocksDBOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.StoreEngineOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.storage.StorageType;
 import com.alipay.sofa.jraft.util.Endpoint;
+import com.tomgs.common.kv.CacheServer;
 import com.tomgs.common.kv.CacheSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +22,7 @@ import java.util.Map;
  * @since 2021/9/26
  */
 @Slf4j
-public class RHeaKVServer {
+public class RHeaKVServer implements CacheServer {
 
     private final CacheSourceConfig config;
 
@@ -31,6 +32,7 @@ public class RHeaKVServer {
         this.config = config;
     }
 
+    @Override
     public void start() {
         Map<String, Object> rawConfig = config.getCacheRawConfig();
         final PlacementDriverOptions pdOpts = PlacementDriverOptionsConfigured.newConfigured()
@@ -55,7 +57,8 @@ public class RHeaKVServer {
         node.start();
     }
 
-    public void stop() {
+    @Override
+    public void close() {
         node.stop();
     }
 
