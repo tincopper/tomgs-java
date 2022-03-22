@@ -98,6 +98,7 @@ public final class MultiRaftCounterServer implements Closeable {
         registry.put(Constants.RAFT_GROUP2.getGroupId(),
                 new MultiGroupCounterStateMachine("test-counter-2"));
 
+        // 这个主要是来设置不同节点在不同分组中的优先级，这样可以避免在不同分组的主节点都落在同一个节点上，失去了多分组的意义
         groups.put(Constants.RAFT_GROUP1.getGroupId(), Constants.RAFT_GROUP1);
         groups.put(Constants.RAFT_GROUP2.getGroupId(), Constants.RAFT_GROUP2);
 
