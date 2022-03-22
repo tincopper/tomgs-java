@@ -9,7 +9,7 @@ import com.alipay.sofa.jraft.rhea.options.configured.RocksDBOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.StoreEngineOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.storage.StorageType;
 import com.alipay.sofa.jraft.util.Endpoint;
-import com.tomgs.jraft.kv.CacheSourceConfig;
+import com.tomgs.common.kv.CacheSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

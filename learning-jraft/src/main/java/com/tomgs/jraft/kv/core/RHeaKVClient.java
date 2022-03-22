@@ -11,8 +11,8 @@ import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
 import com.alipay.sofa.jraft.rhea.options.configured.MultiRegionRouteTableOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
-import com.tomgs.jraft.kv.CacheClient;
-import com.tomgs.jraft.kv.CacheSourceConfig;
+import com.tomgs.common.kv.CacheClient;
+import com.tomgs.common.kv.CacheSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;

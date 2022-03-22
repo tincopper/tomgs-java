@@ -1,19 +1,19 @@
-package com.tomgs.jraft.kv;
+package com.tomgs.ratis.kv;
 
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.HodorCacheSource;
 
 /**
- * RHeaKVDataSource
+ * RatisKVDataSource
  *
  * @author tomgs
- * @since 2021/9/26
+ * @since 2022/3/22
  */
-public class RHeaKVDataSource implements HodorCacheSource {
+public class RatisKVDataSource implements HodorCacheSource {
 
     @Override
     public String getCacheType() {
-        return "rheakv";
+        return "ratiskv";
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.tomgs.jraft.kv;
 
+import com.tomgs.common.kv.CacheSourceConfig;
 import com.tomgs.jraft.kv.core.RHeaKVServer;
 import lombok.extern.slf4j.Slf4j;
 

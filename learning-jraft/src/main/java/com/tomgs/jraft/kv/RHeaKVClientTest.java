@@ -1,5 +1,7 @@
 package com.tomgs.jraft.kv;
 
+import com.tomgs.common.kv.CacheClient;
+import com.tomgs.common.kv.CacheSourceConfig;
 import com.tomgs.jraft.kv.core.RHeaKVClient;
 import org.junit.Assert;
 import org.junit.Before;
