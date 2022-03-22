@@ -9,6 +9,7 @@ import org.apache.ratis.protocol.RaftGroupId;
 import org.apache.ratis.protocol.RaftPeer;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.RaftServerConfigKeys;
+import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 import org.apache.ratis.util.NetUtils;
 
 import java.io.File;
@@ -69,6 +70,13 @@ public class RatisKVServer implements CacheServer {
         server.close();
     }
 
+    // 这个会自动转换为UUID
+    private static final RaftGroupId DUMMY_GROUP_ID =
+            RaftGroupId.valueOf(ByteString.copyFromUtf8("AOzoneRatisGroup"));
+
+    private static final RaftGroup EMPTY_GROUP = RaftGroup.valueOf(DUMMY_GROUP_ID,
+            Collections.emptyList());
+
     private static final UUID CLUSTER_GROUP_ID = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c1");
 
     public synchronized RaftGroup getRaftGroup(String[] addresses) {
@@ -80,7 +88,8 @@ public class RatisKVServer implements CacheServer {
             peers.add(RaftPeer.newBuilder().setId(address.replace(":", "_")).setAddress(address).build());
         }
         final List<RaftPeer> raftPeers = Collections.unmodifiableList(peers);
-        raftGroup = RaftGroup.valueOf(RaftGroupId.valueOf(CLUSTER_GROUP_ID), raftPeers);
+        //raftGroup = RaftGroup.valueOf(RaftGroupId.valueOf(CLUSTER_GROUP_ID), raftPeers);
+        raftGroup = RaftGroup.valueOf(DUMMY_GROUP_ID, raftPeers);
         return raftGroup;
     }
 
