@@ -70,12 +70,8 @@ public class RatisKVServer implements CacheServer {
         server.close();
     }
 
-    // 这个会自动转换为UUID
-    private static final RaftGroupId DUMMY_GROUP_ID =
-            RaftGroupId.valueOf(ByteString.copyFromUtf8("AOzoneRatisGroup"));
-
-    private static final RaftGroup EMPTY_GROUP = RaftGroup.valueOf(DUMMY_GROUP_ID,
-            Collections.emptyList());
+    // 这个会自动转换为UUID，但是需要确保字符串为16位
+    private static final RaftGroupId RATIS_KV_GROUP_ID = RaftGroupId.valueOf(ByteString.copyFromUtf8("RatisKVGroup0000"));
 
     private static final UUID CLUSTER_GROUP_ID = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c1");
 
@@ -89,7 +85,7 @@ public class RatisKVServer implements CacheServer {
         }
         final List<RaftPeer> raftPeers = Collections.unmodifiableList(peers);
         //raftGroup = RaftGroup.valueOf(RaftGroupId.valueOf(CLUSTER_GROUP_ID), raftPeers);
-        raftGroup = RaftGroup.valueOf(DUMMY_GROUP_ID, raftPeers);
+        raftGroup = RaftGroup.valueOf(RATIS_KV_GROUP_ID, raftPeers);
         return raftGroup;
     }
 

@@ -71,6 +71,9 @@ public final class CounterClient {
     executorService.awaitTermination(increment * 500L, TimeUnit.MILLISECONDS);
 
     //send GET command and print the response
+    // 通过proto生成的对象的parseFrom方法反序列化得到对应的对象
+    // ContainerCommandResponseProto response = ContainerCommandResponseProto.parseFrom(reply.getMessage().getContent());
+
     RaftClientReply count = raftClient.io().sendReadOnly(Message.valueOf("GET"));
     String response = count.getMessage().getContent().toString(Charset.defaultCharset());
     System.out.println(response);
