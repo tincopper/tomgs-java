@@ -1,6 +1,10 @@
 package com.tomgs.ratis.kv.core;
 
 import com.alipay.remoting.exception.CodecException;
+import com.tomgs.ratis.kv.protocol.*;
+import com.tomgs.ratis.kv.storage.DBStore;
+import com.tomgs.ratis.kv.storage.StorageEngine;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ratis.protocol.Message;
 import org.apache.ratis.protocol.RaftGroupId;
 import org.apache.ratis.server.RaftServer;
@@ -8,7 +12,6 @@ import org.apache.ratis.server.storage.RaftStorage;
 import org.apache.ratis.statemachine.TransactionContext;
 import org.apache.ratis.statemachine.impl.BaseStateMachine;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
-import org.apache.ratis.thirdparty.com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -19,9 +22,20 @@ import java.util.concurrent.CompletableFuture;
  * @author tomgs
  * @since 2022/3/22
  */
+@Slf4j
 public class RatisKVServerStateMachine extends BaseStateMachine {
 
-    private final ProtostuffSerializer serializer = new ProtostuffSerializer();
+    private final ProtostuffSerializer serializer;
+
+    private final StorageEngine storageEngine;
+
+    private final DBStore dbStore;
+
+    public RatisKVServerStateMachine(final StorageEngine storageEngine) {
+        this.storageEngine = storageEngine;
+        this.serializer = new ProtostuffSerializer();
+        this.dbStore = this.storageEngine.getRawDBStore();
+    }
 
     @Override
     public void initialize(RaftServer raftServer, RaftGroupId raftGroupId, RaftStorage storage) throws IOException {
@@ -40,19 +54,77 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
 
     @Override
     public CompletableFuture<Message> applyTransaction(TransactionContext trx) {
-        return super.applyTransaction(trx);
+        final ByteString logData = trx.getStateMachineLogEntry().getLogData();
+        try {
+            return CompletableFuture.completedFuture(runCommand(Message.valueOf(logData)));
+        } catch (CodecException e) {
+            return completeExceptionally(e);
+        }
     }
 
     @Override
     public CompletableFuture<Message> query(Message request) {
         try {
-            RatisKVRequest kvRequest = serializer.deserialize(request.getContent().toByteArray(), RatisKVRequest.class.getName());
             // do something
-            byte[] bytes = serializer.serialize("success");
-            return CompletableFuture.completedFuture(Message.valueOf(ByteString.copyFrom(bytes)));
-        } catch (CodecException e) {
+            return CompletableFuture.completedFuture(runCommand(request));
+        } catch (Exception e) {
             return completeExceptionally(e);
         }
+    }
+
+    private Message runCommand(Message request) throws CodecException {
+        /*
+         *   OMResponse response = handler.handleReadRequest(request);
+         *   return OMRatisHelper.convertResponseToMessage(response);
+         *   //
+         *   public static Message convertResponseToMessage(OMResponse response) {
+         *       byte[] requestBytes = response.toByteArray();
+         *       return Message.valueOf(ByteString.copyFrom(requestBytes));
+         *   }
+         */
+        RatisKVRequest kvRequest = serializer.deserialize(request.getContent().toByteArray(), RatisKVRequest.class.getName());
+        final CmdType cmdType = kvRequest.getCmdType();
+        RatisKVResponse.RatisKVResponseBuilder builder = RatisKVResponse.builder()
+                .requestId(kvRequest.getRequestId())
+                .traceId(kvRequest.getTraceId())
+                .cmdType(cmdType)
+                .success(true);
+        switch (cmdType) {
+            case GET:
+                log.info("GET op.");
+                final GetRequest getRequest = kvRequest.getGetRequest();
+                byte[] result = dbStore.get(getRequest.getKey());
+                GetResponse getResponse = GetResponse.builder()
+                        .value(result)
+                        .build();
+                builder.getResponse(getResponse);
+                break;
+            case PUT:
+                log.info("PUT op.");
+                final PutRequest putRequest = kvRequest.getPutRequest();
+                try {
+                    dbStore.put(putRequest.getKey(), putRequest.getValue());
+                } catch (Exception e) {
+                    log.error("PUT exception: {}", e.getMessage(), e);
+                    builder.success(false)
+                            .message(e.getMessage());
+                }
+                break;
+            case DELETE:
+                log.info("DELETE op.");
+                final DeleteRequest deleteRequest = kvRequest.getDeleteRequest();
+                try {
+                    dbStore.delete(deleteRequest.getKey());
+                } catch (Exception e) {
+                    log.error("DELETE exception: {}", e.getMessage(), e);
+                    builder.success(false)
+                            .message(e.getMessage());
+                }
+                break;
+            default:
+                throw new RuntimeException("Unsupported request type: " + request.getClass().getName());
+        }
+        return Message.valueOf(ByteString.copyFrom(serializer.serialize(builder.build())));
     }
 
     @Override

@@ -25,6 +25,8 @@ public class CacheSourceConfig {
 
     private int maximumSize;
 
+    private int timeout;
+
     private Map<String, Object> cacheRawConfig;
 
 }

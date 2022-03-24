@@ -2,6 +2,9 @@ package com.tomgs.ratis.kv.core;
 
 import com.tomgs.common.kv.CacheServer;
 import com.tomgs.common.kv.CacheSourceConfig;
+import com.tomgs.ratis.kv.storage.StorageEngine;
+import com.tomgs.ratis.kv.storage.StorageOptions;
+import com.tomgs.ratis.kv.storage.StorageType;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcConfigKeys;
 import org.apache.ratis.protocol.RaftGroup;
@@ -16,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
+
 /**
  * RatisKVServer
  *
@@ -26,7 +31,7 @@ public class RatisKVServer implements CacheServer {
 
     private final RaftServer server;
 
-    private RaftGroup raftGroup;
+    private StorageEngine storageEngine;
 
     public RatisKVServer(final CacheSourceConfig sourceConfig) throws IOException {
         // create peers
@@ -42,6 +47,15 @@ public class RatisKVServer implements CacheServer {
         final File storageDir = new File(sourceConfig.getDataPath() + "/" + currentPeer.getId());
         final File dbDir = new File(sourceConfig.getDataPath()  + "/" + currentPeer.getId());
 
+        // init storeEngine
+        StorageOptions storageOptions = StorageOptions.builder()
+                .clusterName(sourceConfig.getClusterName())
+                .storageType(StorageType.RocksDB)
+                .storagePath(dbDir)
+                .build();
+        storageEngine = new StorageEngine(storageOptions);
+        storageEngine.init();
+
         //create a property object
         RaftProperties properties = new RaftProperties();
         //set the storage directory (different for each peer) in RaftProperty object
@@ -50,10 +64,10 @@ public class RatisKVServer implements CacheServer {
         final int port = NetUtils.createSocketAddr(sourceConfig.getEndpoint()).getPort();
         GrpcConfigKeys.Server.setPort(properties, port);
         //create the counter state machine which hold the counter value
-        RatisKVServerStateMachine serverStateMachine = new RatisKVServerStateMachine();
+        RatisKVServerStateMachine serverStateMachine = new RatisKVServerStateMachine(storageEngine);
         //create and start the Raft server
         this.server = RaftServer.newBuilder()
-                .setGroup(getRaftGroup(addresses))
+                .setGroup(GroupManager.getInstance().getRaftGroup(RATIS_KV_GROUP_ID, addresses))
                 .setProperties(properties)
                 .setServerId(currentPeer.getId())
                 .setStateMachine(serverStateMachine)
@@ -67,26 +81,8 @@ public class RatisKVServer implements CacheServer {
 
     @Override
     public void close() throws IOException {
+        storageEngine.close();
         server.close();
-    }
-
-    // 这个会自动转换为UUID，但是需要确保字符串为16位
-    private static final RaftGroupId RATIS_KV_GROUP_ID = RaftGroupId.valueOf(ByteString.copyFromUtf8("RatisKVGroup0000"));
-
-    private static final UUID CLUSTER_GROUP_ID = UUID.fromString("02511d47-d67c-49a3-9011-abb3109a44c1");
-
-    public synchronized RaftGroup getRaftGroup(String[] addresses) {
-        if (raftGroup != null) {
-            return raftGroup;
-        }
-        final List<RaftPeer> peers = new ArrayList<>(addresses.length);
-        for (String address : addresses) {
-            peers.add(RaftPeer.newBuilder().setId(address.replace(":", "_")).setAddress(address).build());
-        }
-        final List<RaftPeer> raftPeers = Collections.unmodifiableList(peers);
-        //raftGroup = RaftGroup.valueOf(RaftGroupId.valueOf(CLUSTER_GROUP_ID), raftPeers);
-        raftGroup = RaftGroup.valueOf(RATIS_KV_GROUP_ID, raftPeers);
-        return raftGroup;
     }
 
 }
