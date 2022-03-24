@@ -76,7 +76,7 @@ public class RHeaKVClient<K, V> implements CacheClient<K, V> {
     }
 
     @Override
-    public void remove(K key) {
+    public void delete(K key) {
         byte[] keyBytes = JSONUtil.toJsonStr(key).getBytes(StandardCharsets.UTF_8);
         rheaKVStore.delete(keyBytes);
     }

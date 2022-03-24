@@ -14,7 +14,7 @@ public interface CacheClient<K, V> {
 
     void put(K key, V value, int expire);
 
-    void remove(K key);
+    void delete(K key);
 
     void clear();
 
