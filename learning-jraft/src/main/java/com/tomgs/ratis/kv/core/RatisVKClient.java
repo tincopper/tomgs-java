@@ -1,6 +1,5 @@
 package com.tomgs.ratis.kv.core;
 
-import cn.hutool.core.lang.TypeReference;
 import com.alipay.remoting.exception.CodecException;
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
@@ -47,7 +46,7 @@ public class RatisVKClient implements CacheClient<String, String> {
         this.raftClient = buildClient(raftGroup);
     }
 
-    private static RaftClient buildClient(RaftGroup raftGroup) {
+    private RaftClient buildClient(RaftGroup raftGroup) {
         RaftProperties raftProperties = new RaftProperties();
         RaftClient.Builder builder = RaftClient.newBuilder()
                 .setProperties(raftProperties)
@@ -56,6 +55,18 @@ public class RatisVKClient implements CacheClient<String, String> {
                         new GrpcFactory(new Parameters())
                                 .newRaftClientRpc(ClientId.randomId(), raftProperties));
         return builder.build();
+    }
+
+    private RatisKVResponse getReadRatisKVResponse(RatisKVRequest request) throws CodecException, IOException {
+        final byte[] bytes = serializer.serialize(request);
+        final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
+        return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
+    }
+
+    private RatisKVResponse getWriteRatisKVResponse(RatisKVRequest request) throws CodecException, IOException {
+        final byte[] bytes = serializer.serialize(request);
+        final RaftClientReply raftClientReply = raftClient.io().send(Message.valueOf(ByteString.copyFrom(bytes)));
+        return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
     @Override
@@ -69,7 +80,7 @@ public class RatisVKClient implements CacheClient<String, String> {
                     .traceId(123L)
                     .getRequest(getRequest)
                     .build();
-            RatisKVResponse response = getRatisKVResponse(request);
+            RatisKVResponse response = getReadRatisKVResponse(request);
             if (response.getSuccess()) {
                 final byte[] value = response.getGetResponse().getValue();
                 if (value == null) {
@@ -96,19 +107,13 @@ public class RatisVKClient implements CacheClient<String, String> {
                     .traceId(123L)
                     .putRequest(putRequest)
                     .build();
-            RatisKVResponse response = getRatisKVResponse(request);
+            RatisKVResponse response = getWriteRatisKVResponse(request);
             if (!response.getSuccess()) {
                 throw new RatisKVClientException(response.getMessage());
             }
         } catch (Exception e) {
             throw new RatisKVClientException(e.getMessage(), e);
         }
-    }
-
-    private RatisKVResponse getRatisKVResponse(RatisKVRequest request) throws CodecException, IOException {
-        final byte[] bytes = serializer.serialize(request);
-        final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
-        return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
     @Override
@@ -127,7 +132,7 @@ public class RatisVKClient implements CacheClient<String, String> {
                     .traceId(123L)
                     .deleteRequest(deleteRequest)
                     .build();
-            RatisKVResponse response = getRatisKVResponse(request);
+            RatisKVResponse response = getWriteRatisKVResponse(request);
             if (!response.getSuccess()) {
                 throw new RatisKVClientException(response.getMessage());
             }
