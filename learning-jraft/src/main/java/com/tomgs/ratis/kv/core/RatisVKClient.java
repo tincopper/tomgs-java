@@ -60,13 +60,13 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
         return builder.build();
     }
 
-    private RatisKVResponse getReadRatisKVResponse(RatisKVRequest request) throws CodecException, IOException {
+    private RatisKVResponse handleRatisKVReadRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
-    private RatisKVResponse getWriteRatisKVResponse(RatisKVRequest request) throws CodecException, IOException {
+    private RatisKVResponse handleRatisKVWriteRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().send(Message.valueOf(ByteString.copyFrom(bytes)));
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
@@ -83,7 +83,7 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
                     .traceId(123L)
                     .getRequest(getRequest)
                     .build();
-            RatisKVResponse response = getReadRatisKVResponse(request);
+            RatisKVResponse response = handleRatisKVReadRequest(request);
             if (response.getSuccess()) {
                 final byte[] value = response.getGetResponse().getValue();
                 if (value == null) {
@@ -110,7 +110,7 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
                     .traceId(123L)
                     .putRequest(putRequest)
                     .build();
-            RatisKVResponse response = getWriteRatisKVResponse(request);
+            RatisKVResponse response = handleRatisKVWriteRequest(request);
             if (!response.getSuccess()) {
                 throw new RatisKVClientException(response.getMessage());
             }
@@ -135,7 +135,7 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
                     .traceId(123L)
                     .deleteRequest(deleteRequest)
                     .build();
-            RatisKVResponse response = getWriteRatisKVResponse(request);
+            RatisKVResponse response = handleRatisKVWriteRequest(request);
             if (!response.getSuccess()) {
                 throw new RatisKVClientException(response.getMessage());
             }

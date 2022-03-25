@@ -11,6 +11,7 @@ import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.storage.RaftStorage;
 import org.apache.ratis.statemachine.TransactionContext;
 import org.apache.ratis.statemachine.impl.BaseStateMachine;
+import org.apache.ratis.statemachine.impl.SimpleStateMachineStorage;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 
 import java.io.IOException;
@@ -25,11 +26,16 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class RatisKVServerStateMachine extends BaseStateMachine {
 
+    private final SimpleStateMachineStorage storage =
+            new SimpleStateMachineStorage();
+
     private final ProtostuffSerializer serializer;
 
     private final StorageEngine storageEngine;
 
     private final DBStore dbStore;
+
+    private RaftGroupId raftGroupId;
 
     public RatisKVServerStateMachine(final StorageEngine storageEngine) {
         this.storageEngine = storageEngine;
@@ -38,13 +44,22 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
     }
 
     @Override
-    public void initialize(RaftServer raftServer, RaftGroupId raftGroupId, RaftStorage storage) throws IOException {
-        super.initialize(raftServer, raftGroupId, storage);
+    public void initialize(RaftServer raftServer, RaftGroupId id, RaftStorage raftStorage) throws IOException {
+        getLifeCycle().startAndTransition(() -> {
+            super.initialize(raftServer, raftGroupId, raftStorage);
+            this.raftGroupId = id;
+            storage.init(raftStorage);
+        });
     }
 
     @Override
     public void reinitialize() throws IOException {
         super.reinitialize();
+        /*getLifeCycle().startAndTransition(() -> {
+            loadSnapshotInfoFromDB();
+            this.ozoneManagerDoubleBuffer = buildDoubleBufferForRatis();
+            handler.updateDoubleBuffer(ozoneManagerDoubleBuffer);
+        });*/
     }
 
     @Override
@@ -129,8 +144,8 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
 
     @Override
     public void close() throws IOException {
-        storageEngine.close();
         super.close();
+        storageEngine.close();
     }
 
     private static <T> CompletableFuture<T> completeExceptionally(Exception e) {
