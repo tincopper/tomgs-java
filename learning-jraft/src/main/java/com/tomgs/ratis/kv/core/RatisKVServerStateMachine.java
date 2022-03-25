@@ -129,6 +129,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
 
     @Override
     public void close() throws IOException {
+        storageEngine.close();
         super.close();
     }
 

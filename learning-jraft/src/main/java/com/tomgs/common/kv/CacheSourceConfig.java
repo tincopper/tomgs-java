@@ -27,6 +27,10 @@ public class CacheSourceConfig {
 
     private int timeout;
 
+    private Class<?> valueSederClass;
+
+    private Class<?> keySederClass;
+
     private Map<String, Object> cacheRawConfig;
 
 }

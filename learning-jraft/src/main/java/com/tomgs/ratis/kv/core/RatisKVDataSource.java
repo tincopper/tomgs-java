@@ -4,6 +4,9 @@ import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
 import com.tomgs.common.kv.HodorCacheSource;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * RatisKVDataSource
  *
@@ -12,10 +15,13 @@ import com.tomgs.common.kv.HodorCacheSource;
  */
 public class RatisKVDataSource implements HodorCacheSource {
 
-    private final RatisVKClient ratisVKClient;
+    private final CacheSourceConfig cacheSourceConfig;
+
+    private final Map<String, CacheClient<Object, Object>> groupCacheClientMap;
 
     public RatisKVDataSource(final CacheSourceConfig cacheSourceConfig) {
-        this.ratisVKClient = new RatisVKClient(cacheSourceConfig);
+        this.cacheSourceConfig = cacheSourceConfig;
+        this.groupCacheClientMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -25,13 +31,12 @@ public class RatisKVDataSource implements HodorCacheSource {
 
     @Override
     @SuppressWarnings("unchecked")
-    public CacheClient<String, String> getCacheClient(String group) {
-        return ratisVKClient;
+    public <K, V> CacheClient<K, V> getCacheClient(String group) {
+        return (CacheClient<K, V>) groupCacheClientMap.computeIfAbsent(group, k -> new RatisVKClient<>(cacheSourceConfig));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public CacheClient<String, String> getCacheClient() {
+    public <K, V> CacheClient<K, V> getCacheClient() {
         return getCacheClient("default");
     }
 

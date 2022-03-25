@@ -1,7 +1,9 @@
 package com.tomgs.ratis.kv;
 
+import com.alipay.remoting.exception.CodecException;
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
+import com.tomgs.ratis.kv.core.ProtostuffSerializer;
 import com.tomgs.ratis.kv.core.RatisKVDataSource;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +18,7 @@ import org.junit.Test;
  * @since 2022/3/22
  */
 public class RatisKVClientTest {
+
     private CacheClient<String, String> cacheClient;
 
     @Before
@@ -23,9 +26,12 @@ public class RatisKVClientTest {
         CacheSourceConfig sourceConfig = new CacheSourceConfig();
         sourceConfig.setTimeout(3000);
         sourceConfig.setServerAddresses("127.0.0.1:8001,127.0.0.1:8002,127.0.0.1:8003");
+        sourceConfig.setKeySederClass(String.class);
+        sourceConfig.setValueSederClass(String.class);
 
         RatisKVDataSource dataSource = new RatisKVDataSource(sourceConfig);
         this.cacheClient = dataSource.getCacheClient();
+        //this.cacheClient.setValueType(String.class);
     }
 
     @Test
@@ -45,6 +51,15 @@ public class RatisKVClientTest {
     public void testDelete() {
         System.out.println("=================DELETE==================");
         cacheClient.delete("hello");
+    }
+
+    @Test
+    public void testSeder() throws CodecException {
+        ProtostuffSerializer serializer = new ProtostuffSerializer();
+        final byte[] serialize = serializer.serialize("123");
+
+        final Object deserialize = serializer.deserialize(serialize, String.class.getName());
+        System.out.println(deserialize);
     }
 
 }

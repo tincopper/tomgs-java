@@ -26,13 +26,16 @@ import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
  * @author tomgs
  * @since 2022/3/22
  */
-public class RatisVKClient implements CacheClient<String, String> {
+public class RatisVKClient<K, V> implements CacheClient<K, V> {
 
     private final ProtostuffSerializer serializer;
 
     private final RaftClient raftClient;
 
+    private final CacheSourceConfig cacheSourceConfig;
+
     public RatisVKClient(final CacheSourceConfig cacheSourceConfig) {
+        this.cacheSourceConfig = cacheSourceConfig;
         this.serializer = new ProtostuffSerializer();
         // create peers
         final String[] addresses = Optional.ofNullable(cacheSourceConfig.getServerAddresses())
@@ -70,7 +73,7 @@ public class RatisVKClient implements CacheClient<String, String> {
     }
 
     @Override
-    public String get(String key) {
+    public V get(K key) {
         try {
             GetRequest getRequest = new GetRequest();
             getRequest.setKey(serializer.serialize(key));
@@ -86,7 +89,7 @@ public class RatisVKClient implements CacheClient<String, String> {
                 if (value == null) {
                     return null;
                 }
-                return serializer.deserialize(value, String.class.getName());
+                return serializer.deserialize(value, cacheSourceConfig.getValueSederClass().getName());
             } else {
                 throw new RatisKVClientException(response.getMessage());
             }
@@ -96,7 +99,7 @@ public class RatisVKClient implements CacheClient<String, String> {
     }
 
     @Override
-    public void put(String key, String value) {
+    public void put(K key, V value) {
         try {
             PutRequest putRequest = new PutRequest();
             putRequest.setKey(serializer.serialize(key));
@@ -117,12 +120,12 @@ public class RatisVKClient implements CacheClient<String, String> {
     }
 
     @Override
-    public void put(String key, String value, int expire) {
+    public void put(K key, V value, int expire) {
 
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(K key) {
         try {
             DeleteRequest deleteRequest = new DeleteRequest();
             deleteRequest.setKey(serializer.serialize(key));
