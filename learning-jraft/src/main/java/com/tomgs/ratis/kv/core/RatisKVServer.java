@@ -7,17 +7,15 @@ import com.tomgs.ratis.kv.storage.StorageOptions;
 import com.tomgs.ratis.kv.storage.StorageType;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcConfigKeys;
-import org.apache.ratis.protocol.RaftGroup;
-import org.apache.ratis.protocol.RaftGroupId;
 import org.apache.ratis.protocol.RaftPeer;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.RaftServerConfigKeys;
-import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 import org.apache.ratis.util.NetUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
 
 import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
 
@@ -42,7 +40,10 @@ public class RatisKVServer implements CacheServer {
             throw new IllegalArgumentException("Failed to get " + sourceConfig.getServerAddresses() + " from " + sourceConfig);
         }
 
-        final RaftPeer currentPeer = RaftPeer.newBuilder().setId(sourceConfig.getEndpoint().replace(":", "_")).setAddress(sourceConfig.getEndpoint()).build();
+        final RaftPeer currentPeer = RaftPeer.newBuilder()
+                .setId(sourceConfig.getEndpoint().replace(":", "_"))
+                .setAddress(sourceConfig.getEndpoint())
+                .build();
 
         final File storageDir = new File(sourceConfig.getDataPath() + "/" + currentPeer.getId());
         final File dbDir = new File(sourceConfig.getDataPath()  + "/" + currentPeer.getId());
