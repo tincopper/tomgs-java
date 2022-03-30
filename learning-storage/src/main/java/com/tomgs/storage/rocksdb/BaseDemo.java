@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.rocksdb.*;
 import org.rocksdb.util.SizeUnit;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -120,4 +121,53 @@ public class BaseDemo {
 
     }
 
+    @Test
+    public void testPrefixQuery() throws RocksDBException {
+        String dbPath = "./target/test_db2";
+        final Options options = new Options();
+        options.setCreateIfMissing(true);
+        final RocksDB rocksDB = RocksDB.open(options, dbPath);
+        // key会进行排序，所以为了获取/test前缀的，应该先seek到/test前缀，然后判断如果不为/test前缀的那么就是最后一个了，
+        // 不然会全部输出。
+        // rocksdb支持向前和向后遍历的方式，通过seek + next和 seek + prev实现向前还是向后
+        rocksDB.put("/tast/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/tbst/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/test/key1".getBytes(StandardCharsets.UTF_8), "value1".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/test/key2".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/tfst/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/tgst/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+
+        final RocksIterator iter = rocksDB.newIterator();
+        // 从头开始遍历
+        // seek + next
+        System.out.println("==================从头开始遍历===========================");
+        for (iter.seekToFirst(); iter.isValid(); iter.next()) {
+            System.out.println("iter key: " + new String(iter.key()) + ",iter value: " +
+                    new String(iter.value()));
+        }
+
+        // 从/test前缀开始遍历
+        System.out.println("==================从/test前缀开始遍历===========================");
+        for (iter.seek("/test".getBytes(StandardCharsets.UTF_8)); iter.isValid(); iter.next()) {
+            System.out.println("iter key: " + new String(iter.key()) + ",iter1 value: " +
+                    new String(iter.value()));
+        }
+
+        // 从/test前缀前一个数据开始遍历
+        System.out.println("==================从/test前缀前一个的数据开始遍历===========================");
+        for (iter.seekForPrev("/test".getBytes(StandardCharsets.UTF_8)); iter.isValid(); iter.next()) {
+            System.out.println("iter key: " + new String(iter.key()) + ",iter value: " +
+                    new String(iter.value()));
+        }
+
+        // 从最后一个开始向前遍历（反向遍历）
+        // seek + prev实现
+        System.out.println("==================从最后一个开始向前遍历（反向遍历）===========================");
+        for (iter.seekToLast(); iter.isValid(); iter.prev()) {
+            System.out.println("iter key: " + new String(iter.key()) + ",iter value: " +
+                    new String(iter.value()));
+        }
+
+        iter.close();
+    }
 }
