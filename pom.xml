@@ -16,7 +16,7 @@
         <junit.version>4.12</junit.version>
         <metrics.version>3.2.5</metrics.version>
         <commons-codec.version>1.10</commons-codec.version>
-        <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <cglib.version>3.2.4</cglib.version>
         <easyexcel.version>2.1.6</easyexcel.version>
         <disruptor.version>3.4.0</disruptor.version>
