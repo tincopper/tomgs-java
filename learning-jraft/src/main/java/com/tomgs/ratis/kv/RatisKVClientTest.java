@@ -56,10 +56,18 @@ public class RatisKVClientTest {
     @Test
     public void testSeder() throws CodecException {
         ProtostuffSerializer serializer = new ProtostuffSerializer();
-        final byte[] serialize = serializer.serialize("123");
+        final String hello = new String("hello");
+        final byte[] serialize = serializer.serialize(hello);
 
         final Object deserialize = serializer.deserialize(serialize, String.class.getName());
         System.out.println(deserialize);
+
+        ProtostuffSerializer serializer1 = new ProtostuffSerializer();
+        final String hello1 = new String("hello");
+        final byte[] serialize1 = serializer1.serialize(hello1);
+
+        final Object deserialize1 = serializer1.deserialize(serialize1, String.class.getName());
+        System.out.println(deserialize1);
     }
 
 }

@@ -5,7 +5,11 @@ import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
 import com.tomgs.ratis.kv.exception.RatisKVClientException;
 import com.tomgs.ratis.kv.protocol.*;
+import com.tomgs.ratis.kv.watch.DataChangeEvent;
+import com.tomgs.ratis.kv.watch.DataChangeListener;
+import lombok.SneakyThrows;
 import org.apache.ratis.client.RaftClient;
+import org.apache.ratis.client.RaftClientConfigKeys;
 import org.apache.ratis.conf.Parameters;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcFactory;
@@ -13,10 +17,18 @@ import org.apache.ratis.protocol.ClientId;
 import org.apache.ratis.protocol.Message;
 import org.apache.ratis.protocol.RaftClientReply;
 import org.apache.ratis.protocol.RaftGroup;
+import org.apache.ratis.retry.ExponentialBackoffRetry;
+import org.apache.ratis.retry.RetryPolicies;
+import org.apache.ratis.retry.RetryPolicy;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
+import org.apache.ratis.util.TimeDuration;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
 
@@ -32,7 +44,13 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
 
     private final RaftClient raftClient;
 
+    private final RaftClient watchRaftClient;
+
     private final CacheSourceConfig cacheSourceConfig;
+
+    private static final Map<String, DataChangeListener> listenerMap = new ConcurrentHashMap<>();
+
+    private volatile boolean start = false;
 
     public RatisVKClient(final CacheSourceConfig cacheSourceConfig) {
         this.cacheSourceConfig = cacheSourceConfig;
@@ -46,14 +64,25 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
         }
 
         final RaftGroup raftGroup = GroupManager.getInstance().getRaftGroup(RATIS_KV_GROUP_ID, addresses);
-        this.raftClient = buildClient(raftGroup);
+
+        ExponentialBackoffRetry retryPolicy = ExponentialBackoffRetry.newBuilder()
+                .setBaseSleepTime(TimeDuration.valueOf(1000, TimeUnit.MILLISECONDS))
+                .setMaxAttempts(10)
+                .setMaxSleepTime(
+                        TimeDuration.valueOf(100_000, TimeUnit.MILLISECONDS))
+                .build();
+        this.raftClient = buildClient(raftGroup, retryPolicy);
+        this.watchRaftClient = buildClient(raftGroup, RetryPolicies.noRetry());
     }
 
-    private RaftClient buildClient(RaftGroup raftGroup) {
+    private RaftClient buildClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
         RaftProperties raftProperties = new RaftProperties();
+        RaftClientConfigKeys.Rpc.setRequestTimeout(raftProperties,
+                TimeDuration.valueOf(15, TimeUnit.SECONDS));
         RaftClient.Builder builder = RaftClient.newBuilder()
                 .setProperties(raftProperties)
                 .setRaftGroup(raftGroup)
+                .setRetryPolicy(retryPolicy)
                 .setClientRpc(
                         new GrpcFactory(new Parameters())
                                 .newRaftClientRpc(ClientId.randomId(), raftProperties));
@@ -63,6 +92,12 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
     private RatisKVResponse handleRatisKVReadRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
+        return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
+    }
+
+    private RatisKVResponse handleRatisKVWatchRequest(RatisKVRequest request) throws CodecException, IOException {
+        final byte[] bytes = serializer.serialize(request);
+        final RaftClientReply raftClientReply = watchRaftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
@@ -152,6 +187,67 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
     @Override
     public void close() {
 
+    }
+
+    @SneakyThrows
+    @Override
+    public void watch(K key, DataChangeListener dataChangeListener) {
+        final byte[] keySer = serializer.serialize(key);
+        listenerMap.put((String) key, dataChangeListener);
+        if (!start) {
+            Thread watchThread = new Thread(() -> {
+                while (true) {
+                    try {
+                        watchLoop();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, "watch-loop");
+            watchThread.start();
+            start = true;
+        }
+
+        try {
+            WatchRequest watchRequest = new WatchRequest();
+            watchRequest.setKey(keySer);
+            RatisKVRequest request = RatisKVRequest.builder()
+                    .cmdType(CmdType.WATCH)
+                    .requestId(123L)
+                    .traceId(123L)
+                    .watchRequest(watchRequest)
+                    .build();
+            RatisKVResponse response = handleRatisKVWriteRequest(request);
+            if (!response.getSuccess()) {
+                throw new RatisKVClientException(response.getMessage());
+            }
+        } catch (Exception e) {
+            throw new RatisKVClientException(e.getMessage(), e);
+        }
+    }
+
+    private void watchLoop() throws CodecException, IOException {
+        BPopRequest bPopRequest = new BPopRequest();
+        RatisKVRequest request = RatisKVRequest.builder()
+                .cmdType(CmdType.BPOP)
+                .requestId(123L)
+                .traceId(123L)
+                .bPopRequest(bPopRequest)
+                .build();
+        RatisKVResponse response = handleRatisKVWatchRequest(request);
+        System.out.println("watchLoop response: " + response);
+        if (!response.getSuccess()) {
+            return;
+        }
+        final BPopResponse bPopResponse = response.getBPopResponse();
+        final DataChangeEvent event = bPopResponse.getEvent();
+        final DataChangeListener dataChangeListener = listenerMap.get(event.getPath());
+        dataChangeListener.dataChanged(event);
     }
 
 }

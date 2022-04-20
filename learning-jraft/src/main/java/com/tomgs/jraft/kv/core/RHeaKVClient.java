@@ -13,6 +13,7 @@ import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfi
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
+import com.tomgs.ratis.kv.watch.DataChangeListener;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -89,6 +90,11 @@ public class RHeaKVClient<K, V> implements CacheClient<K, V> {
     @Override
     public void close() {
         clear();
+    }
+
+    @Override
+    public void watch(K key, DataChangeListener dataChangeListener) {
+
     }
 
 }

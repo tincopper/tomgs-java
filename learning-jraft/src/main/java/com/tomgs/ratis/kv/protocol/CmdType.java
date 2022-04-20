@@ -9,5 +9,8 @@ package com.tomgs.ratis.kv.protocol;
 public enum CmdType {
     GET,
     PUT,
-    DELETE
+    DELETE,
+    WATCH,
+    UNWATCH,
+    BPOP
 }

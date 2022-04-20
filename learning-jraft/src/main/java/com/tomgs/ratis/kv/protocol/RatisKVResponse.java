@@ -3,6 +3,8 @@ package com.tomgs.ratis.kv.protocol;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * RatisKVResponse
  *
@@ -11,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class RatisKVResponse {
+public class RatisKVResponse implements Serializable {
 
     private CmdType cmdType;
 
@@ -29,5 +31,7 @@ public class RatisKVResponse {
     private GetResponse getResponse;
 
     private PutResponse putResponse;
+
+    private BPopResponse bPopResponse;
 
 }

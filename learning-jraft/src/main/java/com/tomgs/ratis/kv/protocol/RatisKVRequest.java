@@ -28,4 +28,10 @@ public class RatisKVRequest implements Serializable {
 
     private DeleteRequest deleteRequest;
 
+    private WatchRequest watchRequest;
+
+    private UnwatchRequest unwatchRequest;
+
+    private BPopRequest bPopRequest;
+
 }

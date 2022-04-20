@@ -1,5 +1,7 @@
 package com.tomgs.common.kv;
 
+import com.tomgs.ratis.kv.watch.DataChangeListener;
+
 /**
  * cache client
  *
@@ -20,4 +22,5 @@ public interface CacheClient<K, V> {
 
     void close();
 
+    void watch(K key, DataChangeListener dataChangeListener);
 }

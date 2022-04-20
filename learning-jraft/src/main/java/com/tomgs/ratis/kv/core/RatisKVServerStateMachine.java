@@ -1,9 +1,11 @@
 package com.tomgs.ratis.kv.core;
 
 import com.alipay.remoting.exception.CodecException;
+import com.alipay.sofa.jraft.util.BytesUtil;
 import com.tomgs.ratis.kv.protocol.*;
 import com.tomgs.ratis.kv.storage.DBStore;
 import com.tomgs.ratis.kv.storage.StorageEngine;
+import com.tomgs.ratis.kv.watch.DataChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ratis.protocol.Message;
 import org.apache.ratis.protocol.RaftGroupId;
@@ -15,6 +17,10 @@ import org.apache.ratis.statemachine.impl.SimpleStateMachineStorage;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -36,6 +42,12 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
     private final DBStore dbStore;
 
     private RaftGroupId raftGroupId;
+
+    private final static BlockingQueue<DataChangeEvent> eventQueue = new ArrayBlockingQueue<>(8);
+
+    private final static Map<byte[], byte[]> watchMap = new TreeMap<>(BytesUtil.getDefaultByteArrayComparator());
+
+    private final static byte[] EMPTY_BYTE = new byte[0];
 
     public RatisKVServerStateMachine(final StorageEngine storageEngine) {
         this.storageEngine = storageEngine;
@@ -72,7 +84,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
         final ByteString logData = trx.getStateMachineLogEntry().getLogData();
         try {
             return CompletableFuture.completedFuture(runCommand(Message.valueOf(logData)));
-        } catch (CodecException e) {
+        } catch (Exception e) {
             return completeExceptionally(e);
         }
     }
@@ -87,7 +99,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
         }
     }
 
-    private Message runCommand(Message request) throws CodecException {
+    private Message runCommand(Message request) throws CodecException, InterruptedException {
         /*
          *   OMResponse response = handler.handleReadRequest(request);
          *   return OMRatisHelper.convertResponseToMessage(response);
@@ -124,6 +136,11 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                     builder.success(false)
                             .message(e.getMessage());
                 }
+                if (watchMap.containsKey(putRequest.getKey())) {
+                    eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_ADDED,
+                            serializer.deserialize(putRequest.getKey(), String.class.getName()),
+                            putRequest.getValue()));
+                }
                 break;
             case DELETE:
                 log.info("DELETE op.");
@@ -132,6 +149,48 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                     dbStore.delete(deleteRequest.getKey());
                 } catch (Exception e) {
                     log.error("DELETE exception: {}", e.getMessage(), e);
+                    builder.success(false)
+                            .message(e.getMessage());
+                }
+                if (watchMap.containsKey(deleteRequest.getKey())) {
+                    eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_REMOVED,
+                            serializer.deserialize(deleteRequest.getKey(), String.class.getName()),
+                            EMPTY_BYTE));
+                }
+                break;
+            case WATCH:
+                log.info("WATCH op.");
+                final WatchRequest watchRequest = kvRequest.getWatchRequest();
+                try {
+                    watchMap.put(watchRequest.getKey(), EMPTY_BYTE);
+                } catch (Exception e) {
+                    log.error("WATCH exception: {}", e.getMessage(), e);
+                    builder.success(false)
+                            .message(e.getMessage());
+                }
+                break;
+            case UNWATCH:
+                log.info("UNWATCH op.");
+                final UnwatchRequest unwatchRequest = kvRequest.getUnwatchRequest();
+                try {
+                    watchMap.remove(unwatchRequest.getKey());
+                } catch (Exception e) {
+                    log.error("UNWATCH exception: {}", e.getMessage(), e);
+                    builder.success(false)
+                            .message(e.getMessage());
+                }
+                break;
+            case BPOP:
+                log.info("BPOP op.");
+                try {
+                    final DataChangeEvent event = eventQueue.take();
+                    log.info("BPOP event: {}", event);
+                    BPopResponse response = new BPopResponse();
+                    response.setCmdType(cmdType);
+                    response.setEvent(event);
+                    builder.bPopResponse(response);
+                } catch (InterruptedException e) {
+                    log.error("BPOP exception: {}", e.getMessage(), e);
                     builder.success(false)
                             .message(e.getMessage());
                 }
