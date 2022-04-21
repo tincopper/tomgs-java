@@ -8,6 +8,7 @@ import com.tomgs.ratis.kv.protocol.*;
 import com.tomgs.ratis.kv.watch.DataChangeEvent;
 import com.tomgs.ratis.kv.watch.DataChangeListener;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ratis.client.RaftClient;
 import org.apache.ratis.client.RaftClientConfigKeys;
 import org.apache.ratis.conf.Parameters;
@@ -38,6 +39,7 @@ import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
  * @author tomgs
  * @since 2022/3/22
  */
+@Slf4j
 public class RatisVKClient<K, V> implements CacheClient<K, V> {
 
     private final ProtostuffSerializer serializer;
@@ -72,13 +74,13 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
                         TimeDuration.valueOf(100_000, TimeUnit.MILLISECONDS))
                 .build();
         this.raftClient = buildClient(raftGroup, retryPolicy);
-        this.watchRaftClient = buildClient(raftGroup, RetryPolicies.noRetry());
+        this.watchRaftClient = buildClient(raftGroup, RetryPolicies.retryForeverNoSleep());
     }
 
     private RaftClient buildClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
         RaftProperties raftProperties = new RaftProperties();
         RaftClientConfigKeys.Rpc.setRequestTimeout(raftProperties,
-                TimeDuration.valueOf(15, TimeUnit.SECONDS));
+                TimeDuration.valueOf(180, TimeUnit.SECONDS));
         RaftClient.Builder builder = RaftClient.newBuilder()
                 .setProperties(raftProperties)
                 .setRaftGroup(raftGroup)
@@ -92,18 +94,21 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
     private RatisKVResponse handleRatisKVReadRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
+        log.info("read log index : {}", raftClientReply.getLogIndex());
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
     private RatisKVResponse handleRatisKVWatchRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = watchRaftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
+        log.info("watch log index : {}", raftClientReply.getLogIndex());
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
     private RatisKVResponse handleRatisKVWriteRequest(RatisKVRequest request) throws CodecException, IOException {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().send(Message.valueOf(ByteString.copyFrom(bytes)));
+        log.info("write log index : {}", raftClientReply.getLogIndex());
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 

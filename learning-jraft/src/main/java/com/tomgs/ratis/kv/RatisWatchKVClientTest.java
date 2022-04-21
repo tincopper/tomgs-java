@@ -29,7 +29,8 @@ public class RatisWatchKVClientTest {
     public static void main(String[] args) throws InterruptedException {
         CacheSourceConfig sourceConfig = new CacheSourceConfig();
         sourceConfig.setTimeout(3000);
-        sourceConfig.setServerAddresses("127.0.0.1:8001,127.0.0.1:8002,127.0.0.1:8003");
+        //sourceConfig.setServerAddresses("127.0.0.1:8001,127.0.0.1:8002,127.0.0.1:8003");
+        sourceConfig.setServerAddresses("127.0.0.1:8004");
         sourceConfig.setKeySederClass(String.class);
         sourceConfig.setValueSederClass(String.class);
 

@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * RatisServerStateMachine
@@ -183,7 +184,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
             case BPOP:
                 log.info("BPOP op.");
                 try {
-                    final DataChangeEvent event = eventQueue.take();
+                    final DataChangeEvent event = eventQueue.poll(120, TimeUnit.SECONDS);
                     log.info("BPOP event: {}", event);
                     BPopResponse response = new BPopResponse();
                     response.setCmdType(cmdType);
