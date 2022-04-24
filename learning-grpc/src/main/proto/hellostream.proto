@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.tomgs.learning.grpc.proto";
+option java_outer_classname = "HelloStreamProto";
+option objc_class_prefix = "HLW";
+
+package main;
+
+// The greeting service definition.
+service GreeterStream {
+  // Sends a greeting
+  rpc SayHelloStream (stream HelloStreamRequest) returns (stream HelloStreamReply) {
+  }
+
+}
+
+// The request message containing the user's name.
+message HelloStreamRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloStreamReply {
+  string message = 1;
+}
