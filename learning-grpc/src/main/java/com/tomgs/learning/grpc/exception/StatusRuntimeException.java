@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tomgs.learning.grpc.base.exception;
+package com.tomgs.learning.grpc.exception;
 
 import io.grpc.Metadata;
 import io.grpc.Status;
