@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class GrpcServiceRegistry implements GrpcServerInit {
 
-    private final Set<BindableService> services = new HashSet<>();
+    private static final Set<BindableService> services = new HashSet<>();
 
     public GrpcServiceRegistry addService(BindableService service) {
         services.add(service);
