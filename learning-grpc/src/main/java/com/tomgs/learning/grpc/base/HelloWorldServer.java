@@ -21,6 +21,7 @@ import com.tomgs.learning.grpc.proto.HelloReply;
 import com.tomgs.learning.grpc.proto.HelloRequest;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.ServerInterceptors;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class HelloWorldServer {
     /* The port on which the server should run */
     int port = 8080;
     server = ServerBuilder.forPort(port)
-        .addService(new GreeterImpl())
+        .addService(ServerInterceptors.intercept(new GreeterImpl(), new MyServerInterceptor()))
         .build()
         .start();
     logger.info("Server started, listening on " + port);
