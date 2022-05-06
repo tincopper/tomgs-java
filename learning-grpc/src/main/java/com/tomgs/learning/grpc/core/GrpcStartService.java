@@ -25,7 +25,7 @@ public class GrpcStartService implements Service {
     private boolean isStarted = false;
 
     private final ExecutorService executor = ThreadUtils.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors() * 2, "bos-grpc-exec");
+            Runtime.getRuntime().availableProcessors() * 2, "grpc-exec");
 
     @Override
     public String getName() {
