@@ -18,7 +18,7 @@
 package com.tomgs.learning.dubbo.client.demo1;
 
 import com.tomgs.learning.dubbo.api.Helloworld;
-import com.tomgs.learning.dubbo.api.IGreeter;
+import com.tomgs.learning.dubbo.api.Greeter;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
@@ -34,15 +34,15 @@ public class ApiConsumer {
         ApplicationConfig applicationConfig = new ApplicationConfig("demo-consumer");
         // 关闭qos服务
         applicationConfig.setQosEnable(false);
-        ReferenceConfig<IGreeter> ref = new ReferenceConfig<>();
-        ref.setInterface(IGreeter.class);
+        ReferenceConfig<Greeter> ref = new ReferenceConfig<>();
+        ref.setInterface(Greeter.class);
         ref.setCheck(false);
         ref.setProtocol(CommonConstants.DUBBO_PROTOCOL);
         ref.setLazy(false);
         ref.setTimeout(100000);
         ref.setApplication(applicationConfig);
         ref.setRegistry(new RegistryConfig("zookeeper://127.0.0.1:2181"));
-        final IGreeter iGreeter = ref.get();
+        final Greeter iGreeter = ref.get();
 
         System.out.println("dubbo ref started");
 
@@ -52,7 +52,7 @@ public class ApiConsumer {
         System.in.read();
     }
 
-    private static void sayHello2(IGreeter iGreeter) {
+    private static void sayHello2(Greeter iGreeter) {
         try {
             String reply = iGreeter.sayHello2("tomgs");
             TimeUnit.SECONDS.sleep(1);
@@ -62,7 +62,7 @@ public class ApiConsumer {
         }
     }
 
-    private static void sayHello(IGreeter iGreeter) {
+    private static void sayHello(Greeter iGreeter) {
         Helloworld.HelloRequest req = Helloworld.HelloRequest.newBuilder().setName("laurence").build();
         try {
             final Helloworld.User reply = iGreeter.sayHello(req);

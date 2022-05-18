@@ -18,7 +18,7 @@
 package com.tomgs.learning.dubbo.api;
 
 
-public interface IGreeter {
+public interface Greeter {
     /**
      * <pre>
      *  Sends a greeting

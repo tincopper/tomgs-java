@@ -19,9 +19,9 @@ package com.tomgs.learning.dubbo.server.demo1;
 
 
 import com.tomgs.learning.dubbo.api.Helloworld;
-import com.tomgs.learning.dubbo.api.IGreeter;
+import com.tomgs.learning.dubbo.api.Greeter;
 
-public class IGreeter1Impl implements IGreeter {
+public class IGreeter1Impl implements Greeter {
     @Override
     public Helloworld.User sayHello(Helloworld.HelloRequest request) {
         System.out.println("receiv: " + request);
