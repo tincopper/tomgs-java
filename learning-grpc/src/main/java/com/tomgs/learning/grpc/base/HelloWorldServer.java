@@ -17,13 +17,14 @@
 package com.tomgs.learning.grpc.base;
 
 import com.tomgs.learning.grpc.proto.GreeterGrpc;
-import com.tomgs.learning.grpc.proto.HelloReply;
-import com.tomgs.learning.grpc.proto.HelloRequest;
+import com.tomgs.learning.grpc.proto.common.HelloReply;
+import com.tomgs.learning.grpc.proto.common.HelloRequest;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerInterceptors;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -87,7 +88,7 @@ public class HelloWorldServer {
 
     @Override
     public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-      RuntimeException e = new RuntimeException("custom exception");
+      RuntimeException e = new RuntimeException("test custom exception");
       //responseObserver.onError(e);
 
       responseObserver.onError(Status.INVALID_ARGUMENT

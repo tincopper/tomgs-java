@@ -17,8 +17,8 @@
 package com.tomgs.learning.grpc.base;
 
 import com.tomgs.learning.grpc.proto.GreeterGrpc;
-import com.tomgs.learning.grpc.proto.HelloReply;
-import com.tomgs.learning.grpc.proto.HelloRequest;
+import com.tomgs.learning.grpc.proto.common.HelloReply;
+import com.tomgs.learning.grpc.proto.common.HelloRequest;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

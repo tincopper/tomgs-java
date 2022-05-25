@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "common/common.proto";
+
 option java_multiple_files = true;
 option java_package = "com.tomgs.learning.grpc.proto";
 option java_outer_classname = "HelloWorldProto";
@@ -10,19 +12,19 @@ package main;
 // The greeting service definition.
 service Greeter {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+  rpc SayHello (common.HelloRequest) returns (common.HelloReply) {
   }
   // Sends another greeting
-  rpc SayHelloAgain (HelloRequest) returns (HelloReply) {
+  rpc SayHelloAgain (common.HelloRequest) returns (common.HelloReply) {
   }
 }
 
-// The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
-}
-
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
-}
+//// The request message containing the user's name.
+//message HelloRequest {
+//  string name = 1;
+//}
+//
+//// The response message containing the greetings
+//message HelloReply {
+//  string message = 1;
+//}

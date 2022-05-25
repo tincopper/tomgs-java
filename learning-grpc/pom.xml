@@ -20,7 +20,7 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-all</artifactId>
-            <version>1.42.1</version>
+            <version>1.45.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
@@ -60,7 +60,7 @@
                 <configuration>
                     <protocArtifact>com.google.protobuf:protoc:3.19.1:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.42.1:exe:${os.detected.classifier}</pluginArtifact>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.45.1:exe:${os.detected.classifier}</pluginArtifact>
                     <!--<protocExecutable>/bin/protoc</protocExecutable>-->
                 </configuration>
                 <executions>
