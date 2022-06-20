@@ -9,6 +9,23 @@ import org.junit.Test;
 public class BaseTest {
 
     /**
+     * 判断一个数是不是2的幂
+     */
+    @Test
+    public void test0() {
+        isPowerOfTwo(3);
+        isPowerOfTwo(4);
+    }
+
+    private void isPowerOfTwo(int scale) {
+        if ((scale & (scale - 1)) != 0) {
+            System.out.println(scale + " data type scale not a power of two");
+        } else {
+            System.out.println(scale + " data type scale is a power of two");
+        }
+    }
+
+    /**
      * 获取一个整数值的二进制值
      * 如输入int i = 1 输出 0000 0001
      */
