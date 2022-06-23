@@ -136,4 +136,46 @@ public class BaseTest {
         return distance;
     }
 
+    @Test
+    public void test4() {
+        final int i = 0x7F;
+        final int i1 = ~i;
+        System.out.println(Integer.toBinaryString(i));
+        System.out.println(Integer.toBinaryString(i1));
+
+        int n = 104;
+
+        final int i2 = n & i1;
+        System.out.println(Integer.toBinaryString(n));
+        System.out.println(Integer.toBinaryString(i2));
+
+        int n1 = 300;
+        // 取低8位
+        System.out.println(Integer.toBinaryString((byte)n1));
+        final int i3 = n1 & i1;
+        System.out.println(Integer.toBinaryString(n1));
+        System.out.println(Integer.toBinaryString(i3));
+    }
+
+    private final byte[] i32buf = new byte[]{};
+    private void writeVarint32(int n) {
+        int idx = 0;
+        while (true) {
+            // 如果小于128的数，直接取低8位
+            if ((n & ~0x7F) == 0) {
+                i32buf[idx++] = (byte)n;
+                break;
+            } else {
+                // 步骤1：取出字节串末7位
+                // 对于上述取出的7位：在最高位添加1构成一个字节
+                // 如果是最后一次取出，则在最高位添加0构成1个字节
+                i32buf[idx++] = (byte)((n & 0x7F) | 0x80);
+                // 步骤2：通过将字节串整体往右移7位，继续从字节串的末尾选取7位，直到取完为止。
+                n >>>= 7;
+            }
+        }
+        // 步骤3： 将上述形成的每个字节 按序拼接 成一个字节串
+        // 即该字节串就是经过Varint编码后的字节
+        //trans_.write(i32buf, 0, idx);
+    }
 }

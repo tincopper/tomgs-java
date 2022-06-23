@@ -1,37 +1,32 @@
 package com.tomgs.core.thread;
 
-import java.util.concurrent.CountDownLatch;
-
 /**
+ * 演示线程不会被中断
+ *
+ * 如果线程不处于waiting或者timed_wating状态，是不会被中断的，
+ * 即只有抛出InterruptedException的才会被中断如，sleep、wait、join等方法。
+ *
  * @author tomgs
  * @since 2021/3/2
  */
-public class InterruptTest extends Thread {
+public class Interrupt2Test extends Thread {
 
   public static void main(String[] args) throws InterruptedException {
-
-    CountDownLatch countDownLatch = new CountDownLatch(1);
-
     Thread t1 = new Thread(() -> {
-      try {
-        Thread thread = Thread.currentThread();
-        System.out.println("t1::: " + thread);
-        while (true) {
-          // no op
-          Thread.sleep(1000);
-        }
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-        countDownLatch.countDown();
+      Thread thread = Thread.currentThread();
+      System.out.println("t1::: " + thread);
+      int a = 1;
+      while (true) {
+        // no op
+        a++;
+        System.out.println("a: " + a);
       }
     }, "t1");
 
     t1.start();
     System.out.println("main::: " + t1);
-    Thread.sleep(3000);
+    Thread.sleep(1000);
     t1.interrupt();
-    countDownLatch.await();
-    t1.start();
   }
 
   // 自定义中断异常处理

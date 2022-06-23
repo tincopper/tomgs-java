@@ -88,16 +88,16 @@ public class HelloWorldServer {
 
     @Override
     public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-      RuntimeException e = new RuntimeException("test custom exception");
+      /*RuntimeException e = new RuntimeException("test custom exception");
       //responseObserver.onError(e);
 
       responseObserver.onError(Status.INVALID_ARGUMENT
               // 这里就是我们的自定义异常信息
               .withDescription(e.getMessage())
               .withCause(e)
-              .asRuntimeException());
+              .asRuntimeException());*/
 
-      /*try {
+      try {
         HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build();
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
@@ -108,7 +108,7 @@ public class HelloWorldServer {
                 .withCause(e)
                 .asRuntimeException());
         responseObserver.onError(new RuntimeException("custom exception"));
-      }*/
+      }
     }
 
   }
