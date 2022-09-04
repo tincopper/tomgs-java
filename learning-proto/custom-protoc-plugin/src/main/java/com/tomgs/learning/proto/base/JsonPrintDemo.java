@@ -31,18 +31,18 @@ public class JsonPrintDemo {
         System.out.println(inner_name);
         */
 
-        String print1 = CustomJsonFormat.printer().print(request);
+        String print1 = PBJsonFormat.printer().print(request);
         System.out.println(print1);
 
         ExtDemo.HelloRequest.Builder builder1 = ExtDemo.HelloRequest.newBuilder();
-        CustomJsonFormat.parser().merge(print1, builder1);
+        PBJsonFormat.parser().merge(print1, builder1);
         System.out.println(builder1);
 
-        String print2 = CustomJsonFormat.innerPrinter().print(request);
+        String print2 = PBJsonFormat.innerPrinter().print(request);
         System.out.println(print2);
 
         ExtDemo.HelloRequest.Builder builder2 = ExtDemo.HelloRequest.newBuilder();
-        CustomJsonFormat.parser().merge(print2, builder2);
+        PBJsonFormat.parser().merge(print2, builder2);
         System.out.println(builder2);
     }
 

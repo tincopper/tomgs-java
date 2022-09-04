@@ -102,10 +102,10 @@ import javax.annotation.Nullable;
  * extensions and unknown fields are treated as if they do not exist. This applies to proto2
  * messages embedded in proto3 messages as well.
  */
-public class CustomJsonFormat {
-  private static final Logger logger = Logger.getLogger(CustomJsonFormat.class.getName());
+public class PBJsonFormat {
+  private static final Logger logger = Logger.getLogger(PBJsonFormat.class.getName());
 
-  private CustomJsonFormat() {}
+  private PBJsonFormat() {}
 
   /**
    * Creates a {@link Printer} with default configurations.
@@ -188,7 +188,7 @@ public class CustomJsonFormat {
      *
      * @throws IllegalArgumentException if a registry is already set
      */
-    public Printer usingTypeRegistry(CustomJsonFormat.TypeRegistry oldRegistry) {
+    public Printer usingTypeRegistry(PBJsonFormat.TypeRegistry oldRegistry) {
       if (this.oldRegistry != TypeRegistry.getEmptyTypeRegistry()
           || this.registry != com.google.protobuf.TypeRegistry.getEmptyTypeRegistry()) {
         throw new IllegalArgumentException("Only one registry is allowed.");
