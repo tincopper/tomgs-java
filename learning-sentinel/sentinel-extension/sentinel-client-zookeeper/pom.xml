@@ -13,7 +13,7 @@
     <groupId>com.kd.csp</groupId>
     <artifactId>sentinel-client-zookeeper</artifactId>
     <!-- 发布ejob-sdk版本 -->
-    <version>5.1.13</version>
+    <!--<version>1.0-SNAPSHOT</version>-->
 
     <dependencies>
         <dependency>
