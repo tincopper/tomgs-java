@@ -31,16 +31,20 @@ public class JsonPrintDemo {
         System.out.println(inner_name);
         */
 
+        // pb对象序列化为json字符串
         String print1 = PBJsonFormat.printer().print(request);
         System.out.println(print1);
 
+        // json字符串反序列化为pb对象
         ExtDemo.HelloRequest.Builder builder1 = ExtDemo.HelloRequest.newBuilder();
         PBJsonFormat.parser().merge(print1, builder1);
         System.out.println(builder1);
 
+        // pb对象序列化为指定格式的json字符串
         String print2 = PBJsonFormat.innerPrinter().print(request);
         System.out.println(print2);
 
+        // 指定格式的json字符串反序列化pb对象
         ExtDemo.HelloRequest.Builder builder2 = ExtDemo.HelloRequest.newBuilder();
         PBJsonFormat.parser().merge(print2, builder2);
         System.out.println(builder2);

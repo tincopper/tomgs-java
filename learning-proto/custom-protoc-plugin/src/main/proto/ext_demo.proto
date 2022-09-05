@@ -10,12 +10,27 @@ import "tomgs/api/field.proto";
 
 // The greeting service definition.
 service Greeter {
+
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (User) {
+    // 方案一：通过注释的方式描述需要转换的v7接口
+    // @v7_route url: "/v7/example/echo", method: post, appId: xc
     option (google.api.http) = {
         post: "/v1/example/echo"
         body: "*"
+        // 兼容方案
+        additional_bindings {
+          post: "/v7/example/echo"
+          body: "*"
+        }
     };
+    // 方案二：通过扩展的方式实现v7接口转换
+    option (tomgs.api.inner_http) = {
+      post: "/v7/example/echo"
+      appId: "xc"
+    };
+
+    // 接口转换
     option (tomgs.api.dubbo) = {
       serviceFactory: "kd.bos.service.ServiceFactory"
       serviceName: "FormService"
@@ -27,8 +42,13 @@ service Greeter {
 
 // The request message containing the user's name.
 message HelloRequest {
+  // 方案一：通过注释的方式进行字段tag注入
+  // @tag json_name: "json_name", inner_name: "inner_name"
   //string name = 1;
+
+  // 方案二：通过扩展的方式
   string test_name = 1 [json_name = "json_name", (tomgs.api.inner_name) = "inner_name"];
+
   //string name = 1 [json_name = "name", (inner_name) = "test_name"];
   //string name = 1 [json_name = "name"];
 }

@@ -9,6 +9,8 @@ import com.google.protobuf.UnknownFieldSet;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ public class ParseProto {
         Map<String, Object> result = new HashMap<String, Object>();
 
         // 根据得到的desc文件
-        FileDescriptorSet fdSet = FileDescriptorSet.parseFrom(new FileInputStream(descFileDir));
+        FileDescriptorSet fdSet = FileDescriptorSet.parseFrom(Files.newInputStream(Paths.get(descFileDir)));
         for (FileDescriptorProto fdp : fdSet.getFileList()) {
             // 遍历获取各message信息
             for (DescriptorProto dp : fdp.getMessageTypeList()) {
