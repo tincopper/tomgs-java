@@ -93,6 +93,8 @@
                             </protocPlugins>
                         </configuration>
                     </execution>-->
+
+                    <!-- 调试插件时，使用dump文件 -->
                     <execution>
                         <id>protoc-dump</id>
                         <goals>

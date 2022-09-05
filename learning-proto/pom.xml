@@ -15,6 +15,8 @@
         <module>proto-base</module>
         <module>custom-protoc-plugin</module>
         <module>proto-compiler</module>
+        <module>dubbo-compiler</module>
+        <module>protoc-gen-test</module>
     </modules>
 
     <properties>
@@ -142,12 +144,15 @@
                         </execution>
                     </executions>
                 </plugin>
+
+                <!-- jProtoc插件可以通过canteen-maven-plugin打包成本地可执行文件。
+                    Canteen重新打包了jar文件，使其可以直接从命令行执行，而不需要调用java -jar。 -->
                 <!-- Optional, used to build directly executable packages (without using 'java -jar'),
                 for example 'artifactId-1.0.0-osx-x86_64.exe', 'artifactId-1.0.0-osx-x86_64.exe' -->
                 <plugin>
                     <groupId>com.salesforce.servicelibs</groupId>
                     <artifactId>canteen-maven-plugin</artifactId>
-                    <version>1.1.1</version>
+                    <version>1.1.0</version>
                     <executions>
                         <execution>
                             <goals>
