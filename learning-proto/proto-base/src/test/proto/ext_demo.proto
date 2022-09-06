@@ -1,0 +1,36 @@
+syntax = "proto3";
+package tomgs.api;
+
+// 将 gRPC-Gateway 批注添加到现有的 proto 文件中
+import "google/api/annotations.proto";
+// 将 dubbo批注添加到现有的 proto 文件中
+import "tomgs/api/dubbo.proto";
+
+// The greeting service definition.
+service ExtDemo {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (User) {
+    option (google.api.http) = {
+        post: "/v1/example/echo"
+        body: "*"
+    };
+    option (tomgs.api.dubbo) = {
+      serviceFactory: "kd.bos.service.ServiceFactory"
+      serviceName: "FormService"
+      methodName: "getCustomCtlVersion"
+      appId: "bos"
+    };
+  }
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message User {
+  string name = 1;
+  string id = 2;
+  int32 age = 3;
+}

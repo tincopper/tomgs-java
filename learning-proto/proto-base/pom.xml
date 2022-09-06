@@ -98,7 +98,7 @@
                     <execution>
                         <id>protoc-dump</id>
                         <goals>
-                            <goal>compile</goal>
+                            <goal>test-compile</goal>
                         </goals>
                         <configuration>
                             <protocPlugins>

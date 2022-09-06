@@ -1,0 +1,59 @@
+// Copyright 2015 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package tomgs.api;
+
+import "google/protobuf/descriptor.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "FieldProto";
+option java_package = "com.tomgs.api.field";
+option objc_class_prefix = "KAPI";
+
+extend google.protobuf.FieldOptions {
+  string inner_name = 72295733;
+}
+
+extend google.protobuf.MethodOptions {
+  // See `InnerHttpRule`.
+  InnerHttpRule inner_http = 72295731;
+}
+
+message InnerHttpRule {
+
+  string url = 1;
+
+  string appId = 2;
+
+  oneof pattern {
+    // Maps to HTTP GET. Used for listing and getting information about
+    // resources.
+    string get = 3;
+
+    // Maps to HTTP PUT. Used for replacing a resource.
+    string put = 4;
+
+    // Maps to HTTP POST. Used for creating a resource or performing an action.
+    string post = 5;
+
+    // Maps to HTTP DELETE. Used for deleting a resource.
+    string delete = 6;
+
+    // Maps to HTTP PATCH. Used for updating a resource.
+    string patch = 7;
+  }
+
+}

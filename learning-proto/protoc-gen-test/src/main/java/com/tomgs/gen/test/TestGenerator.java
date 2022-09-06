@@ -8,7 +8,6 @@ import com.salesforce.jprotoc.ProtocPlugin;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * TestGenerator
@@ -34,7 +33,7 @@ public class TestGenerator extends Generator {
     }
 
     @Override
-    public Stream<PluginProtos.CodeGeneratorResponse.File> generate(PluginProtos.CodeGeneratorRequest request)
+    public List<PluginProtos.CodeGeneratorResponse.File> generateFiles(PluginProtos.CodeGeneratorRequest request)
             throws GeneratorException {
 
         // create a map from proto types to java types
@@ -54,7 +53,7 @@ public class TestGenerator extends Generator {
                 .setContent(content)
                 .build();
 
-        return Collections.singletonList(file).stream();
+        return Collections.singletonList(file);
     }
 
     private class Context {
