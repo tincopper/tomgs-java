@@ -37,8 +37,8 @@ public class DumpExtensionGenerator extends Generator {
     public List<PluginProtos.CodeGeneratorResponse.File> generateFiles(PluginProtos.CodeGeneratorRequest request) throws GeneratorException {
         try {
             return Arrays.asList(
-                    makeFile("descriptor_dump", request.toByteArray()),
-                    makeFile("descriptor_dump.json", JsonFormat.printer().print(request))
+                    makeFile("tomgs_dump", request.toByteArray()),
+                    makeFile("tomgs_dump.json", JsonFormat.printer().print(request))
             );
         } catch (InvalidProtocolBufferException e) {
             throw new GeneratorException(e.getMessage());
