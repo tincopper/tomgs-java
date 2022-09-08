@@ -47,7 +47,7 @@ message HelloRequest {
   //string name = 1;
 
   // 方案二：通过扩展的方式
-  string test_name = 1 [json_name = "json_name", (tomgs.api.inner_name) = "inner_name"];
+  string test_name = 1 [json_name = "jsonName", (tomgs.api.inner_name) = "innerName"];
 
   //string name = 1 [json_name = "name", (inner_name) = "test_name"];
   //string name = 1 [json_name = "name"];

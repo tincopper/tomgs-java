@@ -1084,9 +1084,8 @@ public class PBJsonFormat {
     private void printField(FieldDescriptor field, Object value) throws IOException {
       if (preservingProtoFieldNames) {
         generator.print("\"" + field.getName() + "\":" + blankOrSpace);
-      } else if (innerProtoFieldNames) {
-        // generator.print("\"" + field.getOptions().getExtension(FieldProto.innerName) + "\":" + blankOrSpace);
-        generator.print("\"" + FieldProto.innerName.getDescriptor().getName() + "\":" + blankOrSpace);
+      } else if (innerProtoFieldNames && field.getOptions().hasExtension(FieldProto.innerName)) {
+        generator.print("\"" + field.getOptions().getExtension(FieldProto.innerName) + "\":" + blankOrSpace);
       } else {
         generator.print("\"" + field.getJsonName() + "\":" + blankOrSpace);
       }
@@ -1513,9 +1512,7 @@ public class PBJsonFormat {
         for (FieldDescriptor field : descriptor.getFields()) {
           fieldNameMap.put(field.getName(), field);
           fieldNameMap.put(field.getJsonName(), field);
-          // fieldNameMap.put(field.getOptions().getExtension(FieldProto.innerName), field);
-          // or
-          fieldNameMap.put(FieldProto.innerName.getDescriptor().getName(), field);
+          fieldNameMap.put(field.getOptions().getExtension(FieldProto.innerName), field);
         }
         fieldNameMaps.put(descriptor, fieldNameMap);
         return fieldNameMap;

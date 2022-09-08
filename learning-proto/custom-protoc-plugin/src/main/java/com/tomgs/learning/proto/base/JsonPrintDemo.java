@@ -46,8 +46,20 @@ public class JsonPrintDemo {
 
         // 指定格式的json字符串反序列化pb对象
         ExtDemo.HelloRequest.Builder builder2 = ExtDemo.HelloRequest.newBuilder();
-        PBJsonFormat.parser().merge(print2, builder2);
+        PBJsonFormat.parser().ignoringUnknownFields().merge(print2, builder2);
         System.out.println(builder2);
+
+        ExtDemo.User user = ExtDemo.User.newBuilder().setName("test").setAge(12).setId("123").build();
+        String print3 = PBJsonFormat.printer().print(user);
+        System.out.println(print3);
+
+        String print4 = PBJsonFormat.innerPrinter().print(user);
+        System.out.println(print4);
+
+        ExtDemo.User.Builder builder3 = ExtDemo.User.newBuilder();
+        PBJsonFormat.parser().merge(print3, builder3);
+        System.out.println(builder3.build());
+
     }
 
 }
