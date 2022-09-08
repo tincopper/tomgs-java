@@ -27,6 +27,7 @@
         <protoc.version>3.15.8</protoc.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <jprotoc.version>1.2.1</jprotoc.version>
     </properties>
 
     <dependencyManagement>
@@ -39,7 +40,7 @@
             <dependency>
                 <groupId>com.salesforce.servicelibs</groupId>
                 <artifactId>jprotoc</artifactId>
-                <version>1.2.1</version>
+                <version>${jprotoc.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.salesforce.servicelibs</groupId>
