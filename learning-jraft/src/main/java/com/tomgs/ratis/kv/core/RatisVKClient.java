@@ -194,9 +194,8 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
 
     }
 
-    @SneakyThrows
     @Override
-    public void watch(K key, DataChangeListener dataChangeListener) {
+    public void watch(K key, DataChangeListener dataChangeListener) throws CodecException {
         final byte[] keySer = serializer.serialize(key);
         listenerMap.put((String) key, dataChangeListener);
         if (!start) {

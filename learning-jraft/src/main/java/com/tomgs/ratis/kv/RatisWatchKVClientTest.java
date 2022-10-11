@@ -26,7 +26,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class RatisWatchKVClientTest {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, CodecException {
         CacheSourceConfig sourceConfig = new CacheSourceConfig();
         sourceConfig.setTimeout(3000);
         //sourceConfig.setServerAddresses("127.0.0.1:8001,127.0.0.1:8002,127.0.0.1:8003");

@@ -22,5 +22,5 @@ public interface CacheClient<K, V> {
 
     void close();
 
-    void watch(K key, DataChangeListener dataChangeListener);
+    void watch(K key, DataChangeListener dataChangeListener) throws Exception;
 }
