@@ -2,6 +2,8 @@ package com.tomgs.learning.proto.base;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
+import com.tomgs.learning.cinema.Cinema;
+import org.junit.Test;
 import tomgs.api.ExtDemo;
 
 /**
@@ -12,7 +14,8 @@ import tomgs.api.ExtDemo;
  */
 public class JsonPrintDemo {
 
-    public static void main(String[] args) throws InvalidProtocolBufferException {
+    @Test
+    public void testBase() throws InvalidProtocolBufferException {
         // proto 消息对象为下划线会转换为驼峰的命名方式
         ExtDemo.HelloRequest request = ExtDemo.HelloRequest.newBuilder().setTestName("tomgs").build();
         String print = JsonFormat.printer().print(request);
@@ -59,7 +62,23 @@ public class JsonPrintDemo {
         ExtDemo.User.Builder builder3 = ExtDemo.User.newBuilder();
         PBJsonFormat.parser().merge(print3, builder3);
         System.out.println(builder3.build());
+    }
 
+    @Test
+    public void testJsonArray() throws InvalidProtocolBufferException {
+        final Cinema.Movie movie1 = Cinema.Movie.newBuilder().setName("test1").setAddress("123").setDescription("345354").build();
+        final Cinema.Movie movie2 = Cinema.Movie.newBuilder().setName("test2").setAddress("123").setDescription("345354").build();
+        Cinema.Ticket.Builder builder = Cinema.Ticket.newBuilder();
+        // 默认值不会在json输出
+        builder.setId(2).addMovie(movie1).addMovie(movie2);
+
+        final Cinema.Ticket ticket = builder.build();
+        String print4 = JsonFormat.printer().print(ticket);
+        System.out.println(print4);
+
+        Cinema.Ticket.Builder builder2 = Cinema.Ticket.newBuilder();
+        JsonFormat.parser().merge(print4, builder2);
+        System.out.println(builder2.build());
     }
 
 }
