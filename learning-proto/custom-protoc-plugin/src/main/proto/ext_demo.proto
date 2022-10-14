@@ -58,4 +58,6 @@ message User {
   string name = 1;
   string id = 2;
   int32 age = 3;
+  int64 card_number = 4 [json_name = "cardNumber", (tomgs.api.inner_name) = "card_number"];
+  double salary = 5;
 }

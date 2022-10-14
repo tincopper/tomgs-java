@@ -116,7 +116,7 @@ public class PBJsonFormat {
         TypeRegistry.getEmptyTypeRegistry(),
         /* alwaysOutputDefaultValueFields */ false,
         /* includingDefaultValueFields */ Collections.<FieldDescriptor>emptySet(),
-        /*innerProtoFieldNames*/ false,
+        /* innerProtoFieldNames */ false,
         /* preservingProtoFieldNames */ false,
         /* omittingInsignificantWhitespace */ false,
         /* printingEnumsAsInts */ false,
@@ -1197,7 +1197,15 @@ public class PBJsonFormat {
         case INT64:
         case SINT64:
         case SFIXED64:
-          generator.print("\"" + ((Long) value).toString() + "\"");
+          if (!innerProtoFieldNames) {
+            generator.print("\"");
+          }
+          // generator.print("\"" + ((Long) value).toString() + "\"");
+          // 解决内部调用Long类型问题
+          generator.print(((Long) value).toString());
+          if (!innerProtoFieldNames) {
+            generator.print("\"");
+          }
           break;
 
         case BOOL:
@@ -1512,7 +1520,9 @@ public class PBJsonFormat {
         for (FieldDescriptor field : descriptor.getFields()) {
           fieldNameMap.put(field.getName(), field);
           fieldNameMap.put(field.getJsonName(), field);
-          fieldNameMap.put(field.getOptions().getExtension(FieldProto.innerName), field);
+          if (field.getOptions().hasExtension(FieldProto.innerName)) {
+            fieldNameMap.put(field.getOptions().getExtension(FieldProto.innerName), field);
+          }
         }
         fieldNameMaps.put(descriptor, fieldNameMap);
         return fieldNameMap;

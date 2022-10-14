@@ -52,15 +52,24 @@ public class JsonPrintDemo {
         PBJsonFormat.parser().ignoringUnknownFields().merge(print2, builder2);
         System.out.println(builder2);
 
-        ExtDemo.User user = ExtDemo.User.newBuilder().setName("test").setAge(12).setId("123").build();
+        ExtDemo.User user = ExtDemo.User.newBuilder()
+                .setName("test")
+                .setAge(12)
+                .setCardNumber(78912356789L)
+                .setSalary(78912356789L)
+                .setId("123")
+                .build();
         String print3 = PBJsonFormat.printer().print(user);
+        System.out.println(print3);
+
+        String print33 = JsonFormat.printer().print(user);
         System.out.println(print3);
 
         String print4 = PBJsonFormat.innerPrinter().print(user);
         System.out.println(print4);
 
         ExtDemo.User.Builder builder3 = ExtDemo.User.newBuilder();
-        PBJsonFormat.parser().merge(print3, builder3);
+        PBJsonFormat.parser().ignoringUnknownFields().merge(print3, builder3);
         System.out.println(builder3.build());
     }
 
