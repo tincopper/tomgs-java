@@ -177,6 +177,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                 try {
                     dbStore.put(putRequest.getKey(), putRequest.getValue());
                     if (isLeader.get() && watchMap.containsKey(putRequest.getKey())) {
+                        log.info("Watch NODE_ADDED.");
                         eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_ADDED,
                                 serializer.deserialize(putRequest.getKey(), String.class.getName()),
                                 putRequest.getValue()));

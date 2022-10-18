@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
 
@@ -49,6 +50,10 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
     private final RaftClient watchRaftClient;
 
     private final CacheSourceConfig cacheSourceConfig;
+
+    private final ScheduledExecutorService scheduledExecutorService;
+
+    private final AtomicBoolean enableWatchThread = new AtomicBoolean(false);
 
     private static final Map<String, DataChangeListener> listenerMap = new ConcurrentHashMap<>();
 
@@ -73,18 +78,11 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
                 .build();
         this.raftClient = buildClient(raftGroup, retryPolicy);
         this.watchRaftClient = buildClient(raftGroup, RetryPolicies.retryForeverNoSleep());
-        final ScheduledExecutorService scheduledExecutorService =
+        this.scheduledExecutorService =
                 Executors.newScheduledThreadPool(1, ThreadFactoryBuilder.create()
                         .setNamePrefix("watch-loop")
                         .setDaemon(true)
                         .build());
-        scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            try {
-                this.watchLoop();
-            } catch (Exception e) {
-                log.warn("watch loop exception: {}", e.getMessage(), e);
-            }
-        }, 3000, 1000, TimeUnit.MILLISECONDS);
     }
 
     private RaftClient buildClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
@@ -221,6 +219,16 @@ public class RatisVKClient<K, V> implements CacheClient<K, V> {
             }
             // add to listener map
             listenerMap.put((String) key, dataChangeListener);
+            // start watch
+            if (enableWatchThread.compareAndSet(false, true)) {
+                scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                    try {
+                        this.watchLoop();
+                    } catch (Exception e) {
+                        log.warn("watch loop exception: {}", e.getMessage(), e);
+                    }
+                }, 1000, 1000, TimeUnit.MILLISECONDS);
+            }
         } catch (Exception e) {
             throw new RatisKVClientException(e.getMessage(), e);
         }
