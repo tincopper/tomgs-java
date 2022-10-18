@@ -16,7 +16,6 @@
  */
 package com.tomgs.ratis.kv.core;
 
-import com.alipay.remoting.exception.CodecException;
 import com.alipay.remoting.serialization.Serializer;
 import com.alipay.sofa.jraft.rhea.serialization.Serializers;
 import com.alipay.sofa.jraft.rhea.util.Maps;
@@ -37,13 +36,13 @@ public class ProtostuffSerializer implements Serializer {
                                                                                      .getSerializer(Serializers.PROTO_STUFF);
 
     @Override
-    public byte[] serialize(final Object obj) throws CodecException {
+    public byte[] serialize(final Object obj) {
         return this.delegate.writeObject(obj);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T deserialize(final byte[] data, final String classOfT) throws CodecException {
+    public <T> T deserialize(final byte[] data, final String classOfT) {
         Class<?> clazz = classCache.get(classOfT);
         if (clazz == null) {
             try {

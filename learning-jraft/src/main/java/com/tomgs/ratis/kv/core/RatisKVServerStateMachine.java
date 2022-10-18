@@ -1,14 +1,12 @@
 package com.tomgs.ratis.kv.core;
 
-import com.alipay.remoting.exception.CodecException;
 import com.alipay.sofa.jraft.util.BytesUtil;
 import com.tomgs.ratis.kv.protocol.*;
 import com.tomgs.ratis.kv.storage.DBStore;
 import com.tomgs.ratis.kv.storage.StorageEngine;
 import com.tomgs.ratis.kv.watch.DataChangeEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ratis.protocol.Message;
-import org.apache.ratis.protocol.RaftGroupId;
+import org.apache.ratis.protocol.*;
 import org.apache.ratis.server.RaftServer;
 import org.apache.ratis.server.storage.RaftStorage;
 import org.apache.ratis.statemachine.TransactionContext;
@@ -17,12 +15,15 @@ import org.apache.ratis.statemachine.impl.SimpleStateMachineStorage;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * RatisServerStateMachine
@@ -43,6 +44,10 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
     private final DBStore dbStore;
 
     private RaftGroupId raftGroupId;
+
+    private final AtomicLong transactions = new AtomicLong(0);
+
+    private final AtomicBoolean isLeader = new AtomicBoolean(false);
 
     private final static BlockingQueue<DataChangeEvent> eventQueue = new ArrayBlockingQueue<>(8);
 
@@ -81,7 +86,46 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
     }
 
     @Override
+    public void notifyLeaderChanged(RaftGroupMemberId groupMemberId, RaftPeerId newLeaderId) {
+        log.debug("notifyLeaderChanged groupMemberId: {}, newLeaderId: {}.", groupMemberId, newLeaderId);
+        RaftPeerId currentPeerId = groupMemberId.getPeerId();
+        if (currentPeerId.equals(newLeaderId)) {
+            isLeader.set(true);
+            System.out.println("LEADER");
+        } else {
+            isLeader.set(false);
+            System.out.println("FOLLOWER");
+        }
+    }
+
+    @Override
+    public void notifyNotLeader(Collection<TransactionContext> pendingEntries) throws IOException {
+        // 不是主节点时回调
+        log.debug("notifyNotLeader pendingEntries: {}", pendingEntries);
+    }
+
+    @Override
+    public TransactionContext startTransaction(RaftClientRequest request) throws IOException {
+        final long incrementAndGet = transactions.incrementAndGet();
+        // 只有leader 才会调用此方法，所以进入此方法的即为leader
+        isLeader.set(true);
+        // send the next transaction id as the "context" from SM
+        return TransactionContext.newBuilder()
+                .setStateMachine(this)
+                .setClientRequest(request)
+                .setStateMachineContext(incrementAndGet)
+                .build();
+    }
+
+    @Override
     public CompletableFuture<Message> applyTransaction(TransactionContext trx) {
+        final long term = trx.getLogEntry().getTerm();
+        final long index = trx.getLogEntry().getIndex();
+        final long commitIndex = trx.getLogEntry().getMetadataEntry().getCommitIndex();
+        final long txIndex = transactions.get();
+
+        log.info("log term: " + term + ", index: " + index + ", commitIndex: " + commitIndex + ", txIndex: " + txIndex);
+
         final ByteString logData = trx.getStateMachineLogEntry().getLogData();
         try {
             return CompletableFuture.completedFuture(runCommand(Message.valueOf(logData)));
@@ -100,7 +144,7 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
         }
     }
 
-    private Message runCommand(Message request) throws CodecException, InterruptedException {
+    private Message runCommand(Message request) {
         /*
          *   OMResponse response = handler.handleReadRequest(request);
          *   return OMRatisHelper.convertResponseToMessage(response);
@@ -132,15 +176,15 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                 final PutRequest putRequest = kvRequest.getPutRequest();
                 try {
                     dbStore.put(putRequest.getKey(), putRequest.getValue());
+                    if (isLeader.get() && watchMap.containsKey(putRequest.getKey())) {
+                        eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_ADDED,
+                                serializer.deserialize(putRequest.getKey(), String.class.getName()),
+                                putRequest.getValue()));
+                    }
                 } catch (Exception e) {
                     log.error("PUT exception: {}", e.getMessage(), e);
                     builder.success(false)
                             .message(e.getMessage());
-                }
-                if (watchMap.containsKey(putRequest.getKey())) {
-                    eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_ADDED,
-                            serializer.deserialize(putRequest.getKey(), String.class.getName()),
-                            putRequest.getValue()));
                 }
                 break;
             case DELETE:
@@ -148,15 +192,15 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                 final DeleteRequest deleteRequest = kvRequest.getDeleteRequest();
                 try {
                     dbStore.delete(deleteRequest.getKey());
+                    if (isLeader.get() && watchMap.containsKey(deleteRequest.getKey())) {
+                        eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_REMOVED,
+                                serializer.deserialize(deleteRequest.getKey(), String.class.getName()),
+                                EMPTY_BYTE));
+                    }
                 } catch (Exception e) {
                     log.error("DELETE exception: {}", e.getMessage(), e);
                     builder.success(false)
                             .message(e.getMessage());
-                }
-                if (watchMap.containsKey(deleteRequest.getKey())) {
-                    eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_REMOVED,
-                            serializer.deserialize(deleteRequest.getKey(), String.class.getName()),
-                            EMPTY_BYTE));
                 }
                 break;
             case WATCH:
@@ -184,8 +228,8 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
             case BPOP:
                 log.info("BPOP op.");
                 try {
-                    final DataChangeEvent event = eventQueue.poll(120, TimeUnit.SECONDS);
-                    log.info("BPOP event: {}", event);
+                    final DataChangeEvent event = eventQueue.poll(60, TimeUnit.SECONDS);
+                    log.debug("BPOP event: {}", event);
                     BPopResponse response = new BPopResponse();
                     response.setCmdType(cmdType);
                     response.setEvent(event);

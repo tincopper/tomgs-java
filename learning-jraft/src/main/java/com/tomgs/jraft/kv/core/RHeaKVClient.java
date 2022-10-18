@@ -97,4 +97,9 @@ public class RHeaKVClient<K, V> implements CacheClient<K, V> {
 
     }
 
+    @Override
+    public void unwatch(K key) {
+
+    }
+
 }

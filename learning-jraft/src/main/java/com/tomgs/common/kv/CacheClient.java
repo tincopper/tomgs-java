@@ -23,4 +23,6 @@ public interface CacheClient<K, V> {
     void close();
 
     void watch(K key, DataChangeListener dataChangeListener) throws Exception;
+
+    void unwatch(K key);
 }
