@@ -23,3 +23,6 @@ ozoneManager.getMetadataManager().getStore().flushDB();
 2、多个客户端对watch的监听实现思路
 ① server端需要hold住多个客户端的连接
 ② 需要改动ratis相关源码来实现 TODO
+
+# ratis相关配置信息 
+在idea中通过Ctrl + N搜索 `ratis.*ConfigKeys`即可查看到想要的配置类。

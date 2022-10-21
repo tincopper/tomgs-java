@@ -32,7 +32,7 @@ public class RatisKVDataSource implements HodorCacheSource {
     @Override
     @SuppressWarnings("unchecked")
     public <K, V> CacheClient<K, V> getCacheClient(String group) {
-        return (CacheClient<K, V>) groupCacheClientMap.computeIfAbsent(group, k -> new RatisVKClient<>(cacheSourceConfig));
+        return (CacheClient<K, V>) groupCacheClientMap.computeIfAbsent(group, k -> new RatisKVClient<>(cacheSourceConfig));
     }
 
     @Override

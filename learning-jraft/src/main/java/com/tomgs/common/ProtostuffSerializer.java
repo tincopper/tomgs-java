@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tomgs.ratis.kv.core;
+package com.tomgs.common;
 
 import com.alipay.remoting.serialization.Serializer;
 import com.alipay.sofa.jraft.rhea.serialization.Serializers;

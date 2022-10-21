@@ -118,7 +118,9 @@ public final class MultiRaftCounterServer2 implements Closeable {
 
         //create and start the Raft server
         // 多分组raft一定需要使用RaftServerProxy
-        this.server = ServerImplUtils.newRaftServer(peer.getId(), null, registry::get, properties, null);
+        // this.server = ServerImplUtils.newRaftServer(peer.getId(), null, registry::get, properties, null);
+        this.server = ServerImplUtils.newRaftServer(peer.getId(), Constants.RAFT_GROUP1, registry::get,
+                null, properties, null);
     }
 
     public void start() throws IOException {

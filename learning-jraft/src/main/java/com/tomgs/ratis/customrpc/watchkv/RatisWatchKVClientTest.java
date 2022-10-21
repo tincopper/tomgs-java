@@ -1,9 +1,8 @@
-package com.tomgs.ratis.kv;
+package com.tomgs.ratis.customrpc.watchkv;
 
+import com.tomgs.common.ProtostuffSerializer;
 import com.tomgs.common.kv.CacheSourceConfig;
-import com.tomgs.ratis.kv.core.ProtostuffSerializer;
-import com.tomgs.ratis.kv.core.RatisKVDataSource;
-import com.tomgs.ratis.kv.core.RatisVKClient;
+import com.tomgs.ratis.customrpc.watchkv.core.RatisWatchKVClient;
 import com.tomgs.ratis.kv.watch.DataChangeEvent;
 import com.tomgs.ratis.kv.watch.DataChangeListener;
 
@@ -30,8 +29,8 @@ public class RatisWatchKVClientTest {
         sourceConfig.setKeySederClass(String.class);
         sourceConfig.setValueSederClass(String.class);
 
-        RatisKVDataSource dataSource = new RatisKVDataSource(sourceConfig);
-        RatisVKClient<String, String> cacheClient = (RatisVKClient) dataSource.getCacheClient();
+        RatisWatchKVClient<String, String> cacheClient = new RatisWatchKVClient<>(sourceConfig);
+        cacheClient.startHandleWatchStreamResponse();
 
         cacheClient.watch("hello", new DataChangeListener() {
             @Override

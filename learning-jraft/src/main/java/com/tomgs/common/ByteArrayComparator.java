@@ -1,4 +1,4 @@
-package com.tomgs.ratis.kv.core;
+package com.tomgs.common;
 
 import java.util.Comparator;
 

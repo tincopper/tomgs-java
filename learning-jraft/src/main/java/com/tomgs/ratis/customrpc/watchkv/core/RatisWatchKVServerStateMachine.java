@@ -1,11 +1,11 @@
-package com.tomgs.ratis.kv.core;
+package com.tomgs.ratis.customrpc.watchkv.core;
 
-import com.alipay.sofa.jraft.util.BytesUtil;
 import com.tomgs.common.ProtostuffSerializer;
+import com.tomgs.learning.grpc.proto.DataChangeEvent;
 import com.tomgs.ratis.kv.protocol.*;
 import com.tomgs.ratis.kv.storage.DBStore;
 import com.tomgs.ratis.kv.storage.StorageEngine;
-import com.tomgs.ratis.kv.watch.DataChangeEvent;
+import com.tomgs.ratisrpc.grpc.core.WatchManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ratis.protocol.*;
 import org.apache.ratis.server.RaftServer;
@@ -17,12 +17,7 @@ import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -33,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 2022/3/22
  */
 @Slf4j
-public class RatisKVServerStateMachine extends BaseStateMachine {
+public class RatisWatchKVServerStateMachine extends BaseStateMachine {
 
     private final SimpleStateMachineStorage storage =
             new SimpleStateMachineStorage();
@@ -50,13 +45,9 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
 
     private final AtomicBoolean isLeader = new AtomicBoolean(false);
 
-    private final static BlockingQueue<DataChangeEvent> eventQueue = new ArrayBlockingQueue<>(8);
+    private final WatchManager watchManager = WatchManager.INSTANCE;
 
-    private final static Map<byte[], byte[]> watchMap = new TreeMap<>(BytesUtil.getDefaultByteArrayComparator());
-
-    private final static byte[] EMPTY_BYTE = new byte[0];
-
-    public RatisKVServerStateMachine(final StorageEngine storageEngine) {
+    public RatisWatchKVServerStateMachine(final StorageEngine storageEngine) {
         this.storageEngine = storageEngine;
         this.serializer = new ProtostuffSerializer();
         this.dbStore = this.storageEngine.getRawDBStore();
@@ -177,11 +168,15 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                 final PutRequest putRequest = kvRequest.getPutRequest();
                 try {
                     dbStore.put(putRequest.getKey(), putRequest.getValue());
-                    if (isLeader.get() && watchMap.containsKey(putRequest.getKey())) {
+                    //if (isLeader.get() && watchManager.containsWatchKey(putRequest.getKey())) {
+                    if (watchManager.containsWatchKey(putRequest.getKey())) {
                         log.info("Watch NODE_ADDED.");
-                        eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_ADDED,
-                                serializer.deserialize(putRequest.getKey(), String.class.getName()),
-                                putRequest.getValue()));
+                        final DataChangeEvent dataChangeEvent = DataChangeEvent.newBuilder()
+                                .setKey(ByteString.copyFrom(putRequest.getKey()))
+                                .setType(DataChangeEvent.Type.NODE_ADDED)
+                                .setData(ByteString.copyFrom(putRequest.getValue()))
+                                .build();
+                        watchManager.notify(dataChangeEvent);
                     }
                 } catch (Exception e) {
                     log.error("PUT exception: {}", e.getMessage(), e);
@@ -194,50 +189,16 @@ public class RatisKVServerStateMachine extends BaseStateMachine {
                 final DeleteRequest deleteRequest = kvRequest.getDeleteRequest();
                 try {
                     dbStore.delete(deleteRequest.getKey());
-                    if (isLeader.get() && watchMap.containsKey(deleteRequest.getKey())) {
-                        eventQueue.put(new DataChangeEvent(DataChangeEvent.Type.NODE_REMOVED,
-                                serializer.deserialize(deleteRequest.getKey(), String.class.getName()),
-                                EMPTY_BYTE));
+                    if (watchManager.containsWatchKey(deleteRequest.getKey())) {
+                        final DataChangeEvent dataChangeEvent = DataChangeEvent.newBuilder()
+                                .setKey(ByteString.copyFrom(deleteRequest.getKey()))
+                                .setType(DataChangeEvent.Type.NODE_REMOVED)
+                                .setData(ByteString.EMPTY)
+                                .build();
+                        watchManager.notify(dataChangeEvent);
                     }
                 } catch (Exception e) {
                     log.error("DELETE exception: {}", e.getMessage(), e);
-                    builder.success(false)
-                            .message(e.getMessage());
-                }
-                break;
-            case WATCH:
-                log.info("WATCH op.");
-                final WatchRequest watchRequest = kvRequest.getWatchRequest();
-                try {
-                    watchMap.put(watchRequest.getKey(), EMPTY_BYTE);
-                } catch (Exception e) {
-                    log.error("WATCH exception: {}", e.getMessage(), e);
-                    builder.success(false)
-                            .message(e.getMessage());
-                }
-                break;
-            case UNWATCH:
-                log.info("UNWATCH op.");
-                final UnwatchRequest unwatchRequest = kvRequest.getUnwatchRequest();
-                try {
-                    watchMap.remove(unwatchRequest.getKey());
-                } catch (Exception e) {
-                    log.error("UNWATCH exception: {}", e.getMessage(), e);
-                    builder.success(false)
-                            .message(e.getMessage());
-                }
-                break;
-            case BPOP:
-                log.info("BPOP op.");
-                try {
-                    final DataChangeEvent event = eventQueue.poll(60, TimeUnit.SECONDS);
-                    log.debug("BPOP event: {}", event);
-                    BPopResponse response = new BPopResponse();
-                    response.setCmdType(cmdType);
-                    response.setEvent(event);
-                    builder.bPopResponse(response);
-                } catch (InterruptedException e) {
-                    log.error("BPOP exception: {}", e.getMessage(), e);
                     builder.success(false)
                             .message(e.getMessage());
                 }
