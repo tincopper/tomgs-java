@@ -6,7 +6,7 @@ import com.tomgs.ratis.kv.core.GroupManager;
 import com.tomgs.ratis.kv.storage.StorageEngine;
 import com.tomgs.ratis.kv.storage.StorageOptions;
 import com.tomgs.ratis.kv.storage.StorageType;
-import com.tomgs.ratisrpc.grpc.CustomRpcType;
+import com.tomgs.ratisrpc.grpc.WatchGrpcRpcType;
 import com.tomgs.ratisrpc.grpc.core.WatchManager;
 import org.apache.ratis.RaftConfigKeys;
 import org.apache.ratis.conf.RaftProperties;
@@ -68,7 +68,7 @@ public class RatisWatchKVServer implements CacheServer {
         //set the port which server listen to in RaftProperty object
         final int port = NetUtils.createSocketAddr(sourceConfig.getEndpoint()).getPort();
         GrpcConfigKeys.Server.setPort(properties, port);
-        RaftConfigKeys.Rpc.setType(properties, CustomRpcType.INSTANCE);
+        RaftConfigKeys.Rpc.setType(properties, WatchGrpcRpcType.INSTANCE);
         //create the counter state machine which hold the counter value
         RatisWatchKVServerStateMachine serverStateMachine = new RatisWatchKVServerStateMachine(storageEngine);
         //create and start the Raft server

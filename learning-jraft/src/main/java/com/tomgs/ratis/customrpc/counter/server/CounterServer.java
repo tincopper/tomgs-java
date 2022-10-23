@@ -19,7 +19,7 @@
 package com.tomgs.ratis.customrpc.counter.server;
 
 import com.tomgs.ratis.common.Constants;
-import com.tomgs.ratisrpc.grpc.CustomRpcType;
+import com.tomgs.ratisrpc.grpc.WatchGrpcRpcType;
 import org.apache.ratis.RaftConfigKeys;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcConfigKeys;
@@ -60,7 +60,7 @@ public final class CounterServer implements Closeable {
     final int port = NetUtils.createSocketAddr(peer.getAddress()).getPort();
 
     GrpcConfigKeys.Server.setPort(properties, port);
-    RaftConfigKeys.Rpc.setType(properties, CustomRpcType.INSTANCE);
+    RaftConfigKeys.Rpc.setType(properties, WatchGrpcRpcType.INSTANCE);
 
     //create the counter state machine which hold the counter value
     CounterStateMachine counterStateMachine = new CounterStateMachine(this);

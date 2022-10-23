@@ -38,14 +38,10 @@ public class GrpcWatchServerProtocolService extends WatchServiceGrpc.WatchServic
 
                 if (request.hasCreateRequest()) {
                     final WatchCreateRequest createRequest = request.getCreateRequest();
-                    // TODO: 处理创建watch请求
-                    // do something
                     watchManager.addWatchRequest(createRequest);
                 }
                 if (request.hasCancelRequest()) {
                     final WatchCancelRequest cancelRequest = request.getCancelRequest();
-                    // TODO: 处理取消watch请求
-                    // do something
                     watchManager.cancelWatchRequest(cancelRequest);
                 }
             }

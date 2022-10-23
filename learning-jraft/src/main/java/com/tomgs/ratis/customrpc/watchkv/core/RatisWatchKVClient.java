@@ -1,19 +1,19 @@
 package com.tomgs.ratis.customrpc.watchkv.core;
 
-import cn.hutool.core.thread.ThreadFactoryBuilder;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.tomgs.common.ProtostuffSerializer;
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
-import com.tomgs.learning.grpc.proto.WatchCreateRequest;
 import com.tomgs.learning.grpc.proto.WatchRequest;
-import com.tomgs.learning.grpc.proto.WatchResponse;
-import com.tomgs.learning.grpc.proto.WatchServiceGrpc;
+import com.tomgs.learning.grpc.proto.*;
 import com.tomgs.ratis.kv.core.GroupManager;
 import com.tomgs.ratis.kv.exception.RatisKVClientException;
 import com.tomgs.ratis.kv.protocol.*;
 import com.tomgs.ratis.kv.watch.DataChangeEvent;
 import com.tomgs.ratis.kv.watch.DataChangeListener;
+import com.tomgs.ratisrpc.grpc.WatchGrpcFactory;
+import com.tomgs.ratisrpc.grpc.core.WatchRaftClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ratis.client.RaftClient;
 import org.apache.ratis.client.RaftClientConfigKeys;
@@ -31,15 +31,12 @@ import org.apache.ratis.thirdparty.io.grpc.stub.StreamObserver;
 import org.apache.ratis.util.TimeDuration;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
 
@@ -56,14 +53,19 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
 
     private final RaftClient raftClient;
 
-    private final RaftClient watchRaftClient;
+    private final WatchRaftClient watchRaftClient;
 
     private final CacheSourceConfig cacheSourceConfig;
 
-    private final ScheduledExecutorService scheduledExecutorService;
-
     private StreamObserver<WatchRequest> watchRequestStreamObserver;
+
     private static final Map<String, DataChangeListener> listenerMap = new ConcurrentHashMap<>();
+
+    private final long channelKeepAlive = 60 * 1000;
+
+    private final int maxInboundMessageSize = 4096;
+
+    private ThreadPoolExecutor grpcExecutor;
 
     public RatisWatchKVClient(final CacheSourceConfig cacheSourceConfig) {
         this.cacheSourceConfig = cacheSourceConfig;
@@ -84,16 +86,11 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
                         TimeDuration.valueOf(100_000, TimeUnit.MILLISECONDS))
                 .build();
         this.raftClient = buildClient(raftGroup, retryPolicy);
-        this.watchRaftClient = buildClient(raftGroup, RetryPolicies.retryForeverNoSleep());
-        this.scheduledExecutorService =
-                Executors.newScheduledThreadPool(1, ThreadFactoryBuilder.create()
-                        .setNamePrefix("watch-loop")
-                        .setDaemon(true)
-                        .build());
+        this.watchRaftClient = buildWatchClient(raftGroup, RetryPolicies.retryForeverNoSleep());
     }
 
     public void startHandleWatchStreamResponse() {
-        final RaftPeerId leaderId = watchRaftClient.getLeaderId();
+        final RaftPeerId leaderId = watchRaftClient.raftClient().getLeaderId();
         final String peerId = leaderId.getRaftPeerIdProto().getId().toStringUtf8();
         //final String address = peer.getAddress();
         final String address = "127.0.0.1:8001";
@@ -108,34 +105,79 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
                 .build();
         //final ConnectivityState state = channel.getState(true);
         //channel.notifyWhenStateChanged();
+        String connectionId = "1";
         final ClientCall<WatchRequest, WatchResponse> clientCall = channel.newCall(WatchServiceGrpc.getWatchMethod(), CallOptions.DEFAULT);
         this.watchRequestStreamObserver = ClientCalls.asyncBidiStreamingCall(clientCall, new StreamObserver<WatchResponse>() {
             @Override
             public void onNext(WatchResponse response) {
-                final com.tomgs.learning.grpc.proto.DataChangeEvent event = response.getEvent();
-                final String key = serializer.deserialize(event.getKey().toByteArray(), String.class.getName());
-                final com.tomgs.learning.grpc.proto.DataChangeEvent.Type type = event.getType();
-                final byte[] dataBytes = event.getData().toByteArray();
-                final String data = serializer.deserialize(dataBytes, String.class.getName());
+                try {
+                    final com.tomgs.learning.grpc.proto.DataChangeEvent event = response.getEvent();
+                    final String key = serializer.deserialize(event.getKey().toByteArray(), String.class.getName());
+                    final com.tomgs.learning.grpc.proto.DataChangeEvent.Type type = event.getType();
+                    final byte[] dataBytes = event.getData().toByteArray();
+                    final String data = serializer.deserialize(dataBytes, String.class.getName());
 
-                log.debug("watch reply: key: {}, type: {}, data: {}", key, type, data);
+                    log.debug("watch reply: key: {}, type: {}, data: {}", key, type, data);
 
-                final DataChangeListener dataChangeListener = listenerMap.get(key);
-                DataChangeEvent dataChangeEvent = new DataChangeEvent(type.name(), key, dataBytes);
-                dataChangeListener.dataChanged(dataChangeEvent);
+                    final DataChangeListener dataChangeListener = listenerMap.get(key);
+                    DataChangeEvent dataChangeEvent = new DataChangeEvent(type.name(), key, dataBytes);
+                    dataChangeListener.dataChanged(dataChangeEvent);
+                } catch (Exception e) {
+                    log.error("[{}]Error to process server push response: {}",
+                            connectionId,
+                            response.getEvent().toString());
+                }
+
             }
 
             @Override
             public void onError(Throwable t) {
                 log.error("error: ", t);
+                // 判断是否需要重连
+
             }
 
             @Override
             public void onCompleted() {
                 log.info("stream completed");
+                // 判断是否需要重连
             }
         });
 
+    }
+
+    /**
+     * create a new channel with specific server address.
+     *
+     * @param serverIp   serverIp.
+     * @param serverPort serverPort.
+     * @return if server check success,return a non-null channel.
+     */
+    private ManagedChannel createNewManagedChannel(String serverIp, int serverPort) {
+        grpcExecutor = ThreadUtil.newExecutor(4, 4);
+        ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forAddress(serverIp, serverPort)
+                .executor(grpcExecutor).compressorRegistry(CompressorRegistry.getDefaultInstance())
+                .decompressorRegistry(DecompressorRegistry.getDefaultInstance())
+                .maxInboundMessageSize(maxInboundMessageSize)
+                .keepAliveTime(channelKeepAlive, TimeUnit.MILLISECONDS).usePlaintext();
+        return managedChannelBuilder.build();
+    }
+
+    private WatchRaftClient buildWatchClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
+        RaftProperties raftProperties = new RaftProperties();
+        RaftClientConfigKeys.Rpc.setRequestTimeout(raftProperties,
+                TimeDuration.valueOf(90, TimeUnit.SECONDS));
+        WatchRaftClient.Builder builder = WatchRaftClient.newBuilder()
+                .setProperties(raftProperties)
+                .setRaftGroup(raftGroup)
+                .setRetryPolicy(retryPolicy)
+                .setClientRpc(
+                        new WatchGrpcFactory(new Parameters())
+                                .newRaftClientRpc(ClientId.randomId(), raftProperties))
+                .setWatchClientRpc(
+                        new WatchGrpcFactory(new Parameters())
+                                .newWatchClientRpc(ClientId.randomId(), raftProperties));
+        return builder.build();
     }
 
     private RaftClient buildClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
@@ -156,12 +198,6 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
         final byte[] bytes = serializer.serialize(request);
         final RaftClientReply raftClientReply = raftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
         log.info("read log index : {}", raftClientReply.getLogIndex());
-        return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
-    }
-
-    private RatisKVResponse handleRatisKVWatchRequest(RatisKVRequest request) throws IOException {
-        final byte[] bytes = serializer.serialize(request);
-        final RaftClientReply raftClientReply = watchRaftClient.io().sendReadOnly(Message.valueOf(ByteString.copyFrom(bytes)));
         return serializer.deserialize(raftClientReply.getMessage().getContent().toByteArray(), RatisKVResponse.class.getName());
     }
 
@@ -272,46 +308,18 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
 
     @Override
     public void unwatch(K key) {
-        final byte[] keySer = serializer.serialize(key);
-        try {
-            UnwatchRequest unwatchRequest = new UnwatchRequest();
-            unwatchRequest.setKey(keySer);
-            RatisKVRequest request = RatisKVRequest.builder()
-                    .cmdType(CmdType.UNWATCH)
-                    .requestId(123L)
-                    .traceId(123L)
-                    .unwatchRequest(unwatchRequest)
-                    .build();
-            RatisKVResponse response = handleRatisKVWriteRequest(request);
-            if (!response.getSuccess()) {
-                throw new RatisKVClientException(response.getMessage());
-            }
-            // add to listener map
-            listenerMap.remove((String) key);
-        } catch (Exception e) {
-            throw new RatisKVClientException(e.getMessage(), e);
-        }
-    }
-
-    private void watchLoop() throws IOException {
-        BPopRequest bPopRequest = new BPopRequest();
-        RatisKVRequest request = RatisKVRequest.builder()
-                .cmdType(CmdType.BPOP)
-                .requestId(123L)
-                .traceId(123L)
-                .bPopRequest(bPopRequest)
+        final byte[] watchKey = serializer.serialize(key);
+        WatchCancelRequest createRequest = WatchCancelRequest.newBuilder()
+                .setWatchId(123L)
+                .setKey(ByteString.copyFrom(watchKey))
                 .build();
-        RatisKVResponse response = handleRatisKVWatchRequest(request);
-        if (!response.getSuccess()) {
-            return;
-        }
-        final BPopResponse bPopResponse = response.getBPopResponse();
-        final DataChangeEvent event = bPopResponse.getEvent();
-        if (event == null) {
-            return;
-        }
-        final DataChangeListener dataChangeListener = listenerMap.get(event.getPath());
-        dataChangeListener.dataChanged(event);
+        WatchRequest watchRequest = WatchRequest.newBuilder()
+                .setNodeIdBytes(ByteString.copyFromUtf8("127.0.0.1"))
+                .setCancelRequest(createRequest)
+                .build();
+
+        watchRequestStreamObserver.onNext(watchRequest);
+        listenerMap.remove((String) key);
     }
 
 }

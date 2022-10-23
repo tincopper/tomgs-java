@@ -17,6 +17,9 @@
  */
 package com.tomgs.ratisrpc.grpc;
 
+import com.tomgs.ratisrpc.grpc.client.GrpcWatchClientRpc;
+import com.tomgs.ratisrpc.grpc.client.WatchClientFactory;
+import com.tomgs.ratisrpc.grpc.client.WatchClientRpc;
 import com.tomgs.ratisrpc.grpc.server.GrpcLogAppender;
 import com.tomgs.ratisrpc.grpc.server.GrpcService;
 import org.apache.ratis.client.ClientFactory;
@@ -38,9 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
-public class CustomGrpcFactory implements ServerFactory, ClientFactory {
+public class WatchGrpcFactory implements ServerFactory, ClientFactory, WatchClientFactory {
 
-  public static final Logger LOG = LoggerFactory.getLogger(CustomGrpcFactory.class);
+  public static final Logger LOG = LoggerFactory.getLogger(WatchGrpcFactory.class);
 
   static final String USE_CACHE_FOR_ALL_THREADS_NAME = "useCacheForAllThreads";
   static final String USE_CACHE_FOR_ALL_THREADS_KEY = "org.apache.ratis.thirdparty.io.netty.allocator."
@@ -76,7 +79,7 @@ public class CustomGrpcFactory implements ServerFactory, ClientFactory {
     return p;
   }
 
-  public CustomGrpcFactory(Parameters parameters) {
+  public WatchGrpcFactory(Parameters parameters) {
     this(
         GrpcConfigKeys.TLS.conf(parameters),
         GrpcConfigKeys.Admin.tlsConf(parameters),
@@ -85,12 +88,12 @@ public class CustomGrpcFactory implements ServerFactory, ClientFactory {
     );
   }
 
-  public CustomGrpcFactory(GrpcTlsConfig tlsConfig) {
+  public WatchGrpcFactory(GrpcTlsConfig tlsConfig) {
     this(tlsConfig, null, null, null);
   }
 
-  private CustomGrpcFactory(GrpcTlsConfig tlsConfig, GrpcTlsConfig adminTlsConfig,
-                            GrpcTlsConfig clientTlsConfig, GrpcTlsConfig serverTlsConfig) {
+  private WatchGrpcFactory(GrpcTlsConfig tlsConfig, GrpcTlsConfig adminTlsConfig,
+                           GrpcTlsConfig clientTlsConfig, GrpcTlsConfig serverTlsConfig) {
     this.tlsConfig = tlsConfig;
     this.adminTlsConfig = adminTlsConfig;
     this.clientTlsConfig = clientTlsConfig;
@@ -114,8 +117,8 @@ public class CustomGrpcFactory implements ServerFactory, ClientFactory {
   }
 
   @Override
-  public CustomRpcType getRpcType() {
-    return CustomRpcType.INSTANCE;
+  public WatchGrpcRpcType getRpcType() {
+    return WatchGrpcRpcType.INSTANCE;
   }
 
   @Override
@@ -140,4 +143,10 @@ public class CustomGrpcFactory implements ServerFactory, ClientFactory {
     return new GrpcClientRpc(clientId, properties,
         getAdminTlsConfig(), getClientTlsConfig());
   }
+
+  @Override
+  public WatchClientRpc newWatchClientRpc(ClientId clientId, RaftProperties properties) {
+    return new GrpcWatchClientRpc(clientId, properties);
+  }
+
 }

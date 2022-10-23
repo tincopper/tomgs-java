@@ -6,18 +6,18 @@ import org.apache.ratis.rpc.RpcType;
 import org.apache.ratis.util.ReflectionUtils;
 
 /**
- * CustomRpcType
+ * WatchGrpcRpcType
  *
  * @author tomgs
  * @since 1.0
  */
-public class CustomRpcType implements RpcType {
+public class WatchGrpcRpcType implements RpcType {
 
-    public static final CustomRpcType INSTANCE = new CustomRpcType();
+    public static final WatchGrpcRpcType INSTANCE = new WatchGrpcRpcType();
 
-    private CustomRpcType() {}
+    private WatchGrpcRpcType() {}
 
-    private final String factoryClassName = CustomGrpcFactory.class.getName();
+    private final String factoryClassName = WatchGrpcFactory.class.getName();
 
     private static final Class<?>[] ARG_CLASSES = {Parameters.class};
 
