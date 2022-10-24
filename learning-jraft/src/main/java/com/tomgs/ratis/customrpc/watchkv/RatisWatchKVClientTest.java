@@ -30,7 +30,7 @@ public class RatisWatchKVClientTest {
         sourceConfig.setValueSederClass(String.class);
 
         RatisWatchKVClient<String, String> cacheClient = new RatisWatchKVClient<>(sourceConfig);
-        cacheClient.startHandleWatchStreamResponse();
+        //cacheClient.startHandleWatchStreamResponse();
 
         cacheClient.watch("hello", new DataChangeListener() {
             @Override

@@ -36,7 +36,7 @@ public class RatisKVClientOpTest {
     @Test
     public void testPut() {
         System.out.println("=================PUT==================");
-        cacheClient.put("hello", "world1");
+        cacheClient.put("hello", "world2");
     }
 
     @Test

@@ -50,11 +50,11 @@ import java.util.function.Supplier;
 import static org.apache.ratis.thirdparty.io.netty.handler.ssl.SslProvider.OPENSSL;
 
 /** A grpc implementation of {@link org.apache.ratis.server.RaftServerRpc}. */
-public final class GrpcService extends RaftServerRpcWithProxy<GrpcServerProtocolClient,
+public final class WatchGrpcService extends RaftServerRpcWithProxy<GrpcServerProtocolClient,
     PeerProxyMap<GrpcServerProtocolClient>> {
-  static final Logger LOG = LoggerFactory.getLogger(GrpcService.class);
+  static final Logger LOG = LoggerFactory.getLogger(WatchGrpcService.class);
   public static final String GRPC_SEND_SERVER_REQUEST =
-      JavaUtils.getClassSimpleName(GrpcService.class) + ".sendRequest";
+      JavaUtils.getClassSimpleName(WatchGrpcService.class) + ".sendRequest";
 
   public static final class Builder {
     private RaftServer server;
@@ -70,8 +70,8 @@ public final class GrpcService extends RaftServerRpcWithProxy<GrpcServerProtocol
       return this;
     }
 
-    public GrpcService build() {
-      return new GrpcService(server, adminTlsConfig, clientTlsConfig, serverTlsConfig);
+    public WatchGrpcService build() {
+      return new WatchGrpcService(server, adminTlsConfig, clientTlsConfig, serverTlsConfig);
     }
 
     public Builder setTlsConfig(GrpcTlsConfig tlsConfig) {
@@ -117,8 +117,8 @@ public final class GrpcService extends RaftServerRpcWithProxy<GrpcServerProtocol
     return serverInterceptor;
   }
 
-  private GrpcService(RaftServer server,
-      GrpcTlsConfig adminTlsConfig, GrpcTlsConfig clientTlsConfig, GrpcTlsConfig serverTlsConfig) {
+  private WatchGrpcService(RaftServer server,
+                           GrpcTlsConfig adminTlsConfig, GrpcTlsConfig clientTlsConfig, GrpcTlsConfig serverTlsConfig) {
     this(server, server::getId,
         GrpcConfigKeys.Admin.host(server.getProperties()),
         GrpcConfigKeys.Admin.port(server.getProperties()),
@@ -137,13 +137,13 @@ public final class GrpcService extends RaftServerRpcWithProxy<GrpcServerProtocol
   }
 
   @SuppressWarnings("checkstyle:ParameterNumber") // private constructor
-  private GrpcService(RaftServer raftServer, Supplier<RaftPeerId> idSupplier,
-      String adminHost, int adminPort, GrpcTlsConfig adminTlsConfig,
-      String clientHost, int clientPort, GrpcTlsConfig clientTlsConfig,
-      String serverHost, int serverPort, GrpcTlsConfig serverTlsConfig,
-      SizeInBytes grpcMessageSizeMax, SizeInBytes appenderBufferSize,
-      SizeInBytes flowControlWindow,TimeDuration requestTimeoutDuration,
-      boolean useSeparateHBChannel) {
+  private WatchGrpcService(RaftServer raftServer, Supplier<RaftPeerId> idSupplier,
+                           String adminHost, int adminPort, GrpcTlsConfig adminTlsConfig,
+                           String clientHost, int clientPort, GrpcTlsConfig clientTlsConfig,
+                           String serverHost, int serverPort, GrpcTlsConfig serverTlsConfig,
+                           SizeInBytes grpcMessageSizeMax, SizeInBytes appenderBufferSize,
+                           SizeInBytes flowControlWindow, TimeDuration requestTimeoutDuration,
+                           boolean useSeparateHBChannel) {
     super(idSupplier, id -> new PeerProxyMap<>(id.toString(),
         p -> new GrpcServerProtocolClient(p, flowControlWindow.getSizeInt(),
             requestTimeoutDuration, serverTlsConfig, useSeparateHBChannel)));

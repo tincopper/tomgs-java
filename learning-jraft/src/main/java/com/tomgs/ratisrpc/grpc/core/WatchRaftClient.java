@@ -18,6 +18,7 @@ import org.apache.ratis.rpc.RpcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -27,9 +28,11 @@ import java.util.Objects;
  * @author tomgs
  * @version 1.0
  */
-public interface WatchRaftClient {
+public interface WatchRaftClient extends Closeable {
 
     Logger LOG = LoggerFactory.getLogger(WatchRaftClient.class);
+
+    WatchClientRpc watchClientRpc();
 
     RaftClient raftClient();
 
@@ -74,7 +77,8 @@ public interface WatchRaftClient {
             final RaftClient raftClient = ClientImplUtils.newRaftClient(clientId, group, leaderId, primaryDataStreamServer,
                     Objects.requireNonNull(clientRpc, "The 'clientRpc' field is not initialized."), retryPolicy,
                     properties, parameters);
-            return new WatchRaftRaftClientImpl(raftClient, watchClientRpc);
+            return new WatchRaftRaftClientImpl(raftClient, watchClientRpc, group, retryPolicy,
+                    properties, parameters);
         }
 
         /** Set {@link RaftClient} ID. */

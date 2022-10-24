@@ -50,8 +50,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * A new log appender implementation using grpc bi-directional stream API.
  */
-public class GrpcLogAppender extends LogAppenderBase {
-  public static final Logger LOG = LoggerFactory.getLogger(GrpcLogAppender.class);
+public class WatchGrpcLogAppender extends LogAppenderBase {
+  public static final Logger LOG = LoggerFactory.getLogger(WatchGrpcLogAppender.class);
 
   private static final Comparator<Long> CALL_ID_COMPARATOR = (left, right) -> {
     // calculate diff in order to take care the possibility of numerical overflow
@@ -80,7 +80,7 @@ public class GrpcLogAppender extends LogAppenderBase {
   private final AutoCloseableReadWriteLock lock;
   private final StackTraceElement caller;
 
-  public GrpcLogAppender(RaftServer.Division server, LeaderState leaderState, FollowerInfo f) {
+  public WatchGrpcLogAppender(RaftServer.Division server, LeaderState leaderState, FollowerInfo f) {
     super(server, leaderState, f);
 
     Preconditions.assertNotNull(getServerRpc(), "getServerRpc()");
@@ -103,8 +103,8 @@ public class GrpcLogAppender extends LogAppenderBase {
   }
 
   @Override
-  public GrpcService getServerRpc() {
-    return (GrpcService)super.getServerRpc();
+  public WatchGrpcService getServerRpc() {
+    return (WatchGrpcService)super.getServerRpc();
   }
 
   private GrpcServerProtocolClient getClient() throws IOException {
@@ -282,7 +282,7 @@ public class GrpcLogAppender extends LogAppenderBase {
   }
 
   private void sendRequest(AppendEntriesRequest request, AppendEntriesRequestProto proto) {
-    CodeInjectionForTesting.execute(GrpcService.GRPC_SEND_SERVER_REQUEST,
+    CodeInjectionForTesting.execute(WatchGrpcService.GRPC_SEND_SERVER_REQUEST,
         getServer().getId(), null, proto);
     request.startRequestTimer();
     resetHeartbeatTrigger();
@@ -396,7 +396,7 @@ public class GrpcLogAppender extends LogAppenderBase {
     @Override
     public void onError(Throwable t) {
       if (!isRunning()) {
-        LOG.info("{} is already stopped", GrpcLogAppender.this);
+        LOG.info("{} is already stopped", WatchGrpcLogAppender.this);
         return;
       }
       GrpcUtil.warn(LOG, () -> this + ": Failed appendEntries", t);
@@ -553,7 +553,7 @@ public class GrpcLogAppender extends LogAppenderBase {
     @Override
     public void onError(Throwable t) {
       if (!isRunning()) {
-        LOG.info("{} is stopped", GrpcLogAppender.this);
+        LOG.info("{} is stopped", WatchGrpcLogAppender.this);
         return;
       }
       GrpcUtil.warn(LOG, () -> this + ": Failed InstallSnapshot", t);

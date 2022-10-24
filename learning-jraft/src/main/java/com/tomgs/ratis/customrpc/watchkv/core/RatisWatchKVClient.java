@@ -1,12 +1,11 @@
 package com.tomgs.ratis.customrpc.watchkv.core;
 
-import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.StrUtil;
 import com.tomgs.common.ProtostuffSerializer;
 import com.tomgs.common.kv.CacheClient;
 import com.tomgs.common.kv.CacheSourceConfig;
+import com.tomgs.learning.grpc.proto.WatchCancelRequest;
+import com.tomgs.learning.grpc.proto.WatchCreateRequest;
 import com.tomgs.learning.grpc.proto.WatchRequest;
-import com.tomgs.learning.grpc.proto.*;
 import com.tomgs.ratis.kv.core.GroupManager;
 import com.tomgs.ratis.kv.exception.RatisKVClientException;
 import com.tomgs.ratis.kv.protocol.*;
@@ -20,22 +19,18 @@ import org.apache.ratis.client.RaftClientConfigKeys;
 import org.apache.ratis.conf.Parameters;
 import org.apache.ratis.conf.RaftProperties;
 import org.apache.ratis.grpc.GrpcFactory;
-import org.apache.ratis.protocol.*;
+import org.apache.ratis.protocol.ClientId;
+import org.apache.ratis.protocol.Message;
+import org.apache.ratis.protocol.RaftClientReply;
+import org.apache.ratis.protocol.RaftGroup;
 import org.apache.ratis.retry.ExponentialBackoffRetry;
 import org.apache.ratis.retry.RetryPolicies;
 import org.apache.ratis.retry.RetryPolicy;
 import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
-import org.apache.ratis.thirdparty.io.grpc.*;
-import org.apache.ratis.thirdparty.io.grpc.stub.ClientCalls;
-import org.apache.ratis.thirdparty.io.grpc.stub.StreamObserver;
 import org.apache.ratis.util.TimeDuration;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.tomgs.ratis.kv.core.GroupManager.RATIS_KV_GROUP_ID;
@@ -57,16 +52,6 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
 
     private final CacheSourceConfig cacheSourceConfig;
 
-    private StreamObserver<WatchRequest> watchRequestStreamObserver;
-
-    private static final Map<String, DataChangeListener> listenerMap = new ConcurrentHashMap<>();
-
-    private final long channelKeepAlive = 60 * 1000;
-
-    private final int maxInboundMessageSize = 4096;
-
-    private ThreadPoolExecutor grpcExecutor;
-
     public RatisWatchKVClient(final CacheSourceConfig cacheSourceConfig) {
         this.cacheSourceConfig = cacheSourceConfig;
         this.serializer = ProtostuffSerializer.INSTANCE;
@@ -87,80 +72,6 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
                 .build();
         this.raftClient = buildClient(raftGroup, retryPolicy);
         this.watchRaftClient = buildWatchClient(raftGroup, RetryPolicies.retryForeverNoSleep());
-    }
-
-    public void startHandleWatchStreamResponse() {
-        final RaftPeerId leaderId = watchRaftClient.raftClient().getLeaderId();
-        final String peerId = leaderId.getRaftPeerIdProto().getId().toStringUtf8();
-        //final String address = peer.getAddress();
-        final String address = "127.0.0.1:8001";
-        log.info("leader peerId: {}, address: {}", peerId, address);
-
-        final List<String> endpoint = StrUtil.splitTrim(address, ":");
-        final ManagedChannel channel = ManagedChannelBuilder.forAddress(endpoint.get(0), Integer.parseInt(endpoint.get(1)))
-                //.executor()
-                .usePlaintext()
-                //.idleTimeout()
-                //.keepAliveTimeout()
-                .build();
-        //final ConnectivityState state = channel.getState(true);
-        //channel.notifyWhenStateChanged();
-        String connectionId = "1";
-        final ClientCall<WatchRequest, WatchResponse> clientCall = channel.newCall(WatchServiceGrpc.getWatchMethod(), CallOptions.DEFAULT);
-        this.watchRequestStreamObserver = ClientCalls.asyncBidiStreamingCall(clientCall, new StreamObserver<WatchResponse>() {
-            @Override
-            public void onNext(WatchResponse response) {
-                try {
-                    final com.tomgs.learning.grpc.proto.DataChangeEvent event = response.getEvent();
-                    final String key = serializer.deserialize(event.getKey().toByteArray(), String.class.getName());
-                    final com.tomgs.learning.grpc.proto.DataChangeEvent.Type type = event.getType();
-                    final byte[] dataBytes = event.getData().toByteArray();
-                    final String data = serializer.deserialize(dataBytes, String.class.getName());
-
-                    log.debug("watch reply: key: {}, type: {}, data: {}", key, type, data);
-
-                    final DataChangeListener dataChangeListener = listenerMap.get(key);
-                    DataChangeEvent dataChangeEvent = new DataChangeEvent(type.name(), key, dataBytes);
-                    dataChangeListener.dataChanged(dataChangeEvent);
-                } catch (Exception e) {
-                    log.error("[{}]Error to process server push response: {}",
-                            connectionId,
-                            response.getEvent().toString());
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                log.error("error: ", t);
-                // 判断是否需要重连
-
-            }
-
-            @Override
-            public void onCompleted() {
-                log.info("stream completed");
-                // 判断是否需要重连
-            }
-        });
-
-    }
-
-    /**
-     * create a new channel with specific server address.
-     *
-     * @param serverIp   serverIp.
-     * @param serverPort serverPort.
-     * @return if server check success,return a non-null channel.
-     */
-    private ManagedChannel createNewManagedChannel(String serverIp, int serverPort) {
-        grpcExecutor = ThreadUtil.newExecutor(4, 4);
-        ManagedChannelBuilder<?> managedChannelBuilder = ManagedChannelBuilder.forAddress(serverIp, serverPort)
-                .executor(grpcExecutor).compressorRegistry(CompressorRegistry.getDefaultInstance())
-                .decompressorRegistry(DecompressorRegistry.getDefaultInstance())
-                .maxInboundMessageSize(maxInboundMessageSize)
-                .keepAliveTime(channelKeepAlive, TimeUnit.MILLISECONDS).usePlaintext();
-        return managedChannelBuilder.build();
     }
 
     private WatchRaftClient buildWatchClient(RaftGroup raftGroup, RetryPolicy retryPolicy) {
@@ -302,8 +213,24 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
                 .setCreateRequest(createRequest)
                 .build();
 
-        watchRequestStreamObserver.onNext(watchRequest);
-        listenerMap.put((String) key, dataChangeListener);
+        watchRaftClient.watchClientRpc().watch(watchRequest, changeEvent -> {
+            try {
+                final String dataKey = serializer.deserialize(changeEvent.getKey().toByteArray(), String.class.getName());
+                final com.tomgs.learning.grpc.proto.DataChangeEvent.Type type = changeEvent.getType();
+                final byte[] dataBytes = changeEvent.getData().toByteArray();
+                final String data = serializer.deserialize(dataBytes, String.class.getName());
+
+                log.debug("watch reply: key: {}, type: {}, data: {}", dataKey, type, data);
+
+                DataChangeEvent dataChangeEvent = new DataChangeEvent(type.name(), dataKey, dataBytes);
+                dataChangeListener.dataChanged(dataChangeEvent);
+            } catch (Exception e) {
+                log.error("[{}]Error to process server push response: {}", createRequest.getWatchId(), changeEvent.toString());
+            }
+        });
+
+        //watchRequestStreamObserver.onNext(watchRequest);
+        //listenerMap.put((String) key, dataChangeListener);
     }
 
     @Override
@@ -318,8 +245,9 @@ public class RatisWatchKVClient<K, V> implements CacheClient<K, V> {
                 .setCancelRequest(createRequest)
                 .build();
 
-        watchRequestStreamObserver.onNext(watchRequest);
-        listenerMap.remove((String) key);
+        watchRaftClient.watchClientRpc().unwatch(watchRequest);
+        //watchRequestStreamObserver.onNext(watchRequest);
+        //listenerMap.remove((String) key);
     }
 
 }

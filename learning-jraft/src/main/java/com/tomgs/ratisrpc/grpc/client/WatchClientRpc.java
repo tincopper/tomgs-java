@@ -18,23 +18,18 @@
 package com.tomgs.ratisrpc.grpc.client;
 
 import com.tomgs.learning.grpc.proto.WatchRequest;
-import com.tomgs.learning.grpc.proto.WatchResponse;
-import org.apache.ratis.protocol.RaftClientReply;
-import org.apache.ratis.protocol.RaftClientRequest;
 import org.apache.ratis.protocol.RaftPeer;
 import org.apache.ratis.protocol.RaftPeerId;
 import org.apache.ratis.util.IOUtils;
-import org.apache.ratis.util.JavaUtils;
 
 import java.io.Closeable;
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 
 /** The client side rpc of a raft service. */
 public interface WatchClientRpc extends RaftPeer.Add, Closeable {
 
-  /** Send a request. */
-  WatchResponse sendRequest(WatchRequest request) throws IOException;
+  void watch(WatchRequest watchRequest, WatchCallback watchCallback);
+
+  void unwatch(WatchRequest watchRequest);
 
   /**
    * Handle the given throwable. For example, try reconnecting.
@@ -53,4 +48,7 @@ public interface WatchClientRpc extends RaftPeer.Add, Closeable {
   default boolean shouldReconnect(Throwable t) {
     return IOUtils.shouldReconnect(t);
   }
+
+    void startHandleWatchStreamResponse();
+
 }

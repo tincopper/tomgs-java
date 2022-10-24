@@ -1,7 +1,7 @@
 package com.tomgs.ratis.customrpc.watchkv;
 
 import com.tomgs.common.kv.CacheSourceConfig;
-import com.tomgs.ratis.customrpc.watchkv.core.RatisWatchKVClient;
+import com.tomgs.ratis.kv.core.RatisKVClient;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class RatisWatchKVOpTest {
 
-    private RatisWatchKVClient<String, String> ratisKVClient;
+    private RatisKVClient<String, String> ratisKVClient;
 
     @Before
     public void before() {
@@ -26,13 +26,13 @@ public class RatisWatchKVOpTest {
         sourceConfig.setKeySederClass(String.class);
         sourceConfig.setValueSederClass(String.class);
 
-        this.ratisKVClient = new RatisWatchKVClient<>(sourceConfig);
+        this.ratisKVClient = new RatisKVClient<>(sourceConfig);
     }
 
     @Test
     public void testPut() {
         System.out.println("=================PUT==================");
-        ratisKVClient.put("hello", "world2");
+        ratisKVClient.put("hello", "world3");
     }
 
     @Test

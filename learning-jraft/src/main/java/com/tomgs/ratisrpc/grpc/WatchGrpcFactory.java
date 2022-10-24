@@ -20,8 +20,8 @@ package com.tomgs.ratisrpc.grpc;
 import com.tomgs.ratisrpc.grpc.client.GrpcWatchClientRpc;
 import com.tomgs.ratisrpc.grpc.client.WatchClientFactory;
 import com.tomgs.ratisrpc.grpc.client.WatchClientRpc;
-import com.tomgs.ratisrpc.grpc.server.GrpcLogAppender;
-import com.tomgs.ratisrpc.grpc.server.GrpcService;
+import com.tomgs.ratisrpc.grpc.server.WatchGrpcLogAppender;
+import com.tomgs.ratisrpc.grpc.server.WatchGrpcService;
 import org.apache.ratis.client.ClientFactory;
 import org.apache.ratis.conf.Parameters;
 import org.apache.ratis.conf.RaftProperties;
@@ -123,13 +123,13 @@ public class WatchGrpcFactory implements ServerFactory, ClientFactory, WatchClie
 
   @Override
   public LogAppender newLogAppender(RaftServer.Division server, LeaderState state, FollowerInfo f) {
-    return new GrpcLogAppender(server, state, f);
+    return new WatchGrpcLogAppender(server, state, f);
   }
 
   @Override
-  public GrpcService newRaftServerRpc(RaftServer server) {
+  public WatchGrpcService newRaftServerRpc(RaftServer server) {
     checkPooledByteBufAllocatorUseCacheForAllThreads(LOG::info);
-    return GrpcService.newBuilder()
+    return WatchGrpcService.newBuilder()
         .setServer(server)
         .setAdminTlsConfig(getAdminTlsConfig())
         .setServerTlsConfig(getServerTlsConfig())
@@ -146,6 +146,7 @@ public class WatchGrpcFactory implements ServerFactory, ClientFactory, WatchClie
 
   @Override
   public WatchClientRpc newWatchClientRpc(ClientId clientId, RaftProperties properties) {
+    checkPooledByteBufAllocatorUseCacheForAllThreads(LOG::debug);
     return new GrpcWatchClientRpc(clientId, properties);
   }
 
