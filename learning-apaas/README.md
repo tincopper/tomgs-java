@@ -4,8 +4,23 @@ LazyDynamicObject
 {
   "name": "demo_obj",
   "dataType": "mysql",
-  "fields": ["id", "name"],
-  "subObj": "demo_sub_obj"
+  "primaryKey": "id",
+  "fields": [{
+    "name": "id",
+    "isPk": true,
+    "type": "string",
+    "default": "null"
+  }, {
+    "name": "name"
+  }],
+  "subObj": "demo_sub_obj",
+  "methods": [{
+    "name": "get",
+    "params": ["id"]
+  },{
+    "name": "put",
+    "params": ["id", "name"]
+  }]
 }
 ```
 
