@@ -57,6 +57,7 @@
         <module>learning-grpc</module>
         <module>learning-sqlparser</module>
         <module>learning-pulsar</module>
+        <module>learning-apaas</module>
     </modules>
 
     <parent>
