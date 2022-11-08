@@ -7,7 +7,20 @@ package com.tomgs.learning.constant;
  * @since 1.0
  */
 public enum DataBaseType {
-    MYSQL,
-    PGSQL,
-    REDIS
+    MYSQL("mysql"),
+
+    PGSQL("postgresql"),
+
+    REDIS("redis");
+
+    private final String type;
+
+    DataBaseType(String type) {
+        this.type = type;
+    }
+
+    public String getName() {
+        return type;
+    }
+
 }

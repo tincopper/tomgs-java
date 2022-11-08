@@ -9,6 +9,7 @@ import com.tomgs.learning.model.DynamicObject;
 import com.tomgs.learning.model.FieldObject;
 import com.tomgs.learning.model.MethodObject;
 import com.tomgs.learning.model.ParameterObject;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -73,6 +74,24 @@ public class DynamicObjectTest {
                 .build();
 
         System.out.println(JSONUtil.toJsonStr(dynamicObject));
+
+        String metadata = "{\"methods\":[{\"resultStructType\":\"NONE\",\"params\":[{\"fieldObject\":{\"fieldDataStructType\":\"NONE\"," +
+                "\"jsonName\":\"id\",\"name\":\"id\",\"id\":20,\"fieldDataType\":\"LONG\"},\"parameterStructType\":\"NONE\",\"id\":40}]," +
+                "\"resultDynObjId\":11,\"name\":\"getName\",\"id\":30},{\"resultStructType\":\"LIST\",\"params\":" +
+                "[{\"fieldObject\":{\"fieldDataStructType\":\"NONE\",\"jsonName\":\"id\",\"name\":\"id\",\"id\":20,\"fieldDataType\":" +
+                "\"LONG\"},\"parameterStructType\":\"LIST\",\"id\":41}],\"resultDynObjId\":11,\"name\":\"getNames\",\"id\":31}]," +
+                "\"dataBaseType\":\"MYSQL\",\"name\":\"test_demo\",\"id\":10,\"fields\":[{\"fieldDataStructType\":\"NONE\",\"jsonName\":\"id\"," +
+                "\"name\":\"id\",\"id\":20,\"fieldDataType\":\"LONG\"},{\"fieldDataStructType\":\"NONE\",\"jsonName\":\"name\",\"name\":" +
+                "\"name\",\"id\":21,\"fieldDataType\":\"STRING\"}],\"primaryKey\":\"id\"}";
+
+        final DynamicObject dynamicObject1 = JSONUtil.toBean(metadata, DynamicObject.class);
+        Assert.assertEquals(dynamicObject1, dynamicObject);
+    }
+
+    @Test
+    public void reflectionDynamicObject() {
+        DynamicObject dynamicObject = DynamicObject.builder().build();
+        final Class<? extends DynamicObject> aClass = dynamicObject.getClass();
     }
 
 }

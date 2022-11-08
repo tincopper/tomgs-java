@@ -16,7 +16,7 @@ public enum DataStructType {
 
     NONE("none");
 
-    private String type;
+    private final String type;
 
     DataStructType(String type) {
         this.type = type;

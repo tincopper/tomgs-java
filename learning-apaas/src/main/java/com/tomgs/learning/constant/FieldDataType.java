@@ -24,7 +24,7 @@ public enum FieldDataType {
 
     DYN_OBJECT("dyn_object");
 
-    private String type;
+    private final String type;
 
     FieldDataType(String type) {
         this.type = type;
