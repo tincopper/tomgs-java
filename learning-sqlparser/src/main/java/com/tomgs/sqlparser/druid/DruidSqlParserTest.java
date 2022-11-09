@@ -7,6 +7,8 @@ import com.alibaba.druid.sql.ast.SQLOrderBy;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.dialect.postgresql.ast.stmt.PGInsertStatement;
+import com.alibaba.druid.sql.dialect.postgresql.ast.stmt.PGSelectQueryBlock;
 import com.alibaba.druid.util.JdbcConstants;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,6 +26,52 @@ import java.util.List;
  * @since 2022/1/7
  */
 public class DruidSqlParserTest {
+
+    @Test
+    public void buildSelectSql() {
+        //简单sql
+        SQLSelect sqlSelect = new SQLSelect();
+        SQLSelectQueryBlock queryBlock = new PGSelectQueryBlock();
+        //列名
+        queryBlock.addSelectItem(new SQLIdentifierExpr("name"));
+        queryBlock.addSelectItem(new SQLIdentifierExpr("age"));
+        queryBlock.addSelectItem(new SQLIdentifierExpr("id"));
+        queryBlock.setFrom(new SQLExprTableSource(new SQLIdentifierExpr("t_user")));
+        //queryBlock.setWhere();
+        //待分页
+        queryBlock.setLimit(new SQLLimit(new SQLNumberExpr(1), new SQLNumberExpr(10)));
+        sqlSelect.setQuery(queryBlock);
+
+        String sql = SQLUtils.toSQLString(sqlSelect);
+        System.out.println(sql);
+    }
+
+    @Test
+    public void buildInsertSql() {
+        // 可以从PGInsertStatement#parseInsert()方法中学习如何使用
+        PGInsertStatement stmt = new PGInsertStatement();
+        //设置表名
+        stmt.setTableSource(new SQLExprTableSource(new SQLIdentifierExpr("t_user")));
+
+        // 添加列
+        stmt.addColumn(new SQLIdentifierExpr("name"));
+        stmt.addColumn(new SQLIdentifierExpr("age"));
+        stmt.addColumn(new SQLIdentifierExpr("eamil"));
+
+        // 设置对应列值
+        stmt.setDefaultValues(true);
+        SQLInsertStatement.ValuesClause valuesCaluse = new SQLInsertStatement.ValuesClause();
+        valuesCaluse.addValue(new SQLCharExpr("tomgs"));
+        valuesCaluse.addValue(new SQLIntegerExpr(18));
+        valuesCaluse.addValue(new SQLCharExpr("123@qq.com"));
+        stmt.addValueCause(valuesCaluse);
+
+        // 子查询
+        // stmt.setQuery();
+
+        final String insertSql = stmt.toString();
+        System.out.println(insertSql);
+    }
 
     @Test
     public void testAddSelectColumn() {
