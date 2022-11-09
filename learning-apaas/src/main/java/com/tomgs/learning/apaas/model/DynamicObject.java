@@ -1,6 +1,6 @@
-package com.tomgs.learning.model;
+package com.tomgs.learning.apaas.model;
 
-import com.tomgs.learning.constant.DataBaseType;
+import com.tomgs.learning.apaas.constant.DataBaseType;
 import lombok.Builder;
 import lombok.Data;
 

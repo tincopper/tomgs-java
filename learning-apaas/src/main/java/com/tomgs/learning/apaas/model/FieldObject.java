@@ -1,7 +1,7 @@
-package com.tomgs.learning.model;
+package com.tomgs.learning.apaas.model;
 
-import com.tomgs.learning.constant.DataStructType;
-import com.tomgs.learning.constant.FieldDataType;
+import com.tomgs.learning.apaas.constant.DataStructType;
+import com.tomgs.learning.apaas.constant.FieldDataType;
 import lombok.Builder;
 import lombok.Data;
 

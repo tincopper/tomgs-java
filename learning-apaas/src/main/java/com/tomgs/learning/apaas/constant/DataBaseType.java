@@ -1,4 +1,4 @@
-package com.tomgs.learning.constant;
+package com.tomgs.learning.apaas.constant;
 
 /**
  * DataBaseType
