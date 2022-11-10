@@ -19,6 +19,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.tomgs.learning</groupId>
+            <artifactId>learning-guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.tomgs.learning</groupId>
+            <artifactId>learning-storage</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

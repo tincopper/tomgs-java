@@ -2,16 +2,17 @@ package com.tomgs.learning;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.common.collect.Lists;
 import com.tomgs.learning.apaas.constant.DataBaseType;
 import com.tomgs.learning.apaas.constant.DataStructType;
 import com.tomgs.learning.apaas.constant.FieldDataType;
+import com.tomgs.learning.apaas.constant.FieldOpDef;
 import com.tomgs.learning.apaas.core.DataRelationMapping;
-import com.tomgs.learning.apaas.model.DynamicObject;
-import com.tomgs.learning.apaas.model.FieldObject;
-import com.tomgs.learning.apaas.model.MethodObject;
-import com.tomgs.learning.apaas.model.ParameterObject;
+import com.tomgs.learning.apaas.model.*;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * DynamicObjectTest
@@ -49,10 +50,15 @@ public class DynamicObjectTest {
     @Test
     public void testGetDataRelationMapping() {
         final DynamicObject dynamicObject = getDynamicObject();
+        List<Argument> arguments = Lists.newArrayList(
+                Argument.builder().name("id").op(FieldOpDef.EQ).value(Lists.newArrayList(123L)).build(),
+                Argument.builder().name("name").op(FieldOpDef.IN).value(Lists.newArrayList("tomgs", "tomgs1")).build()
+        );
+
         DataRelationMapping dataRelationMapping = new DataRelationMapping();
-        final String getSql = dataRelationMapping.getDataRelationMapping(dynamicObject, null);
+        final String getSql = dataRelationMapping.getDataRelationMapping(dynamicObject, null, arguments);
         System.out.println(getSql);
-        String getSql1 = dataRelationMapping.getDataRelationMapping(dynamicObject, null);
+        String getSql1 = dataRelationMapping.getDataRelationMapping(dynamicObject, null, arguments);
         System.out.println(getSql1);
     }
 

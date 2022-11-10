@@ -81,6 +81,18 @@
             </dependency>
 
             <dependency>
+                <groupId>com.tomgs.learning</groupId>
+                <artifactId>learning-guice</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.tomgs.learning</groupId>
+                <artifactId>learning-storage</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring.boot.version}</version>
