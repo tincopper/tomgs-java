@@ -63,13 +63,11 @@
     <dependency>
       <groupId>org.eclipse.jgit</groupId>
       <artifactId>org.eclipse.jgit</artifactId>
-      <version>5.10.0.202012080955-r</version>
     </dependency>
 
     <dependency>
       <groupId>org.rocksdb</groupId>
       <artifactId>rocksdbjni</artifactId>
-      <version>6.25.3</version>
     </dependency>
 
     <dependency>
@@ -106,6 +104,18 @@
       <artifactId>hamcrest-all</artifactId>
       <version>${hamcrest.version}</version>
     </dependency>
-
+    <!-- jraft -->
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>jraft-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>jraft-rheakv-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.alipay.sofa</groupId>
+      <artifactId>jraft-rheakv-pd</artifactId>
+    </dependency>
   </dependencies>
 </project>
