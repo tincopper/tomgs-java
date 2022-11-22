@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>learning-pf4j</artifactId>
+        <groupId>com.tomgs.learning</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>greeting-plugin</artifactId>
+    <packaging>jar</packaging>
+
+    <name>greeting-plugin</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+
+        <!-- 提供id和版本方便后续排查等使用 -->
+        <plugin.id>greeting-plugin</plugin.id>
+        <plugin.version>0.0.1</plugin.version>
+        <!-- 插件类，如果不关系声明周期可以不提供 -->
+        <plugin.class>com.tomgs.learning.plugin.ChinesePlugin</plugin.class>
+        <plugin.class/>
+        <plugin.provider>tomgs</plugin.provider>
+        <plugin.dependencies/>
+    </properties>
+
+    <dependencies>
+
+    </dependencies>
+</project>

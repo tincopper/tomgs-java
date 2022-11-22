@@ -60,6 +60,7 @@
         <module>learning-sqlparser</module>
         <module>learning-pulsar</module>
         <module>learning-apaas</module>
+        <module>learning-pf4j</module>
     </modules>
 
     <parent>

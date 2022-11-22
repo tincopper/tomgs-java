@@ -27,6 +27,7 @@ import java.util.List;
 public class DataRelationMapping {
 
     public String getDataRelationMapping(DynamicObject dynObj, Page page, List<Argument> arguments) {
+        // TODO: 基于SPI方式
         switch (dynObj.getDataBaseType()) {
             case PGSQL:
                 final SQLSelectQueryBlock pgQueryBlock = new PGSelectQueryBlock();
