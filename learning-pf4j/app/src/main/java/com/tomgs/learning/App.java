@@ -49,6 +49,14 @@ public class App {
                 throw new RuntimeException(ex);
             }*/
         });
+
+        pluginManager.stopPlugin("greeting-plugin");
+        final List<?> greetings1 = pluginManager.getExtensions("greeting-plugin");
+        System.out.println(greetings1);
+
+        pluginManager.unloadPlugin("greeting-plugin");
+        final List<?> greetings2 = pluginManager.getExtensions("greeting-plugin");
+        System.out.println(greetings2);
     }
 
 }
