@@ -178,4 +178,22 @@ public class BaseTest {
         // 即该字节串就是经过Varint编码后的字节
         //trans_.write(i32buf, 0, idx);
     }
+
+    @Test
+    public void test5() {
+        int fat = 2; // 00000010
+        int features = 25;// 00011001
+
+        System.out.println(features);
+        System.out.println(features & fat);
+
+        features = fat | features;
+        System.out.println(features);
+        System.out.println(features & fat);
+
+        features = (features & fat) ^ features;
+        System.out.println(features);
+        System.out.println(features & fat);
+    }
+
 }

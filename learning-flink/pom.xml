@@ -12,7 +12,7 @@
   <artifactId>learning-flink</artifactId>
 
   <properties>
-    <flink.version>1.11.1</flink.version>
+    <flink.version>1.14.4</flink.version>
     <es.restclient.version>6.8.3</es.restclient.version>
     <log4j.version>2.11.1</log4j.version>
     <slf4j.version>1.7.25</slf4j.version>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.googlecode.aviator</groupId>
       <artifactId>aviator</artifactId>
-      <version>5.2.5</version>
+      <version>5.3.3</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-walkthrough-datastream-java</artifactId>
-      <version>${flink.version}</version>
+      <version>1.15.1</version>
     </dependency>
 
     <dependency>
@@ -88,6 +88,12 @@
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-connector-elasticsearch6_2.12</artifactId>
       <version>${flink.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-ml_2.11</artifactId>
+      <version>1.8.3</version>
     </dependency>
 
     <dependency>
