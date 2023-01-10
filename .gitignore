@@ -46,6 +46,8 @@ spring-*/src/main/java/META-INF/MANIFEST.MF
 *.ipr
 *.iws
 .idea
+.vscode
+.theia
 *.bak
 out
 test-output
