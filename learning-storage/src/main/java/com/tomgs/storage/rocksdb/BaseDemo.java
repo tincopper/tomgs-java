@@ -136,6 +136,7 @@ public class BaseDemo {
         rocksDB.put("/test/key2".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
         rocksDB.put("/tfst/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
         rocksDB.put("/tgst/key1".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
+        rocksDB.put("/test/key3".getBytes(StandardCharsets.UTF_8), "value2".getBytes(StandardCharsets.UTF_8));
 
         final RocksIterator iter = rocksDB.newIterator();
         // 从头开始遍历
@@ -149,6 +150,17 @@ public class BaseDemo {
         // 从/test前缀开始遍历
         System.out.println("==================从/test前缀开始遍历===========================");
         for (iter.seek("/test".getBytes(StandardCharsets.UTF_8)); iter.isValid(); iter.next()) {
+            System.out.println("iter key: " + new String(iter.key()) + ",iter1 value: " +
+                    new String(iter.value()));
+        }
+
+        // 只遍历/test前缀
+        System.out.println("==================只遍历/test前缀===========================");
+        for (iter.seek("/test".getBytes(StandardCharsets.UTF_8)); iter.isValid(); iter.next()) {
+            String tmpKey = new String(iter.key());
+            if (!tmpKey.startsWith("/test")) {
+                break;
+            }
             System.out.println("iter key: " + new String(iter.key()) + ",iter1 value: " +
                     new String(iter.value()));
         }
