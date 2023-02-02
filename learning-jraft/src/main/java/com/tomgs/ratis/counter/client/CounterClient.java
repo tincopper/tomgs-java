@@ -65,6 +65,14 @@ public final class CounterClient {
       executorService.submit(() ->
           raftClient.io().send(Message.valueOf("INCREMENT")));
     }
+    // create snapshot
+    final RaftClientReply raftClientReply = raftClient.getSnapshotManagementApi(Constants.PEERS.get(0).getId())
+            .create(3000L);
+    if (raftClientReply.isSuccess()) {
+      System.out.println(raftClientReply);
+    } else {
+      System.out.println(raftClientReply.getException().toString());
+    }
 
     //shutdown the executor service and wait until they finish their work
     executorService.shutdown();

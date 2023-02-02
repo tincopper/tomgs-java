@@ -23,7 +23,8 @@ public class ColumnFamilyDemo extends BaseDemo {
     public void testCustomColumnFamily() {
         String cfdbPath = "./target/data-cf/";
         System.out.println("测试自定义的列簇...");
-        try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeLevelStyleCompaction()) {
+        try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions()
+                .optimizeLevelStyleCompaction()) {
             String cfName = "cf";
             // list of column family descriptors, first entry must always be default column family
             final List<ColumnFamilyDescriptor> cfDescriptors = Arrays.asList(
@@ -32,7 +33,10 @@ public class ColumnFamilyDemo extends BaseDemo {
             );
 
             List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
-            try (final DBOptions dbOptions = new DBOptions().setCreateIfMissing(true).setCreateMissingColumnFamilies(true);
+            try (final DBOptions dbOptions = new DBOptions()
+                    //.setIncreaseParallelism()
+                    .setCreateIfMissing(true)
+                    .setCreateMissingColumnFamilies(true);
                  final RocksDB db = RocksDB.open(dbOptions, cfdbPath, cfDescriptors, cfHandles)) {
 
                 ColumnFamilyHandle cfHandle = cfHandles.stream()
@@ -80,7 +84,54 @@ public class ColumnFamilyDemo extends BaseDemo {
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
+    }
 
+    @Test
+    public void testColumFamilyDemo2() {
+        String cfdbPath = "./target/data-cf/";
+        System.out.println("测试自定义的列簇...");
+        try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeLevelStyleCompaction()) {
+            String cfName = "cf";
+            // list of column family descriptors, first entry must always be default column family
+            final List<ColumnFamilyDescriptor> cfDescriptors = Arrays.asList(
+                    new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts),
+                    new ColumnFamilyDescriptor(cfName.getBytes(), cfOpts)
+            );
+
+            List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
+            try (final DBOptions dbOptions = new DBOptions()
+                    //.setIncreaseParallelism()
+                    .setCreateIfMissing(true)
+                    .setCreateMissingColumnFamilies(true);
+                 final RocksDB db = RocksDB.open(dbOptions, cfdbPath, cfDescriptors, cfHandles)) {
+                try {
+                    // put and get from non-default column family
+                    db.put(cfHandles.get(1), new WriteOptions(), "key".getBytes(), "value".getBytes());
+
+                    // create table
+                    final ColumnFamilyHandle columnFamilyHandle = db.createColumnFamily(new ColumnFamilyDescriptor("table1".getBytes(), cfOpts));
+                    db.put(columnFamilyHandle, new WriteOptions(), "key".getBytes(), "value1".getBytes());
+
+                    final byte[] defaultValue = db.get(cfHandles.get(1), "key".getBytes());
+                    final byte[] customValue = db.get(columnFamilyHandle, "key".getBytes());
+
+                    System.out.println("defaultValue: " + new String(defaultValue));
+                    System.out.println("customValue: " + new String(customValue));
+
+                    // drop column family
+                    db.dropColumnFamily(cfHandles.get(1));
+
+                    final byte[] deleteValue = db.get(cfHandles.get(1), "key".getBytes());
+                    System.out.println("deleteValue: " + new String(deleteValue));
+                } finally {
+                    for (final ColumnFamilyHandle handle : cfHandles) {
+                        handle.close();
+                    }
+                }
+            }
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
     }
 
 }

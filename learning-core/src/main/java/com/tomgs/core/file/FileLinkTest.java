@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -36,6 +37,15 @@ public class FileLinkTest {
         File sourceDir = new File("E:\\data\\test");
         File destDir = new File("E:\\data\\test1");
         FileIOUtils.createDeepHardlink(sourceDir, destDir);
+    }
+
+    @Test
+    public void readResource() {
+        URL resource = Thread.currentThread().getContextClassLoader().getResource("");
+        System.out.println(resource);
+
+        resource = Thread.currentThread().getContextClassLoader().getResource("tmp.xlsx");
+        System.out.println(resource);
     }
 
 }

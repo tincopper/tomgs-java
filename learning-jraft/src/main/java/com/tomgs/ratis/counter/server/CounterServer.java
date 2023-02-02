@@ -53,6 +53,10 @@ public final class CounterServer implements Closeable {
 
     //set the storage directory (different for each peer) in RaftProperty object
     RaftServerConfigKeys.setStorageDir(properties, Collections.singletonList(storageDir));
+    RaftServerConfigKeys.Snapshot.setCreationGap(properties, 8);
+    RaftServerConfigKeys.Snapshot.setAutoTriggerEnabled(properties, true);
+    RaftServerConfigKeys.Snapshot.setAutoTriggerThreshold(properties, 10);
+    RaftServerConfigKeys.Snapshot.setRetentionFileNum(properties, 3);
 
     //set the port which server listen to in RaftProperty object
     final int port = NetUtils.createSocketAddr(peer.getAddress()).getPort();
