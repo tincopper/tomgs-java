@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>tomgs-java</artifactId>
+        <groupId>com.tomgs.learning</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>learning-httpclient</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>learning-retrofit</module>
+        <module>learning-okhttp</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.10.0</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+    </dependencies>
+</project>
