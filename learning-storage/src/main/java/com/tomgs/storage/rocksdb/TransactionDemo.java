@@ -7,8 +7,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * TransactionDemo
- *
- * https://blog.csdn.net/penriver/article/details/117559188
+ * <p>
+ * <a href="https://blog.csdn.net/penriver/article/details/117559188">RocksDB Java API 操作示例</a>
  *
  * @author tomgs
  * @since 2022/3/22

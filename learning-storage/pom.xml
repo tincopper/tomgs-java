@@ -117,5 +117,12 @@
       <groupId>com.alipay.sofa</groupId>
       <artifactId>jraft-rheakv-pd</artifactId>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dynamodb -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-dynamodb</artifactId>
+      <version>1.12.408</version>
+    </dependency>
   </dependencies>
 </project>

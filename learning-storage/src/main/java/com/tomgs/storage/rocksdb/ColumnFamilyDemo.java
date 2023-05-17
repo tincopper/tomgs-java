@@ -95,7 +95,8 @@ public class ColumnFamilyDemo extends BaseDemo {
             // list of column family descriptors, first entry must always be default column family
             final List<ColumnFamilyDescriptor> cfDescriptors = Arrays.asList(
                     new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts),
-                    new ColumnFamilyDescriptor(cfName.getBytes(), cfOpts)
+                    new ColumnFamilyDescriptor(cfName.getBytes(), cfOpts),
+                    new ColumnFamilyDescriptor("table1".getBytes(), cfOpts)
             );
 
             List<ColumnFamilyHandle> cfHandles = new ArrayList<>();
@@ -132,6 +133,14 @@ public class ColumnFamilyDemo extends BaseDemo {
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testBaseOpen() throws RocksDBException {
+        String dbPath = "./target/data-cf/";
+        final Options options = new Options();
+        options.setCreateIfMissing(true);
+        final RocksDB rocksDB = RocksDB.open(options, dbPath);
     }
 
 }

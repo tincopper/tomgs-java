@@ -61,6 +61,7 @@
         <module>learning-pulsar</module>
         <module>learning-apaas</module>
         <module>learning-pf4j</module>
+        <module>learning-httpclient</module>
     </modules>
 
     <parent>
