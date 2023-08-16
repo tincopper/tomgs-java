@@ -78,7 +78,7 @@
       <artifactId>schedulerx2-worker</artifactId>
       <version>1.9.2</version>
       <!--如果用的是logback，需要把log4j和log4j2排除掉 -->
-      <exclusions>
+      <!--<exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
           <artifactId>log4j-api</artifactId>
@@ -91,14 +91,14 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>-->
     </dependency>
     <dependency>
       <groupId>com.aliyun.schedulerx</groupId>
       <artifactId>schedulerx2-spring-boot-starter</artifactId>
       <version>1.9.2</version>
       <!--如果使用logback，需要将log4j和log4j2排除 -->
-      <exclusions>
+      <!--<exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
           <artifactId>log4j-api</artifactId>
@@ -111,7 +111,7 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>-->
     </dependency>
   </dependencies>
 
