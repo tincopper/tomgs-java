@@ -30,8 +30,8 @@ public class LC2AddTwoNumbers {
         // 进位
         int carry = 0;
         while (l1 != null || l2 != null || carry != 0) {
-            int v1 = l1 == null ? 0 : l1.value;
-            int v2 = l2 == null ? 0 : l2.value;
+            int v1 = l1 == null ? 0 : l1.val;
+            int v2 = l2 == null ? 0 : l2.val;
 
             int v = v1 + v2 + carry;
             int quotient = v / 10;
@@ -68,8 +68,8 @@ public class LC2AddTwoNumbers {
         int carry = 0;
 
         while (l1 != null || l2 != null) {
-            int v1 = l1 == null ? 0 : l1.value;
-            int v2 = l2 == null ? 0 : l2.value;
+            int v1 = l1 == null ? 0 : l1.val;
+            int v2 = l2 == null ? 0 : l2.val;
             int sumVal = v1 + v2 + carry;
             carry = sumVal / 10;
             if (head == null) { // first node
