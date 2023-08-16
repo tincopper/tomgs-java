@@ -42,6 +42,7 @@ public class LC05LongestPalindrome {
         return true;
     }
 
+    // 在 s 中寻找以 s[l] 和 s[r] 为中心的最长回文串
     private String findPalindrome(String s, int l, int r) {
         // 往两边展开
         while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {

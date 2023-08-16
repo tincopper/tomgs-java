@@ -23,7 +23,7 @@ public class LC541ReverseString2 {
         for (int i = 0; i < len; i += 2 * k) {
             if (len - i < k) {
                 reverse(charArray, i, len - 1);
-            } else if (len -i < 2 * k && len - i >= k) {
+            } else if (len - i < 2 * k && len - i >= k) {
                 reverse(charArray, i, i + k - 1);
             } else {
                 reverse(charArray, i, i + k - 1);

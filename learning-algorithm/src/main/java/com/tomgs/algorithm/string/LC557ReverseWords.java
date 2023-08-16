@@ -44,6 +44,9 @@ public class LC557ReverseWords {
                 l = i + 1;
             }
         }
+        if (len > l) {
+            reverse(charArray, l, len - 1);
+        }
 
         return new String(charArray, 0, len);
     }
@@ -62,6 +65,13 @@ public class LC557ReverseWords {
     public void test() {
         String s = "Let's take LeetCode contest";
         final String result = reverseWords(s);
+        System.out.println(result);
+    }
+
+    @Test
+    public void test2() {
+        String s = "Let's take LeetCode contest";
+        final String result = reverseWords2(s);
         System.out.println(result);
     }
 
