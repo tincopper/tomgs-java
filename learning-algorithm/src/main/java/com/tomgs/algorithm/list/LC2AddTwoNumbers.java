@@ -4,6 +4,7 @@ import org.junit.Test;
 
 /**
  * LC2：两数相加
+ * <a href="https://leetcode.cn/problems/add-two-numbers/">2. 两数相加</a>
  * <p>
  * 给你两个非空链表，表示两个非负的整数。
  * 它们按照逆序的方式存储，并且每一个节点只能存储一位数字。
@@ -16,8 +17,8 @@ import org.junit.Test;
  * output = [7, 0, 8]
  * ==> 342 + 465 = 807
  * <p>
- * l1 = [9,9,9,9,9,9], l2 = [9,9,9,9]
- * output = [8,9,9,9,0,1]
+ * 输入：l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+ * 输出：[8,9,9,9,0,0,0,1]
  *
  * @author tomgs
  * @since 2022/1/24
@@ -93,6 +94,50 @@ public class LC2AddTwoNumbers {
         return head;
     }
 
+    public ListNode addTwoNumbers3(ListNode l1, ListNode l2) {
+        // 输入：l1 = [2,4,3], l2 = [5,6,4]
+        // 输出：[7,0,8]
+        // 解释：342 + 465 = 807.
+        // 输入：l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+        // 输出：[8,9,9,9,0,0,0,1]
+
+        int carry = 0; // 进位
+        ListNode result = new ListNode(-1), p = result;
+        ListNode p1 = l1, p2 = l2;
+
+        while (p1 != null && p2 != null) {
+            int sum = p1.val + p2.val + carry;
+            carry = sum / 10;
+            p.next = new ListNode(sum % 10);
+            p = p.next;
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+
+        while (p1 != null) {
+            int sum = p1.val + carry;
+            carry = sum / 10;
+            p.next = new ListNode(sum % 10);
+            p = p.next;
+            p1 = p1.next;
+        }
+
+        while (p2 != null) {
+            int sum = p2.val + carry;
+            carry = sum / 10;
+            p.next = new ListNode(sum % 10);
+            p = p.next;
+            p2 = p2.next;
+        }
+
+        if (carry > 0) {
+            p.next = new ListNode(carry);
+        }
+
+        return result.next;
+
+    }
+
     @Test
     public void test() {
         ListNode l1 = ListNode.createListNode(2, 4, 3);
@@ -124,6 +169,30 @@ public class LC2AddTwoNumbers {
         System.out.println(l2.toPrettyString());
 
         printResult(l1, l2);
+    }
+
+    @Test
+    public void test3() {
+        ListNode l1 = ListNode.createListNode(2, 4, 3);
+        System.out.println(l1.toPrettyString());
+
+        ListNode l2 = ListNode.createListNode(5, 6, 4);
+        System.out.println(l2.toPrettyString());
+
+        ListNode result = addTwoNumbers3(l1, l2);
+        System.out.println(result.toPrettyString());
+    }
+
+    @Test
+    public void test4() {
+        ListNode l1 = ListNode.createListNode(9, 9, 9, 9, 9, 9, 9);
+        System.out.println(l1.toPrettyString());
+
+        ListNode l2 = ListNode.createListNode(9, 9, 9, 9);
+        System.out.println(l2.toPrettyString());
+
+        ListNode result = addTwoNumbers3(l1, l2);
+        System.out.println(result.toPrettyString());
     }
 
     private void printResult(ListNode l1, ListNode l2) {

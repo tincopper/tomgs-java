@@ -7,7 +7,7 @@ import java.util.Random;
  * @author tomgs
  * @since 2020/7/8
  */
-public class Test {
+public class TestCopySet {
 
   public static void main(String[] args) {
     int i = 10 % 2;
