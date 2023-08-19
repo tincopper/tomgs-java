@@ -39,11 +39,43 @@ public class LC21MergeTwoLists {
         return head.next;
     }
 
+    public ListNode mergeTwoLists2(ListNode list1, ListNode list2) {
+        // 输入：l1 = [1,2,4], l2 = [1,3,4]
+        // 输出：[1,1,2,3,4,4]
+
+        // 定义一个链表头为head，p用于遍历链表的指针
+        ListNode head = new ListNode(-1), p = head;
+        // p1, p2 分别为用于遍历链表list1，list2的指针
+        ListNode p1 = list1, p2 = list2;
+
+        while (p1 != null && p2 != null) {
+            // 比较两个链表的对应节点的大小
+            if (p1.val > p2.val) {
+                p.next = p2;
+                p2 = p2.next;
+            } else {
+                p.next = p1;
+                p1 = p1.next;
+            }
+            p = p.next;
+        }
+
+        if (p1 != null) {
+            p.next = p1;
+        }
+
+        if (p2 != null) {
+            p.next = p2;
+        }
+
+        return head.next;
+    }
+
     @Test
     public void test() {
         ListNode list1 = ListNode.createListNode(1, 2, 4);
         ListNode list2 = ListNode.createListNode(1, 3, 4);
-        ListNode listNode = mergeTwoLists(list1, list2);
+        ListNode listNode = mergeTwoLists2(list1, list2);
 
         System.out.println(listNode.toPrettyString());
     }
