@@ -26,6 +26,12 @@ import java.util.List;
  */
 public class LC15ThreeSum {
 
+    /**
+     * 思路先求两个sum的和，再找到 target - 2sum
+     *
+     * @param nums
+     * @return
+     */
     public List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         if (nums == null || nums.length < 3) {
