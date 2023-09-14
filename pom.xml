@@ -62,6 +62,7 @@
         <module>learning-apaas</module>
         <module>learning-pf4j</module>
         <module>learning-httpclient</module>
+        <module>learning-akka</module>
     </modules>
 
     <parent>
