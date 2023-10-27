@@ -46,8 +46,10 @@ public class TimeDelayedListener implements JobListener {
         newTrigger.setJobKey(jobDetail.getKey());
         newTrigger.setKey(trigger.getKey());
         newTrigger.setStartTime(nextFireTime);
+        newTrigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
         try {
             context.getScheduler().rescheduleJob(trigger.getKey(), newTrigger);
+            // context.getScheduler().scheduleJob(jobDetail, Sets.newHashSet(newTrigger), true);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
