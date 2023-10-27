@@ -96,7 +96,7 @@
     <dependency>
       <groupId>com.aliyun.schedulerx</groupId>
       <artifactId>schedulerx2-spring-boot-starter</artifactId>
-      <version>1.9.2</version>
+      <version>1.10.8</version>
       <!--如果使用logback，需要将log4j和log4j2排除 -->
       <!--<exclusions>
         <exclusion>
@@ -115,8 +115,18 @@
     </dependency>
     <dependency>
       <groupId>com.aliyun.schedulerx</groupId>
+      <artifactId>schedulerx2-plugin-kubernetes</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun.schedulerx</groupId>
       <artifactId>schedulerx2-plugin-xxljob</artifactId>
       <version>2.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.aliyun.schedulerx</groupId>
+      <artifactId>schedulerx2-plugin-elasticjob</artifactId>
+      <version>3.0.1.4</version>
     </dependency>
     <dependency>
       <groupId>com.mashape.unirest</groupId>
