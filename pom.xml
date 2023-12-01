@@ -23,6 +23,7 @@
         <hutool.version>5.7.4</hutool.version>
         <jraft.core.version>1.3.11</jraft.core.version>
         <jraft-rheakv.core.version>1.3.11</jraft-rheakv.core.version>
+        <jose4j.version>0.9.3</jose4j.version>
     </properties>
 
     <modules>
@@ -258,6 +259,12 @@
                 <groupId>org.rocksdb</groupId>
                 <artifactId>rocksdbjni</artifactId>
                 <version>7.6.0</version>
+            </dependency>
+            <!-- jwt -->
+            <dependency>
+                <groupId>org.bitbucket.b_c</groupId>
+                <artifactId>jose4j</artifactId>
+                <version>${jose4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
