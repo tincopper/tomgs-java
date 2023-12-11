@@ -29,13 +29,14 @@ import java.util.PriorityQueue;
  */
 public class LC23MergeKLists {
 
+    // 方法1、先两两合并，然后再最终合并，转成为合并两个链表的解法
+    // 方法2、通过最小堆，每次从堆里获取最小的元素放入到合并的链表当中即可
     public ListNode mergeKLists(ListNode[] lists) {
-        // 方法1、先两两合并，然后再最终合并，转成为合并两个链表的解法
-        // 方法2、通过最小堆，每次从堆里获取最小的元素放入到合并的链表当中即可
         if (lists.length == 0) {
             return null;
         }
         ListNode head = new ListNode(-1), p = head;
+        // 因为链表有序，所以只需存储链表的头节点即可
         PriorityQueue<ListNode> queue = new PriorityQueue<>((o1, o2) -> o1.val - o2.val);
 
         for (ListNode listNode : lists) {

@@ -60,6 +60,17 @@ LeetCode 题目：
 
 ## 双指针
 用于解决子串、链表、数组、字符串问题，一前一后进行指针的移动。
+
+对于链表类双指针，先考虑使用虚拟节点的方式定义一个虚拟链表；
+```java
+// 定义一个链表头为head，p用于遍历链表的指针
+ListNode head = new ListNode(-1), p = head;
+```
+LeetCode 题目：
+- LC21MergeTwoLists
+- LC86SplitList
+- 
+
 ### 左右指针
 一般用于解决数组问题，左右两端相向移动，反转数组，二分搜索等等。
 

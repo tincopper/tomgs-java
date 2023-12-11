@@ -39,6 +39,27 @@ public class LC160GetIntersectionNode {
         return p1;
     }
 
+    public ListNode getIntersectionNode2(ListNode headA, ListNode headB) {
+        // 第二种解法
+        ListNode p1 = headA, p2 = headB;
+        while (p1 != p2) {
+            // 如果节点headA为空拼接headB
+            if (p1 == null) {
+                p1 = headB;
+            } else {
+                p1 = p1.next;
+            }
+
+            if (p2 == null) {
+                p2 = headA;
+            } else {
+                p2 = p2.next;
+            }
+        }
+
+        return p1;
+    }
+
     @Test
     public void test() {
         ListNode head1 = ListNode.createListNode(1, 8);
