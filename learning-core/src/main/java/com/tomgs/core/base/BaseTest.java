@@ -24,4 +24,14 @@ public class BaseTest {
     System.out.println("start time:" + windowStart);
   }
 
+  @Test
+  public void test02() {
+    int[] arr = {1, 2, 3};
+    int[] arr2 = {1, 2, 3, 4, 5};
+    for (int i = 0; i < arr2.length; i++) {
+      int index = i % arr.length;
+      //System.out.println(arr[index]);
+      System.out.println(index);
+    }
+  }
 }
