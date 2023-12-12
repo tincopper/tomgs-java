@@ -72,10 +72,40 @@ LeetCode 题目：
 - 
 
 ### 左右指针
-一般用于解决数组问题，左右两端相向移动，反转数组，二分搜索等等。
+一般用于解决数组问题，左右两端相向移动，反转数组，回文串的判断，二分搜索等等。
+判断回文串，通过左右指针往两边向中心收拢。
+```java
+public boolean isPalindrome(String s) {
+    int left = 0, right = s.length() - 1;
+    while (left < right) {
+        if (s.charAt(left) != s.charAt(right)) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+
+    return true;
+}
+```
+如果是获取回文串字符，则需要中心往外边扩散获取回文串。那么需要先判断是否为回文串，然后找起中点，再往两边扩散，直到左右两边不相等，则表示为最长的回文串。
+```java
+// 在 s 中寻找以 s[l] 和 s[r] 为中心的最长回文串
+private String findPalindrome(String s, int l, int r) {
+    // 往两边展开
+    while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+        l--;
+        r++;
+    }
+    return s.substring(l + 1, r);
+}
+```
+
+
 
 ### 快慢指针
-一般用于解决链表问题，归并排序找中点，链表成环判定
+1. 解决链表问题，归并排序找中点，链表成环判定
+2. 数组类问题一般用于找两个数的和、原地移动数组的值等等
 
 ## 二分搜索
 

@@ -18,9 +18,11 @@ import java.util.Arrays;
 public class LC283MoveZeroes {
 
     public void moveZeroes(int[] nums) {
+        // 定义两个指针，slow 用于指向0元素的指针，fast 指向非0元素的指针
         int slow = 0, fast = 0;
         while (fast < nums.length) {
             if (nums[fast] != 0) {
+                // 有可能第一位不为0，所以这里需要使用中间的变量tmp，而不是直接赋值nums[fast] = 0; 这样不严谨
                 int tmp = nums[slow];
                 nums[slow] = nums[fast];
                 nums[fast] = tmp;

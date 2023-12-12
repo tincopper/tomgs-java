@@ -18,6 +18,9 @@ public class LC83DeleteDuplicates {
         ListNode slow = head, fast = head;
         while (fast != null) {
             if (slow.val != fast.val) {
+                //slow = slow.next;
+                //slow.val = fast.val;
+                // 将slow的下一个节点指向fast
                 slow.next = fast;
                 slow = slow.next;
             }
