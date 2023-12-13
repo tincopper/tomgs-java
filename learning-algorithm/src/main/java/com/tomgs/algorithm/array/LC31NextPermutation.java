@@ -29,7 +29,7 @@ import java.util.Arrays;
  * 输出：[1]
  * <p>
  * 来源：力扣（LeetCode）
- * 链接：https://leetcode-cn.com/problems/next-permutation
+ * 链接：<a href="https://leetcode-cn.com/problems/next-permutation">...</a>
  * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
  *
  * @author tomgs

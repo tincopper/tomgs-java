@@ -54,9 +54,15 @@ void slidingWindow(String s) {
     }
 }
 ```
+滑动窗口算法的思路：
+1、我们在字符串 S 中使用双指针中的左右指针技巧，初始化 left = right = 0，把索引左闭右开区间 [left, right) 称为一个「窗口」。
+2、我们先不断地增加 right 指针扩大窗口 [left, right)，直到窗口中的字符串符合要求（包含了 T 中的所有字符）。
+3、此时，我们停止增加 right，转而不断增加 left 指针缩小窗口 [left, right)，直到窗口中的字符串不再符合要求（不包含 T 中的所有字符了）。同时，每次增加 left，我们都要更新一轮结果。
+4、重复第 2 和第 3 步，直到 right 到达字符串 S 的尽头。
+
 LeetCode 题目：
 - LC03LengthOfLongestSubstring
-- 
+- LC76MinWindowSubstring
 
 ## 双指针
 用于解决子串、链表、数组、字符串问题，一前一后进行指针的移动。
@@ -101,11 +107,14 @@ private String findPalindrome(String s, int l, int r) {
 }
 ```
 
-
-
 ### 快慢指针
 1. 解决链表问题，归并排序找中点，链表成环判定
 2. 数组类问题一般用于找两个数的和、原地移动数组的值等等
+
+- LC344ReverseString
+- LC27RemoveElement
+- LC83DeleteDuplicates
+- 
 
 ## 二分搜索
 
@@ -120,3 +129,54 @@ private String findPalindrome(String s, int l, int r) {
 比如一个奇数为11，它的二进制为1011，1的二进制为0001，那么11^1的结果为10，二进制为1010.是不是所有的奇数都有这个性质呢？是的，因为奇数的二进制的最后一位一定是1，而且1的二进制的最后一位一定是1，又因为异或运算可以理解为无进位加法，所以所有的奇数异或1的结果都是原来的数字减去1的结果。
 
 ## 动态规划
+
+## 前缀和
+前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和。
+
+- LC303NumArray
+- LC304NumMatrix
+
+## 差分数组
+差分数组的主要适用场景是频繁对原始数组的某个区间的元素进行增减。
+比如说，我给你输入一个数组 nums，然后又要求给区间 nums[2..6] 全部加 1，再给 nums[3..9] 全部减 3，再给 nums[0..4] 全部加 2，再给...，然后问你，最后 nums 数组的值是什么？
+```java
+// 差分数组工具类
+class Difference {
+    // 差分数组
+    private int[] diff;
+    
+    /* 输入一个初始数组，区间操作将在这个数组上进行 */
+    public Difference(int[] nums) {
+        assert nums.length > 0;
+        diff = new int[nums.length];
+        // 根据初始数组构造差分数组
+        diff[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            diff[i] = nums[i] - nums[i - 1];
+        }
+    }
+
+    /* 给闭区间 [i, j] 增加 val（可以是负数）*/
+    public void increment(int i, int j, int val) {
+        diff[i] += val;
+        if (j + 1 < diff.length) {
+            diff[j + 1] -= val;
+        }
+    }
+
+    /* 返回结果数组 */
+    public int[] result() {
+        int[] res = new int[diff.length];
+        // 根据差分数组构造结果数组
+        res[0] = diff[0];
+        for (int i = 1; i < diff.length; i++) {
+            res[i] = res[i - 1] + diff[i];
+        }
+        return res;
+    }
+}
+```
+- LC1094CarPooling
+- LC1109CorporateFlightBookings
+- LC370RangeAddition
+
