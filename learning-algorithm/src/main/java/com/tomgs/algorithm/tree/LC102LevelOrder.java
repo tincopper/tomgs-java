@@ -74,6 +74,42 @@ public class LC102LevelOrder {
         return result;
     }
 
+    // 自顶向下的方式
+    public List<List<Integer>> levelOrder3(TreeNode root) {
+        if (root == null) {
+            return result;
+        }
+        List<TreeNode> nodes = new ArrayList<>();
+        nodes.add(root);
+
+        levelTraverse(nodes);
+
+        return result;
+    }
+
+    public void levelTraverse(List<TreeNode> curLevelNodes) {
+        if (curLevelNodes.isEmpty()) {
+            return;
+        }
+        // 获取当前层的值
+        List<Integer> curNodeValues = new ArrayList<>();
+        // 下一层
+        List<TreeNode> nextNodes = new ArrayList<>();
+
+        for (TreeNode curLevelNode : curLevelNodes) {
+            curNodeValues.add(curLevelNode.val);
+            if (curLevelNode.left != null) {
+                nextNodes.add(curLevelNode.left);
+            }
+            if (curLevelNode.right != null) {
+                nextNodes.add(curLevelNode.right);
+            }
+        }
+        result.add(curNodeValues);
+
+        levelTraverse(nextNodes);
+    }
+
     @Test
     public void test() {
         TreeNode root = new TreeNode(3);
@@ -103,6 +139,22 @@ public class LC102LevelOrder {
         System.out.println(root);
 
         final List<List<Integer>> result = levelOrder2(root);
+        System.out.println(result);
+    }
+
+    @Test
+    public void test3() {
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(9);
+        root.left.left = new TreeNode(19);
+        root.left.right = new TreeNode(29);
+        root.right = new TreeNode(20);
+        root.right.left = new TreeNode(15);
+        root.right.right = new TreeNode(7);
+
+        System.out.println(root);
+
+        final List<List<Integer>> result = levelOrder3(root);
         System.out.println(result);
     }
 }
