@@ -2,6 +2,9 @@ package com.tomgs.algorithm.tree;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * LC116116PopulatingNextRightNode
  * <p>
@@ -28,10 +31,38 @@ public class LC116PopulatingNextRightNode {
         if (root == null) {
             return null;
         }
-
-        levelTraverse(root);
+        List<Node> curNodes = new ArrayList<>();
+        curNodes.add(root);
+        levelTraverse(curNodes);
 
         return root;
+    }
+
+    public void levelTraverse(List<Node> nodes) {
+        if (nodes.isEmpty()) {
+            return;
+        }
+
+        // 交换
+        for (int i = 0; i < nodes.size(); i++) {
+            Node node = nodes.get(i);
+            if (i + 1 < nodes.size()) {
+                node.next = nodes.get(i + 1);
+            }
+        }
+
+        // 遍历
+        List<Node> nextNodes = new ArrayList<>();
+        for (Node node : nodes) {
+            if (node.left != null) {
+                nextNodes.add(node.left);
+            }
+            if (node.right != null) {
+                nextNodes.add(node.right);
+            }
+        }
+
+        levelTraverse(nextNodes);
     }
 
     // 将二叉树转为三叉树的方式
@@ -43,10 +74,6 @@ public class LC116PopulatingNextRightNode {
         traverse(root.left, root.right);
 
         return root;
-    }
-
-    public void levelTraverse(Node node) {
-
     }
 
     public void  traverse(Node node1, Node node2) {
