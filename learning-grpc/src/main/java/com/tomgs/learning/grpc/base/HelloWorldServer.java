@@ -19,10 +19,7 @@ package com.tomgs.learning.grpc.base;
 import com.tomgs.learning.grpc.proto.GreeterGrpc;
 import com.tomgs.learning.grpc.proto.common.HelloReply;
 import com.tomgs.learning.grpc.proto.common.HelloRequest;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import io.grpc.ServerInterceptors;
-import io.grpc.Status;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
@@ -41,7 +38,8 @@ public class HelloWorldServer {
     /* The port on which the server should run */
     int port = 8080;
     server = ServerBuilder.forPort(port)
-        .addService(ServerInterceptors.intercept(new GreeterImpl(), new MyServerInterceptor()))
+        //.addService(ServerInterceptors.intercept(new GreeterImpl(), new MyServerInterceptor()))
+        .addService(ServerInterceptors.intercept(new GreeterImpl(), new CustomServerInterceptor2()))
         .build()
         .start();
     logger.info("Server started, listening on " + port);
@@ -85,6 +83,8 @@ public class HelloWorldServer {
   }
 
   static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
+    static final Metadata.Key<String> REQID_HEADER_KEY =
+            Metadata.Key.of("request-id-1", Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
     public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
@@ -98,17 +98,26 @@ public class HelloWorldServer {
               .asRuntimeException());*/
 
       try {
-        HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build();
-        responseObserver.onNext(reply);
-        responseObserver.onCompleted();
+        //HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build();
+        //responseObserver.onNext(reply);
+        //responseObserver.onCompleted();
+        throw new RuntimeException("test exception");
       } catch (Exception e) {
+        Metadata metadata = new Metadata();
+        metadata.put(REQID_HEADER_KEY, "123");
         responseObserver.onError(Status.INVALID_ARGUMENT
                 // 这里就是我们的自定义异常信息
-                .withDescription(e.getMessage())
-                .withCause(e)
-                .asRuntimeException());
-        responseObserver.onError(new RuntimeException("custom exception"));
+                .withDescription("{\"description\":\""+ e.getMessage() +"\",\"errcode\":1000001001}")
+                .withCause(e.getCause())
+                .asRuntimeException(metadata));
       }
+    }
+
+    @Override
+    public void sayGood(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+      HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + request.getName()).build();
+      responseObserver.onNext(reply);
+      responseObserver.onCompleted();
     }
 
   }

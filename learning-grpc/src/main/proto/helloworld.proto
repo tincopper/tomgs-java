@@ -15,7 +15,7 @@ service Greeter {
   rpc SayHello (common.HelloRequest) returns (common.HelloReply) {
   }
   // Sends another greeting
-  rpc SayHelloAgain (common.HelloRequest) returns (common.HelloReply) {
+  rpc SayGood (common.HelloRequest) returns (common.HelloReply) {
   }
 }
 
